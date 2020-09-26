@@ -20,6 +20,16 @@ Make sure that the `type` field is one of the enumerated strings in `PipelineTyp
 
 Make sure that the `input` field is one of the accepted types given in `RunPipeline.action` (currently can only be an int and is never used, so can be ignored for now).
 
+## Executables
+
+- `pipeline_manager` : A standalone node used to manage a component container to use it as a pipeline.
+
+    ### Parameters
+    - `components` : String array declaring the components to be launched in the pipeline when it is run.
+    - `remap_rules` : String array decalring the topic remapping rules for the pipeline components.
+    - `pkg_name` : String, the package in which the components belong.
+    - `namespace` : String, the namespace in which the components will be launched.
+
 ## Contributors
 
 - Logan Fillo (logan.fillo@gmail.com)
