@@ -32,6 +32,7 @@ You should see the string `"Hello World from ComponentOne and ComponentTwo"` bei
     
     ### Published Topics
     - `component_two/out` (`std_msgs/msg/String.msg`) : Output string.
+    - `/triton/pipeline_feedback` (`triton_interfaces/msg/PipelineFeedback.msg`) : Pipeline feedback.
 
 ## Contributors
 
