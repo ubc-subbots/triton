@@ -25,7 +25,7 @@ You should see the string `"Hello World from ComponentOne and ComponentTwo"` bei
     ### Published Topics
     - `component_one/out` (`std_msgs/msg/String.msg`) : Output string.
     
-- `component_two` : A component node (`exampe::ComponentTwo`) which adds `"and ComponentTwo"` to any string it recieves. Also notifies pipeline of success once it recieves 25 string messages.
+- `component_two` : A component node (`example::ComponentTwo`) which adds `"and ComponentTwo"` to any string it recieves. Also notifies pipeline of success once it recieves 25 string messages.
 
     ### Subscribed Topics
     - `component_two/in` (`std_msgs/msg/String.msg`) : Input string.
