@@ -39,8 +39,8 @@ class PipelineManager(Node):
         self.pipeline_feedback_msg = ""
         # This will add all attributes starting with 'TYPE' to the list
         self.pipeline_types = []
-        for typename in re.findall(r'TYPE_([^\n]*)\n', PipelineType.__doc__):
-            self.pipeline_types.append(getattr(PipelineType, 'TYPE_'+str(typename)))
+        for typename in re.findall(r'TYPE_+.*', PipelineType.__doc__):
+            self.pipeline_types.append(getattr(PipelineType, str(typename)))
         
         self.declare_parameters(
             namespace='pipeline',
