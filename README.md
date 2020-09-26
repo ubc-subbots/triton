@@ -24,7 +24,7 @@ From the same folder, build all the packages using the following command
 
     colcon build
   
- If the above command executes successfully, you are ready to develop! To finish the setup, edit your `.bashrc` file to source the global and local setup scripts whenever you open up a new terminal, this can be done using a text editor or by using `nano` as such
+To finish the setup, edit your `.bashrc` file to source the global and local setup scripts whenever you open up a new terminal, this can be done using a text editor or by using `nano` as such
  
     nano ~/.bashrc
     
@@ -34,7 +34,11 @@ Navigate to the bottom of the file and add the following three lines, be sure to
     source <PATH_TO_TRITON>/triton/install/setup.bash   # local setup script
     export RCUTILS_COLORIZED_OUTPUT=1
     
-The last line is helpful in that it colorizes ROS2 logging so that info/warn/error messages are easier to differentiate.
+The last line is helpful in that it colorizes ROS2 logging so that info/warn/error messages are easier to differentiate. Once this is done, open a new terminal for the `.bashrc` to be executed and the required scripts be sourced. To perform a sanity check that everything is working, launch the pipeline as such
+
+    ros2 launch triton_pipeline triton_pipeline.launch.py
+   
+If this command executes successfully, you are ready to develop!
     
 ## Tips
 Here are some tips to be aware of when developing on this repository and when developing in ROS2 in general
