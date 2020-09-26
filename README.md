@@ -30,8 +30,8 @@ From the same folder, build all the packages using the following command
     
 Navigate to the bottom of the file and add the following three lines, be sure to set `<PATH_TO_TRITON>` to whatever it is on your machine
 
-    source /opt/ros/foxy/setup.bash
-    source <PATH_TO_TRITON>/triton/install/setup.bash
+    source /opt/ros/foxy/setup.bash                     # global setup script
+    source <PATH_TO_TRITON>/triton/install/setup.bash   # local setup script
     export RCUTILS_COLORIZED_OUTPUT=1
     
 The last line is helpful in that it colorizes ROS2 logging so that info/warn/error messages are easier to differentiate.
