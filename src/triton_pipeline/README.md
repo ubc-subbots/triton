@@ -20,7 +20,7 @@ Make sure that the `type` field is one of the enumerated strings in `PipelineTyp
 
 Make sure that the `input` field is one of the accepted types given in `RunPipeline.action` (currently can only be an int and is never used, so can be ignored for now).
 
-## Executables
+## Nodes
 
 - `pipeline_manager` : A standalone node used to manage a component container to use it as a pipeline.
 
