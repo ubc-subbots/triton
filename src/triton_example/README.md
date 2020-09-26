@@ -15,6 +15,11 @@ You can also see the final output of the pipeline using the command
 
 You should see the string `"Hello World from ComponentOne and ComponentTwo"` being output from the above command. Once this message is output 25 times, the second component notifies the pipeline manager that the example pipeline has been successfully run and it is unloaded from the pipeline.
 
+## Nodes
+
+- `component_one` : A component node (`example::ComponentOne`) which adds `"from ComponentOne"` to any string it recieves.
+- `component_two` : A component node (`exampe::ComponentTwo`) which adds `"and ComponentTwo"` to any string it recieves. Also notifies pipeline of success once it recieves 25 string messages.
+
 ## Contributors
 
 - Logan Fillo (logan.fillo@gmail.com)
