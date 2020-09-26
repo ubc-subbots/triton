@@ -24,11 +24,20 @@ Make sure that the `input` field is one of the accepted types given in `RunPipel
 
 - `pipeline_manager` : A standalone node used to manage a component container to use it as a pipeline.
 
+    ### Subscribed Topics
+    - `/triton/pipeline_feedback` (`triton_interfaces/msg/PipelineFeedback.msg`) : Accepts feedback from nodes in the pipeline.
+    
+    ### Services
+    - `/triton/configure_pipeline` (`triton_interfaces/srv/ConfigurePipeline.srv`) : Service for configuring the pipeline.
+    
+    ### Action Servers
+    - `/triton/run_pipeline` (`triton_interfaces/action/RunPipeline.action`) : Action for running the configured pipeline.
+
     ### Parameters
-    - `components` : String array declaring the components to be launched in the pipeline when it is run.
-    - `remap_rules` : String array declaring the topic remapping rules for the pipeline components.
-    - `pkg_name` : String, the package in which the components belong.
-    - `namespace` : String, the namespace in which the components will be launched.
+    - `components` (`String[]`): Declares the components to be launched in the pipeline when it is run.
+    - `remap_rules` (`String[]`): Declares the topic remapping rules for the pipeline components.
+    - `pkg_name` (`String`): The package to which the components belong.
+    - `namespace` (`String`): The namespace in which the components will be launched.
 
 ## Contributors
 
