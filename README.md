@@ -5,20 +5,20 @@ This repository contains the ROS2 system for the UBC SubBots Triton AUV. It can 
 ## Setup
 To get started, first clone this repo to your computer running Ubuntu 20.04 into whatever directory you choose as such
 
-  git clone https://github.com/ubc-subbots/triton.git
+    git clone https://github.com/ubc-subbots/triton.git
   
 Next, install rosdep as such
  
-  sudo apt install python3-rosdep2
-  rosdep update
+    sudo apt install python3-rosdep2
+    rosdep update
   
 Then, from the folder `triton`, resolve any dependency issues using the following command
  
-  rosdep install -i --from-path src --rosdistro foxy -y
+    rosdep install -i --from-path src --rosdistro foxy -y
   
 From the same folder, build all the packages using the following command
 
-  colcon build
+    colcon build
   
  If the above command does not fail, you are ready to develop!
 
