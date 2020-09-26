@@ -18,7 +18,20 @@ You should see the string `"Hello World from ComponentOne and ComponentTwo"` bei
 ## Nodes
 
 - `component_one` : A component node (`example::ComponentOne`) which adds `"from ComponentOne"` to any string it recieves.
+
+    ### Subscribed Topics
+    - `component_one/in` (`std_msgs/msg/String.msg`) : Input string.
+    
+    ### Published Topics
+    - `component_one/out` (`std_msgs/msg/String.msg`) : Output string.
+    
 - `component_two` : A component node (`exampe::ComponentTwo`) which adds `"and ComponentTwo"` to any string it recieves. Also notifies pipeline of success once it recieves 25 string messages.
+
+    ### Subscribed Topics
+    - `component_two/in` (`std_msgs/msg/String.msg`) : Input string.
+    
+    ### Published Topics
+    - `component_two/out` (`std_msgs/msg/String.msg`) : Output string.
 
 ## Contributors
 
