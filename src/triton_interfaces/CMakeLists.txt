@@ -22,6 +22,7 @@ find_package(ament_cmake REQUIRED)
 # find_package(<dependency> REQUIRED)
 
 find_package(rosidl_default_generators REQUIRED)
+find_package(std_msgs REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   "action/RunPipeline.action"
@@ -29,6 +30,9 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/PipelineType.msg"
   "msg/PipelineFeedback.msg"
   "msg/CircleDetection.msg"
+  "msg/DetectionBox.msg"
+  "msg/DetectionBoxArray.msg"
+  DEPENDENCIES builtin_interfaces std_msgs
 )
 
 if(BUILD_TESTING)

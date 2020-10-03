@@ -1,0 +1,8 @@
+pipeline_manager:
+  ros__parameters:
+    pipeline:
+      components:
+        - object_recognition::ObjectRecognizer
+      namespace: /triton/object_recognition
+      pkg_name: triton_object_recognition
+    use_sim_time: false
