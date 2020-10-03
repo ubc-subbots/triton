@@ -38,7 +38,8 @@ class PipelineManager(Node):
         self.pipeline_feedback_msg = ""
 
         self.pipeline_types = [
-            PipelineType.TYPE_EXAMPLE
+            PipelineType.TYPE_EXAMPLE,
+            PipelineType.TYPE_OBJECT_RECOGNITION
         ]
 
         self.declare_parameters(
