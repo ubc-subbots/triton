@@ -1,6 +1,7 @@
 import os
 import time
 import yaml
+import re
 
 import rclpy
 from rclpy.node import Node
@@ -36,11 +37,11 @@ class PipelineManager(Node):
         self.pipeline_success = False
         self.pipeline_abort = False
         self.pipeline_feedback_msg = ""
-
-        self.pipeline_types = [
-            PipelineType.TYPE_EXAMPLE
-        ]
-
+        # This will add all attributes starting with 'TYPE' to the list
+        self.pipeline_types = []
+        for typename in re.findall(r'TYPE_([^\n]*)\n', PipelineType.__doc__):
+            self.pipeline_types.append(getattr(PipelineType, 'TYPE_'+str(typename)))
+        
         self.declare_parameters(
             namespace='pipeline',
             parameters=[
