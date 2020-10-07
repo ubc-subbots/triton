@@ -43,7 +43,7 @@ class vision_utils
      * @return Three images representing the algorithms at various stages. The last
      *          image must always be the final output fo the algorithm.
      */
-    detect(src);
+    //detect(src);
 
     /**
      * Preprocess the source image by blurring and resizing
