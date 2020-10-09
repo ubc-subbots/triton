@@ -17,24 +17,33 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
+find_package(cv_bridge REQUIRED)
+find_package(OpenCV 4 REQUIRED)
 find_package(triton_vision_utils REQUIRED)
 
-include_directories(include/)
+include_directories(
+  include
+)
 
-add_executable(gate_detector src/gate_detector.cpp)
+add_executable(gate_detector
+  src/gate_detector.cpp
+)
 
 target_include_directories(gate_detector PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>)
+  $<INSTALL_INTERFACE:include>
+)
   
-ament_target_dependencies(
-  gate_detector
-  "triton_vision_utils"
+ament_target_dependencies(gate_detector
+  cv_bridge
+  OpenCV
+  triton_vision_utils
 )
 
 install(TARGETS gate_detector
   EXPORT export_${PROJECT_NAME}
-  DESTINATION lib/${PROJECT_NAME})
+  DESTINATION lib/${PROJECT_NAME}
+)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

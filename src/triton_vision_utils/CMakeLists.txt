@@ -17,7 +17,6 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
-find_package(cv_bridge REQUIRED)
 find_package(OpenCV 4 REQUIRED)
 
 include_directories(include/)
@@ -29,11 +28,17 @@ add_library(triton_vision_utils SHARED
 target_include_directories(triton_vision_utils
   PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include>)
+    $<INSTALL_INTERFACE:include>
+)
 
+ament_target_dependencies(triton_vision_utils
+  OpenCV
+)
 
 ament_export_targets(export_triton_vision_utils HAS_LIBRARY_TARGET)
-ament_export_dependencies(cv_bridge)
+ament_export_dependencies(
+  OpenCV
+)
 
 install(
   DIRECTORY include/
@@ -48,6 +53,7 @@ install(
   RUNTIME DESTINATION bin
   INCLUDES DESTINATION include
 )
+
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   # the following line skips the linter which checks for copyrights
