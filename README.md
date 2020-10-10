@@ -2,11 +2,43 @@
 
 This repository contains the ROS2 system for the UBC SubBots Triton AUV. It is meant be launched in Ubuntu 20.04 on the Jetson TX2 on board the Triton AUV. 
 
+# Contents
+
+- [Setup](#setup)
+    - [OpenCV Installation](#opencv-installation)
+    - [ROS2 Dependencies](#ros2-dependencies)
+- [Tips](#tips)
 ## Setup
 To get started, first clone this repo to your computer running Ubuntu 20.04 into whatever directory you choose as such
 
     git clone https://github.com/ubc-subbots/triton.git
-    
+
+### OpenCV Installation
+First, make sure you have all the dependencies installed for building and running OpenCV
+
+    sudo apt-get install build-essential # compiler
+    sudo apt-get install cmake git libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev # required
+    sudo apt-get install python3-dev python3-numpy libtbb2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev libdc1394-22-dev # optional
+
+Next, download and unzip the [OpenCV 4.2.0 sources](https://github.com/opencv/opencv/archive/4.2.0.zip) into your downloads folder (`~/Downloads`). You should now have the folder `~/Downloads/opencv-4.2.0`. Now navigate to this folder and create a build folder to navigate to as such
+
+    cd ~/Downloads/opencv-4.2.0
+    mkdir build
+    cd build
+
+Next configure CMake for the build as such
+
+    cmake -D CMAKE_BUILD_TYPE=Release -D CMAKE_INSTALL_PREFIX=/usr/local ..
+
+Still from the build folder, make the project using parallel jobs, this will take a while
+
+    make -j7 # runs 7 jobs in parallel
+
+After the make command finishes successfully, install OpenCV as such
+
+    sudo make install
+
+### ROS2 Dependencies
 Source the global ROS2 setup script in the terminal
 
     source /opt/ros/foxy/setup.bash
