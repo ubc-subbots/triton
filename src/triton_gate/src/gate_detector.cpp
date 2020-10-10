@@ -8,7 +8,6 @@ int main()
 {
   cv::Mat src;
   ObjectDetector objdtr;
-  objdtr = ObjectDetector();
 
   src = cv::imread("~/subbot/underwater-object-detection/images/gate/19.jpg");
 
