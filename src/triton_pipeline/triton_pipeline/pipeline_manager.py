@@ -96,7 +96,7 @@ class PipelineManager(Node):
     Callback function for the pipeline feedback subscriber
 
     Given the pipeline feedback message, sets the manager state related
-    to the success/failiure of the pipeline
+    to the success/failure of the pipeline
 
     @param msg A PipelineFeedback message
     """
