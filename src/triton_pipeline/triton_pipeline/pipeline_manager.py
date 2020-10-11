@@ -46,8 +46,8 @@ class PipelineManager(Node):
             namespace='pipeline',
             parameters=[
                 ('components', ['']),
+                ('pkg_names', ['']),
                 ('remap_rules', ['']),
-                ('pkg_name', ''),
                 ('namespace', '')
         ])
 
@@ -163,8 +163,9 @@ class PipelineManager(Node):
         self.pipeline_abort = False
         self.pipeline_feedback_msg = ""
         pipeline_components = self.get_parameter('pipeline.components').value
-        for component in pipeline_components:
-            self._load_component(component)
+        pipeline_pkg_names = self.get_parameter('pipeline.pkg_names').value
+        for component, pkg_name in zip(pipeline_components, pipeline_pkg_names):
+            self._load_component(component, pkg_name)
         feedback = RunPipeline.Feedback()
         prev_msg = ""
         while not self.pipeline_success and not self.pipeline_abort:
@@ -194,9 +195,9 @@ class PipelineManager(Node):
 
     @param component A node component string (i.e 'package::NodeName')
     """
-    def _load_component(self, component):
+    def _load_component(self, component, pkg_name):
         req = LoadNode.Request()
-        req.package_name = self.get_parameter('pipeline.pkg_name').value
+        req.package_name = pkg_name
         req.plugin_name = component
         req.node_namespace = self.get_parameter('pipeline.namespace').value
         req.remap_rules = self.get_parameter('pipeline.remap_rules').value
@@ -294,7 +295,12 @@ class PipelineManager(Node):
                     self.get_logger().error(str(e))
             try:
                 self.set_parameters(params_list)
-                return True
+                if len(self.get_parameter('pipeline.components').value) ==
+                  len(self.get_parameter('pipeline.pkg_names').value): 
+                    return True
+                else:
+                    self.get_logger().warn('Number of components and package names do not correspond')
+                    return False
             except rclpy.exceptions.ParameterException as e:
                 self.get_logger().warn('Could not set pipeline parameters')
                 self.get_logger().error(str(e))
@@ -337,7 +343,7 @@ class PipelineManager(Node):
                 param_val
             )
             return new_param
-    
+
 """
 Executes the pipeline manager node
 
