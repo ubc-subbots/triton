@@ -91,6 +91,7 @@ class PipelineManager(Node):
             'configure_pipeline',
             self.configure_pipeline
         )
+        self.get_logger().info('Pipeline manager succesfully started!')
             
     """
     Callback function for the pipeline feedback subscriber
