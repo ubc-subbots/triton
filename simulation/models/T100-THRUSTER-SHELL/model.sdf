@@ -1,0 +1,45 @@
+<sdf version='1.7'>
+  <model name='T100-THRUSTER-SHELL'>
+    <link name='T100-THRUSTER-SHELL'>
+      <inertial>
+        <pose>3.9e-05 -0.004977 0.009261 0 -0 0</pose>
+        <mass>0.38044</mass>
+        <inertia>
+          <ixx>0.00039776</ixx>
+          <ixy>-1.3762e-07</ixy>
+          <ixz>-4.8314e-07</ixz>
+          <iyy>0.00040427</iyy>
+          <iyz>1.5933e-05</iyz>
+          <izz>0.00027739</izz>
+        </inertia>
+      </inertial>
+      <collision name='T100-THRUSTER-SHELL_collision'>
+        <pose>0 0 0 1.5708 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>/home/jake/triton/simulation/models/T100-THRUSTER-SHELL/meshes/T100-THRUSTER-SHELL.dae</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='T100-THRUSTER-SHELL_visual'>
+        <pose>0 0 0 1.5708 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>/home/jake/triton/simulation/models/T100-THRUSTER-SHELL/meshes/T100-THRUSTER-SHELL.dae</uri>
+          </mesh>
+        </geometry>
+       <material>
+          <lighting>1</lighting>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Black</name>
+          </script>
+          <shader type='pixel'/>
+          <emissive>0 0 0 1</emissive>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>
