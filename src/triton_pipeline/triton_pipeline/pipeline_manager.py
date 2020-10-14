@@ -129,7 +129,10 @@ class PipelineManager(Node):
             response.success = False
         else:
             manager_dir = get_package_share_directory('triton_pipeline')
-            config_path = os.path.join(manager_dir, '{}.yaml'.format(pipeline_type))
+            config_file_name = pipeline_type if not request.config_file_name else request.config_file_name
+            config_file = '{}.yaml'.format(config_file_name)
+            self.get_logger().info('Using the configuration file "{}"'.format(config_file))
+            config_path = os.path.join(manager_dir, config_file)
             config_yaml = None
             with open(config_path, 'r') as stream:
                 try:
@@ -142,7 +145,7 @@ class PipelineManager(Node):
             else:
                 response.success = False
         if response.success is True:
-            self.get_logger().info('Pipeline configured for {}'.format(pipeline_type))
+            self.get_logger().info('Pipeline configured for {}!'.format(pipeline_type))
         return response
 
 
