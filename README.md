@@ -5,6 +5,7 @@ This repository contains the ROS2 system for the UBC SubBots Triton AUV. It is m
 # Contents
 
 - [Setup](#setup)
+    - [Gazebo Installation](#gazebo-installation)
     - [OpenCV Installation](#opencv-installation)
     - [ROS2 Dependencies](#ros2-dependencies)
 - [Tips](#tips)
@@ -13,6 +14,24 @@ To get started, first clone this repo to your computer running Ubuntu 20.04 into
 
     git clone https://github.com/ubc-subbots/triton.git
 
+### Gazebo Installation
+To install Gazebo, it is as simple as running the following command
+
+    curl -sSL http://get.gazebosim.org | sh
+
+To verify it was succesfully installed, run the following command
+
+    gazebo --version
+
+Next, we need to add the setup script to our `.bashrc` so that it is sourced on every new terminal, open up `~/.bashrc` in a text editor or in nano as such
+
+    nano ~/.bashrc
+
+Append the following line to the bottom of the file
+
+    source /usr/share/gazebo/setup.sh
+
+Now Gazebo is succesfully installed!
 ### OpenCV Installation
 First, make sure you have all the dependencies installed for building and running OpenCV
 
@@ -38,6 +57,7 @@ After the make command finishes successfully, install OpenCV as such
 
     sudo make install
 
+OpenCV is now succesfully installed!
 ### ROS2 Dependencies
 Source the global ROS2 setup script in the terminal
 
