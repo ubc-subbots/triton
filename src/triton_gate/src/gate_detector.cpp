@@ -7,24 +7,16 @@ using namespace vision_utils;
 int main()
 {
   cv::Mat src;
-  ObjectDetector objdtr;
+  ObjectDetector objdtr = ObjectDetector(0.5,true,400);
 
-  src = cv::imread("~/subbot/underwater-object-detection/images/gate/19.jpg");
+  src = cv::imread("/home/jared/19.jpg");
+  cv::imshow("Src", src);
 
-  cv::Mat preprocessed = objdtr.preprocess(src);
-  cv::imshow("Test", preprocessed);
-  cv::waitKey(0);
-
-  cv::Mat enhanced = objdtr.enhance(preprocessed);
-  cv::imshow("Test", enhanced);
-  cv::waitKey(0);
-
-  cv::Mat gradiented = objdtr.gradient(enhanced);
-  cv::imshow("Test", gradiented);
-  cv::waitKey(0);
+  cv::Mat gradiented = objdtr.gradient(src);
+  cv::imshow("Grad", gradiented);
 
   cv::Mat morphed = objdtr.morphological(gradiented);
-  cv::imshow("Test", morphed);
+  cv::imshow("Mor", morphed);
   cv::waitKey(0);
 
   return 0;

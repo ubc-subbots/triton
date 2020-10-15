@@ -22,7 +22,7 @@ ObjectDetector::ObjectDetector(float _im_resize, bool _debug, float _focal)
 
 Mat ObjectDetector::preprocess(Mat src)
 {
-    im_dims = Size(src.size[0]*im_resize, src.size[1]*im_resize);
+    im_dims = Size(src.rows*im_resize, src.cols*im_resize);
     if (im_resize != 1.0)
     {
         Mat srcSplit[3];
@@ -83,7 +83,7 @@ Mat ObjectDetector::enhance(Mat src, int clahe_clr_space_bgr, int clahe_clr_spac
         parts[partsLen] = hsv_clahe;
         partsLen++;
     }
-
+    /*
     if (partsLen > 0)
     {
         float weight = 1.0/partsLen;
@@ -95,6 +95,9 @@ Mat ObjectDetector::enhance(Mat src, int clahe_clr_space_bgr, int clahe_clr_spac
         }
         src = blended;
     }
+    */
+    Mat blended;
+    merge(parts, partsLen, blended);
     return src;
 }
 
