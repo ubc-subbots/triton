@@ -194,6 +194,7 @@ class PipelineManager(Node):
     node was successfully loaded.
 
     @param component A node component string (i.e 'package::NodeName')
+    @param pkg_name A node component string (i.e 'triton_package')
     """
     def _load_component(self, component, pkg_name):
         req = LoadNode.Request()
@@ -295,10 +296,13 @@ class PipelineManager(Node):
                     self.get_logger().error(str(e))
             try:
                 self.set_parameters(params_list)
-                if len(self.get_parameter('pipeline.components').value) == len(self.get_parameter('pipeline.pkg_names').value): 
+                if (len(self.get_parameter('pipeline.components').value) ==
+                      len(self.get_parameter('pipeline.pkg_names').value)):
                     return True
                 else:
-                    self.get_logger().warn('Number of components and package names do not match, respectively {} and {}'.format(len(self.get_parameter('pipeline.components').value),len(self.get_parameter('pipeline.pkg_names').value)))
+                    self.get_logger().warn('Number of components and package names do not match, {} and {} respectively'
+                                            .format(len(self.get_parameter('pipeline.components').value),
+                                             len(self.get_parameter('pipeline.pkg_names').value)))
                     return False
             except rclpy.exceptions.ParameterException as e:
                 self.get_logger().warn('Could not set pipeline parameters')

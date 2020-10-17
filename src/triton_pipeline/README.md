@@ -35,9 +35,9 @@ Make sure that the `input` field is one of the accepted types given in `RunPipel
 
     ### Parameters
     - `components` (`String[]`): Declares the components to be launched in the pipeline when it is run.
-    - `remap_rules` (`String[]`): Declares the topic remapping rules for the pipeline components.
-    - `pkg_name` (`String`): The package to which the components belong.
+    - `pkg_names` (`String[]`): The packages to which the components belong. There should be a one-to-one correspondence with each component.
     - `namespace` (`String`): The namespace in which the components will be launched.
+    - `remap_rules` (`String[]`): Declares the topic remapping rules for the pipeline components.
 
 ## Contributors
 
