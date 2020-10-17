@@ -16,28 +16,27 @@ from composition_interfaces.srv import LoadNode, UnloadNode, ListNodes
 
 
 class PipelineManager(Node):
-
     """
     Pipeline Manager.
 
     Responsible for configuring the running the pipeline
     """
 
-    """
-    Pipeline manager constructor
 
-    Declares the parameters for the pipeline manager, and sets
-    up the neccessary action and service servers, and topic
-    publishers and subscribrers.
-    """
     def __init__(self):
+        """
+        Pipeline manager constructor
+
+        Declares the parameters for the pipeline manager, and sets
+        up the neccessary action, service servers, and topic
+        publishers and subscribrers.
+        """
         super().__init__('pipeline_manager')
 
         self.nodes_in_pipeline = []
         self.pipeline_success = False
         self.pipeline_abort = False
         self.pipeline_feedback_msg = ""
-        # This will add all attributes starting with 'TYPE' to the list
         self.pipeline_types = []
         for typename in re.findall(r'TYPE_+.*', PipelineType.__doc__):
             self.pipeline_types.append(getattr(PipelineType, str(typename)))
@@ -93,33 +92,34 @@ class PipelineManager(Node):
         )
         self.get_logger().info('Pipeline manager succesfully started!')
             
-    """
-    Callback function for the pipeline feedback subscriber
 
-    Given the pipeline feedback message, sets the manager state related
-    to the success/failure of the pipeline
-
-    @param msg A PipelineFeedback message
-    """
     def feedback_callback(self, msg):
+        """
+        Callback function for the pipeline feedback subscriber
+
+        Given the pipeline feedback message, sets the manager state related
+        to the success/failure of the pipeline
+
+        @param msg: A PipelineFeedback message
+        """
         self.pipeline_abort = msg.abort
         self.pipeline_success = msg.success
         self.pipeline_feedback_msg = msg.message
 
 
-    """
-    Callback function for the configure pipeline service
-
-    Given the pipeline type in the request, locates and parses the
-    associated config file and sets the parameters of the pipeline
-    manager to be those given in the config file. Fails if the pipeline
-    type is not a valid type, the config file is ill formatted or the 
-    parameters in the config file cannot be set.
-
-    @param request A service request
-    @param response A service response
-    """
     def configure_pipeline(self, request, response):
+        """
+        Callback function for the configure pipeline service
+
+        Given the pipeline type in the request, locates and parses the
+        associated config file and sets the parameters of the pipeline
+        manager to be those given in the config file. Fails if the pipeline
+        type is not a valid type, the config file is ill formatted or the 
+        parameters in the config file cannot be set.
+
+        @param request: A service request
+        @param response: A service response
+        """
         pipeline_type = request.pipeline_type.type
         self.get_logger().info('Configuring pipeline for {}...'.format(pipeline_type))
         if pipeline_type not in self.pipeline_types:
@@ -153,19 +153,19 @@ class PipelineManager(Node):
         return response
 
 
-    """
-    Callback function for the run pipeline action
-
-    Loads the components needed for the pipeline type which the pipeline
-    manager has been configured for into the pipeline, then waits until 
-    the pipeline manager recieves feedback indicating that the loaded 
-    pipeline has succeded or has had to abort. Succeeds or aborts the 
-    goal handle accordingle then returns the output value using the 
-    goal handle.
-
-    @param goal_handle An action goal handle
-    """
     def run_pipeline(self, goal_handle):
+        """
+        Callback function for the run pipeline action
+
+        Loads the components needed for the pipeline type which the pipeline
+        manager has been configured for into the pipeline, then waits until 
+        the pipeline manager recieves feedback indicating that the loaded 
+        pipeline has succeded or has had to abort. Succeeds or aborts the 
+        goal handle accordingle then returns the output value using the 
+        goal handle.
+
+        @param goal_handle: An action goal handle
+        """
         self.get_logger().info('Running pipeline...')
         self.pipeline_success = False
         self.pipeline_abort = False
@@ -193,18 +193,18 @@ class PipelineManager(Node):
         res.output = 0
 
 
-    """
-    Loads a component into the pipeline
-
-    Uses the load node service the component container provides
-    to load the node into the pipeline synchronously. Employs 
-    busy waiting to recieve the response of whether or not the
-    node was successfully loaded.
-
-    @param component A node component string (i.e 'package::NodeName')
-    @param pkg_name A node component string (i.e 'triton_package')
-    """
     def _load_component(self, component, pkg_name):
+        """
+        Loads a component into the pipeline
+
+        Uses the load node service the component container provides
+        to load the node into the pipeline synchronously. Employs 
+        busy waiting to recieve the response of whether or not the
+        node was successfully loaded.
+
+        @param component: A node component string (i.e 'package::NodeName')
+        @param pkg_name: A node component string (i.e 'triton_package')
+        """
         req = LoadNode.Request()
         req.package_name = pkg_name
         req.plugin_name = component
@@ -227,16 +227,16 @@ class PipelineManager(Node):
             self.get_logger().info(node_name + ' loaded succesfully')
 
 
-    """
-    Unloads all the components from the pipeline
-
-    Uses the list nodes service the component container provides
-    to determine the names and ids of the nodes currently loaded
-    in the pipeline. Employs busy waiting to recieve the response 
-    about the listed nodes. Then, using the unique id associated to
-    each node listed, unloads that node.
-    """
     def _unload_components(self):
+        """
+        Unloads all the components from the pipeline
+
+        Uses the list nodes service the component container provides
+        to determine the names and ids of the nodes currently loaded
+        in the pipeline. Employs busy waiting to recieve the response 
+        about the listed nodes. Then, using the unique id associated to
+        each node listed, unloads that node.
+        """
         req = ListNodes.Request()
         future = self.pipeline_listing_client.call_async(req)
         res = None
@@ -252,19 +252,19 @@ class PipelineManager(Node):
             self._unload_component(unique_id, node_name)
 
 
-    """
-    Unloads a single component from the pipeline
-
-    Uses the unload node service the component container provides
-    to unload the node from the pipeline. Employs busy waiting to
-    recieve the response of whether or not the node was unloaded 
-    successfully.
-
-    @param unique_id A unique identifer for the node
-    @param node_name The namespaced node name string (i.e '/ns/node_name')
-
-    """
     def _unload_component(self, unique_id, node_name):
+        """
+        Unloads a single component from the pipeline
+
+        Uses the unload node service the component container provides
+        to unload the node from the pipeline. Employs busy waiting to
+        recieve the response of whether or not the node was unloaded 
+        successfully.
+
+        @param unique_id: A unique identifer for the node
+        @param node_name: The namespaced node name string (i.e '/ns/node_name')
+
+        """
         req = UnloadNode.Request()
         req.unique_id = unique_id
         future = self.pipeline_unloading_client.call_async(req)
@@ -281,17 +281,17 @@ class PipelineManager(Node):
             self.get_logger().info('{} was unloaded succesfully'.format(node_name))
 
 
-    """
-    Sets the parameters for the pipeline manager from the config yaml
-
-    Gets the pipeline parameters from the config yaml, turns them into
-    parameter objects and sets them for the pipeline manager. Fails if 
-    any of the parameters are ill formatted
-
-    @param config_yaml A yaml structure object
-    @return True if the parameters were loaded successfully, else False
-    """
     def _load_params_from_yaml(self, config_yaml):
+        """
+        Sets the parameters for the pipeline manager from the config yaml
+
+        Gets the pipeline parameters from the config yaml, turns them into
+        parameter objects and sets them for the pipeline manager. Fails if 
+        any of the parameters are ill formatted
+
+        @param config_yaml: A yaml structure object
+        @return: True if the parameters were loaded successfully, else False
+        """
         pipeline_params = self._get_pipeline_params(config_yaml)
         if pipeline_params is not None:
             params_list = []
@@ -321,14 +321,14 @@ class PipelineManager(Node):
             return False
 
 
-    """
-    Traverses the config yaml until it finds the sub yaml
-    structure under the key 'pipeline'
-
-    @param config_yaml A yaml structure object
-    @returns The pipeline parameter yaml object, or None if it doesn't exist
-    """
     def _get_pipeline_params(self, config_yaml):
+        """
+        Traverses the config yaml until it finds the sub yaml
+        structure under the key 'pipeline'
+
+        @param: config_yaml A yaml structure object
+        @return: The pipeline parameter yaml object, or None if it doesn't exist
+        """
         for key, value in config_yaml.items():
             if key == "pipeline":
                 return value
@@ -337,32 +337,33 @@ class PipelineManager(Node):
         return None
 
 
-    """
-    Creates a parameter object of the given name with the given value
-
-    @param param_name Name of the parameter
-    @param param_value Value of the parameter
-    @returns A rclpy param object with given name, value and inferred type
-    """
     def _create_param_object(self, param_name, param_val):
-            param_name = 'pipeline.' + param_name
-            curr_param_val = self.get_parameter(param_name).value
-            param_type = rclpy.Parameter.Type.from_parameter_value(curr_param_val)
-            new_param = rclpy.parameter.Parameter(
-                param_name,
-                param_type,
-                param_val
-            )
-            return new_param
+        """
+        Creates a parameter object of the given name with the given value
 
-"""
-Executes the pipeline manager node
+        @param param_name: Name of the parameter
+        @param param_value: Value of the parameter
+        @return: A rclpy param object with given name, value and inferred type
+        """
+        param_name = 'pipeline.' + param_name
+        curr_param_val = self.get_parameter(param_name).value
+        param_type = rclpy.Parameter.Type.from_parameter_value(curr_param_val)
+        new_param = rclpy.parameter.Parameter(
+            param_name,
+            param_type,
+            param_val
+        )
+        return new_param
 
-Uses a multi threaded executor for the pipeline manager and 
-continuously spins until stopped, then destroys the pipeline
-manager and shuts down the infastructure
-"""
+
 def main(args=None):
+    """
+    Executes the pipeline manager node
+
+    Uses a multi threaded executor for the pipeline manager and 
+    continuously spins until stopped, then destroys the pipeline
+    manager and shuts down the infastructure
+    """
     rclpy.init(args=args)
     pipeline_manager = PipelineManager()
     executor = MultiThreadedExecutor()
