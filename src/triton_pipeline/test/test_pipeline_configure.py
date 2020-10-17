@@ -86,4 +86,21 @@ class TestPipeline(unittest.TestCase):
                     self.fail('Expected configure pipeline service to fail' \
                                 ' due to non existent type')
                 break
-            
+
+    def test_configure_valid_type_no_yaml(self, pipeline_manager, proc_info, proc_output):
+        req = ConfigurePipeline.Request()
+        pipeline_type =  PipelineType()
+        no_yaml_type = 'test_no_yaml'
+        pipeline_type.type = no_yaml_type
+        req.pipeline_type =pipeline_type
+        future = self.configure_client.call_async(req)
+        while rclpy.ok():
+            rclpy.spin_once(self.node)
+            if future.done():
+                res = future.result()
+                if res.success is False:
+                    self.assertTrue(False)
+                else:
+                    self.fail('Expected configure pipeline service to fail' \
+                                ' due to no yaml associated to pipeline type')
+                break

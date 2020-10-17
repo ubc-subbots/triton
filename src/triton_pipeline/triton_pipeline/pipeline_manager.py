@@ -134,15 +134,19 @@ class PipelineManager(Node):
             self.get_logger().info('Using the configuration file "{}"'.format(config_file))
             config_path = os.path.join(manager_dir, config_file)
             config_yaml = None
-            with open(config_path, 'r') as stream:
-                try:
-                    config_yaml = yaml.safe_load(stream)
-                except yaml.YAMLError as e:
-                    self.get_logger().warn('Could not parse {}.yaml'.format(pipeline_type))
-                    self.get_logger().error(str(e))
-            if config_yaml is not None:
-                response.success = self._load_params_from_yaml(config_yaml)
+            if os.path.isfile(config_path):
+                with open(config_path, 'r') as stream:
+                    try:
+                        config_yaml = yaml.safe_load(stream)
+                    except yaml.YAMLError as e:
+                        self.get_logger().warn('Could not parse {}.yaml'.format(pipeline_type))
+                        self.get_logger().error(str(e))
+                if config_yaml is not None:
+                    response.success = self._load_params_from_yaml(config_yaml)
+                else:
+                    response.success = False
             else:
+                # TODO: add message
                 response.success = False
         if response.success is True:
             self.get_logger().info('Pipeline configured for {}!'.format(pipeline_type))
