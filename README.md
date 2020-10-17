@@ -8,6 +8,7 @@ This repository contains the ROS2 system for the UBC SubBots Triton AUV. It is m
     - [Gazebo Installation](#gazebo-installation)
     - [OpenCV Installation](#opencv-installation)
     - [ROS2 Dependencies](#ros2-dependencies)
+- [Contributing](#contributing)
 - [Tips](#tips)
 ## Setup
 To get started, first clone this repo to your computer running Ubuntu 20.04 into whatever directory you choose as such
@@ -91,6 +92,9 @@ The last line is helpful in that it colorizes ROS2 logging so that info/warn/err
     ros2 launch triton_pipeline triton_pipeline.launch.py
    
 If this command executes successfully, you are ready to develop!
+
+## Contributing
+To learn how to contribute to this repo, see the seperate [workflow](WORKFLOW.md) and [conventions](CONVENTIONS.md) documents.
     
 ## Tips
 Here are some tips to be aware of when developing on this repository and when developing in ROS2 in general

@@ -251,7 +251,10 @@ ROS2 has it's own set of conventions which we will follow. The following list gi
 # GitHub
 There are a few conventions we have in place to keep our version control system cohesive. The following list gives the conventions that should be followed
 - When naming a branch to work on a given issue, name the branch **<YOUR_NAME>/issueN**  where `<YOUR_NAME>` is your name and `N` is the issue number (e.g `logan/issue19`)
-- Each package should have documentation in a `README.md` file. When documenting a package, you need at least 3 sections; Description, Usage, and Contributors, as shown below ![Package Documentation](assets/package_doc_conventions.png) 
+- Each package should have documentation in a `README.md` file. When documenting a package, you need at least 3 sections; Description, Usage, and Contributors, as shown below 
+
+![Package Documentation](assets/package_doc_conventions.png) 
+
 Make sure to always put yourself as a contributor to the package if you contribute a non-trivial amount to the package. You can have other sections (e.g Nodes, Models, Images) which further document the package. See current packages in the repo to see examples of common sections which are added.
 
 
