@@ -60,7 +60,7 @@ class TestPipeline(unittest.TestCase):
             '/triton/configure_pipeline'
         )
         while not self.configure_client.wait_for_service(timeout_sec=1.0):
-            self.get_logger().warn('Configure pipeline service not available, waiting again...')
+            self.node.get_logger().warn('Configure pipeline service not available, waiting again...')
 
     def tearDown(self):
         self.node.destroy_node()
