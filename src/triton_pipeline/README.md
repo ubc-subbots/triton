@@ -6,9 +6,9 @@ a set of nodes, defined by a pipeline type, which aim to perform an action. The 
 
 ## Usage
 
-To define a pipeline type, follow the syntax given in `example.yaml` in the `config` folder. After defining your pipeline type, you have to add it to `PipelineType.msg` in `triton_interfaces` for you to be able to configure and run it. To launch the pipeline (along with the required pipeline manager) use the `triton_pipeline.launch.py` launch file as such
+To define a pipeline type, follow the syntax given in `example.yaml` in the `config` folder. After defining your pipeline type, you have to add it to `PipelineType.msg` in `triton_interfaces` for you to be able to configure and run it. To launch the pipeline (along with the required pipeline manager) use the `pipeline_launch.py` launch file as such
 
-    ros2 launch triton_pipeline triton_pipeline.launch.py
+    ros2 launch triton_pipeline pipeline_launch.py
 
 To configure the pipeline use the `ConfigurePipeline.srv` service from `triton_interfaces` as such
 

@@ -91,6 +91,7 @@ class PipelineManager(Node):
             'configure_pipeline',
             self.configure_pipeline
         )
+        self.get_logger().info('Pipeline manager succesfully started!')
             
     """
     Callback function for the pipeline feedback subscriber
@@ -128,20 +129,27 @@ class PipelineManager(Node):
             response.success = False
         else:
             manager_dir = get_package_share_directory('triton_pipeline')
-            config_path = os.path.join(manager_dir, '{}.yaml'.format(pipeline_type))
+            config_file_name = pipeline_type if not request.config_file_name else request.config_file_name
+            config_file = '{}.yaml'.format(config_file_name)
+            self.get_logger().info('Using the configuration file "{}"'.format(config_file))
+            config_path = os.path.join(manager_dir, config_file)
             config_yaml = None
-            with open(config_path, 'r') as stream:
-                try:
-                    config_yaml = yaml.safe_load(stream)
-                except yaml.YAMLError as e:
-                    self.get_logger().warn('Could not parse {}.yaml'.format(pipeline_type))
-                    self.get_logger().error(str(e))
-            if config_yaml is not None:
-                response.success = self._load_params_from_yaml(config_yaml)
+            if os.path.isfile(config_path):
+                with open(config_path, 'r') as stream:
+                    try:
+                        config_yaml = yaml.safe_load(stream)
+                    except yaml.YAMLError as e:
+                        self.get_logger().warn('Could not parse {}.yaml'.format(pipeline_type))
+                        self.get_logger().error(str(e))
+                if config_yaml is not None:
+                    response.success = self._load_params_from_yaml(config_yaml)
+                else:
+                    response.success = False
             else:
+                # TODO: add message
                 response.success = False
         if response.success is True:
-            self.get_logger().info('Pipeline configured for {}'.format(pipeline_type))
+            self.get_logger().info('Pipeline configured for {}!'.format(pipeline_type))
         return response
 
 
