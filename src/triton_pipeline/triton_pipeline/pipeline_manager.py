@@ -1,6 +1,7 @@
 import os
 import time
 import yaml
+import re
 
 import rclpy
 from rclpy.node import Node
@@ -36,12 +37,11 @@ class PipelineManager(Node):
         self.pipeline_success = False
         self.pipeline_abort = False
         self.pipeline_feedback_msg = ""
-
-        self.pipeline_types = [
-            PipelineType.TYPE_EXAMPLE,
-            PipelineType.TYPE_OBJECT_RECOGNITION
-        ]
-
+        # This will add all attributes starting with 'TYPE' to the list
+        self.pipeline_types = []
+        for typename in re.findall(r'TYPE_+.*', PipelineType.__doc__):
+            self.pipeline_types.append(getattr(PipelineType, str(typename)))
+        
         self.declare_parameters(
             namespace='pipeline',
             parameters=[
@@ -96,7 +96,7 @@ class PipelineManager(Node):
     Callback function for the pipeline feedback subscriber
 
     Given the pipeline feedback message, sets the manager state related
-    to the success/failiure of the pipeline
+    to the success/failure of the pipeline
 
     @param msg A PipelineFeedback message
     """
