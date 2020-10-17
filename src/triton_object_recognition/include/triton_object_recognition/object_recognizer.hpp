@@ -63,8 +63,11 @@ namespace object_recognition
 
         //Neural Net settings
         std::shared_ptr<cv::dnn::Net> net_;
-        cv::String model_ = "src/triton_object_recognition/models/yolov3.weights";
-        cv::String config_ = "src/triton_object_recognition/models/yolov3.cfg";
+        std::string model_folder_ = "src/triton_object_recognition/models/";
+        std::string weights_url_ = "https://pjreddie.com/media/files/yolov3.weights";
+        std::string weights_filename_ = "yolov3.weights";
+        std::string cfg_url_ = "https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/yolov3.cfg";
+        std::string cfg_filename_ = "yolov3.cfg";
         cv::dnn::Backend backend_ = cv::dnn::DNN_BACKEND_OPENCV;
         cv::dnn::Target target_ = cv::dnn::DNN_TARGET_CPU;
         std::vector<std::string> classes_;

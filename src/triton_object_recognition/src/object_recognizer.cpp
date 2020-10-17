@@ -1,5 +1,6 @@
 #include "triton_object_recognition/object_recognizer.hpp"
 #include <opencv2/dnn.hpp>
+#include <boost/filesystem.hpp>
 using std::placeholders::_1;
 using namespace std;
 using namespace cv;
@@ -16,9 +17,33 @@ namespace object_recognition
         subscription_ = this->create_subscription<sensor_msgs::msg::Image>(
         "object_recognizer/in", 10, bind(&ObjectRecognizer::callback, this, _1));
 
+        boost::filesystem::path model_folder = boost::filesystem::path(model_folder_);
+        if (!boost::filesystem::is_directory(model_folder)){
+            create_directories(model_folder);
+        }
 
-        net_.reset(new Net());
-        *net_ = readNet(model_,config_);
+        boost::filesystem::path model_config = model_folder / cfg_filename_;
+        if (!boost::filesystem::exists(model_config)){
+            RCLCPP_WARN(get_logger(),"Model weights not found. Downloading from " + cfg_url_);
+            //Warning: This command is not portable
+            string command = "wget -O " + model_config.string() + " " + cfg_url_;
+            if (system(command.c_str())){
+                RCLCPP_ERROR(get_logger(),"Model weights failed to download");
+            };
+        }
+        
+        boost::filesystem::path model_weights = model_folder / weights_filename_;
+        if (!boost::filesystem::exists(model_weights)){
+            RCLCPP_WARN(get_logger(),"Model config not found. Downloading from " + weights_url_);
+            //Warning: This command is not portable
+            string command = "wget -O " + model_config.string() + " " + weights_url_;
+            if (system(command.c_str())){
+                RCLCPP_ERROR(get_logger(),"Model config failed to download");
+            };
+        }
+        
+        net_ = std::make_shared<Net>();
+        *net_ = readNet(model_weights.string(),model_config.string());
         net_->setPreferableBackend(backend_);
         net_->setPreferableTarget(target_);
     }

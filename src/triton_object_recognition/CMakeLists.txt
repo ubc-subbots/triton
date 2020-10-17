@@ -24,15 +24,16 @@ find_package(triton_interfaces REQUIRED)
 find_package(cv_bridge REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(OpenCV 4.2 REQUIRED)
+find_package(Boost REQUIRED COMPONENTS filesystem) 
 
 include_directories(include ${catkin_INCLUDE_DIRS})
-include_directories( ${OpenCV_INCLUDE_DIRS} )
+include_directories(${OpenCV_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
 add_library(triton_object_recognition SHARED
   src/object_recognizer.cpp
 )
 
-target_link_libraries(triton_object_recognition ${OpenCV_LIBRARIES})
+target_link_libraries(triton_object_recognition ${OpenCV_LIBRARIES} ${Boost_LIBRARIES})
 
 rclcpp_components_register_nodes(triton_object_recognition "object_recognition::ObjectRecognizer")
 
@@ -48,6 +49,7 @@ ament_target_dependencies(triton_object_recognition
   "cv_bridge"
   "sensor_msgs"
   "OpenCV"
+  "Boost"
 )
 
 install(TARGETS
