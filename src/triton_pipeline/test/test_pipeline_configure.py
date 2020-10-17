@@ -99,7 +99,8 @@ class TestPipeline(unittest.TestCase):
             if future.done():
                 res = future.result()
                 if res.success is False:
-                    self.assertTrue(False)
+                    # TODO: assert message prints
+                    self.assertTrue(True)
                 else:
                     self.fail('Expected configure pipeline service to fail' \
                                 ' due to no yaml associated to pipeline type')
