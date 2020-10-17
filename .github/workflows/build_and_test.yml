@@ -30,5 +30,7 @@ jobs:
           source /opt/ros/foxy/setup.bash
           colcon build
           colcon test
+          colcon test-result --verbose
+
 
 
