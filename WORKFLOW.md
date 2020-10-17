@@ -20,6 +20,10 @@ Therefore, the name I would call my branch would be `logan/issue1`. To update th
 
 ![Pull Request](assets/pull_request.png)
 
+Make sure that you link the pull request to the corresponding issue using the lower right bar as shown below
+
+![Link Issue](assets/link_issue.png)
+
 Once filling out this pull request, you will then wait for it to be approved. The approver might ask you to make some changes to your branch, or you might have to change something if the build and test checks do not pass when you open the pull request. Note that the pull request will update as you push to your branch. If all the checks are passing, you should see something like this at the bottom of your pull request 
 
 ![Success Checks](assets/success_checks.png)
