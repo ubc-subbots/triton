@@ -1,5 +1,6 @@
 # Types used to test pipeline manager, do not use in pipeline
 string TYPE_TEST_NO_YAML = "test_no_yaml"
+string TYPE_TEST_BAD_YAML = "test_bad_yaml"
 
 # Available pipeline types
 string TYPE_EXAMPLE = "example"

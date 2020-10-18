@@ -143,10 +143,11 @@ class PipelineManager(Node):
                         self.get_logger().error(str(e))
                 if config_yaml is not None:
                     response.success = self._load_params_from_yaml(config_yaml)
+                    # TODO: should we check if the parameter types are correct?
                 else:
                     response.success = False
             else:
-                # TODO: add message
+                self.get_logger().warn('Could not find {}.yaml'.format(pipeline_type))
                 response.success = False
         if response.success is True:
             self.get_logger().info('Pipeline configured for {}!'.format(pipeline_type))

@@ -44,13 +44,16 @@ def generate_test_description():
 
 class TestPipeline(unittest.TestCase):
 
+
     @classmethod
     def setUpClass(cls):
         rclpy.init()
 
+
     @classmethod
     def tearDownClass(cls):
         rclpy.shutdown()
+
 
     def setUp(self):
         self.node = rclpy.create_node('test_node')
@@ -62,8 +65,10 @@ class TestPipeline(unittest.TestCase):
         while not self.configure_client.wait_for_service(timeout_sec=1.0):
             self.node.get_logger().warn('Configure pipeline service not available, waiting again...')
 
+
     def tearDown(self):
         self.node.destroy_node()
+
 
     def test_configure_invalid_type(self, pipeline_manager, proc_info, proc_output):
         req = ConfigurePipeline.Request()
@@ -87,6 +92,7 @@ class TestPipeline(unittest.TestCase):
                                 ' due to non existent type')
                 break
 
+
     def test_configure_valid_type_no_yaml(self, pipeline_manager, proc_info, proc_output):
         req = ConfigurePipeline.Request()
         pipeline_type =  PipelineType()
@@ -99,9 +105,30 @@ class TestPipeline(unittest.TestCase):
             if future.done():
                 res = future.result()
                 if res.success is False:
-                    # TODO: assert message prints
-                    self.assertTrue(True)
+                    proc_output.assertWaitFor(
+                        expected_output='Could not find {}.yaml'.format(no_yaml_type))
                 else:
                     self.fail('Expected configure pipeline service to fail' \
                                 ' due to no yaml associated to pipeline type')
                 break
+
+
+    def test_configure_valid_type_bad_yaml(self, pipeline_manager, proc_info, proc_output):
+        req = ConfigurePipeline.Request()
+        pipeline_type =  PipelineType()
+        bad_yaml_type = 'test_bad_yaml'
+        pipeline_type.type = bad_yaml_type
+        req.pipeline_type =pipeline_type
+        future = self.configure_client.call_async(req)
+        while rclpy.ok():
+            rclpy.spin_once(self.node)
+            if future.done():
+                res = future.result()
+                if res.success is False:
+                    proc_output.assertWaitFor(
+                        expected_output='Could not parse {}.yaml'.format(bad_yaml_type))
+                else:
+                    self.fail('Expected configure pipeline service to fail' \
+                                ' due to bad yaml associated to pipeline type')
+                break
+
