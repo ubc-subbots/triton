@@ -23,6 +23,7 @@ find_package(std_msgs REQUIRED)
 find_package(triton_interfaces REQUIRED)
 find_package(cv_bridge REQUIRED)
 find_package(sensor_msgs REQUIRED)
+find_package(image_transport REQUIRED)
 find_package(OpenCV 4.2 REQUIRED)
 find_package(Boost REQUIRED COMPONENTS filesystem) 
 
@@ -48,6 +49,7 @@ ament_target_dependencies(triton_object_recognition
   "triton_interfaces"
   "cv_bridge"
   "sensor_msgs"
+  "image_transport"
   "OpenCV"
   "Boost"
 )
@@ -57,6 +59,12 @@ install(TARGETS
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
+)
+
+install(DIRECTORY
+  config
+  launch
+  DESTINATION share/${PROJECT_NAME}/
 )
 
 if(BUILD_TESTING)

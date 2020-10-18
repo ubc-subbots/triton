@@ -2,10 +2,12 @@
 #define TRITON_OBJECT_RECOGNITION__OBJECT_RECOGNIZER
 
 #include "rclcpp/rclcpp.hpp"
+#include "image_transport/image_transport.hpp"
 #include "std_msgs/msg/string.hpp"
 #include "cv_bridge/cv_bridge.h"
 #include "sensor_msgs/image_encodings.hpp"
 #include "triton_interfaces/msg/detection_box_array.hpp"
+#include "triton_interfaces/srv/object_detection.hpp"
 #include <opencv2/opencv.hpp>
 
 namespace object_recognition
@@ -38,31 +40,34 @@ namespace object_recognition
 
     private:
 
-        /** Brief description of function.
+        /** Reads image and performs object recognition.
          * 
-         * Longer description in which you describe more in depth about
-         * the way the function performs the task mentioned in the brief
-         * description above.
+         * Uses the loaded network to perform object recognition on the image.
          * 
-         * @pre precondition of this method, if any
+         * @param msg message containing image data
          * 
-         * @param options ros2 node options.
-         * @param other_param another param
-         * 
-         * @returns what this function returns, if anything
-         * 
-         * @post postcondition of this method, if any
+         * @returns DetectionBoxArray message containing the bounding boxes of detected objects
          * 
          * @note something of particular note about this function
          * 
          */
-        void callback(const sensor_msgs::msg::Image::SharedPtr image) const;
+        triton_interfaces::msg::DetectionBoxArray process(const sensor_msgs::msg::Image & msg) const;
+
+        /** Callback used by subscriber to process and publish results
+         */
+        void subscriberCallback(const sensor_msgs::msg::Image::ConstSharedPtr & msg) const;
+        /** Callback used by service to process and respond to client with results
+         */
+        void serviceCallback(const triton_interfaces::srv::ObjectDetection::Request::SharedPtr request, 
+                const triton_interfaces::srv::ObjectDetection::Response::SharedPtr response) const;
 
         rclcpp::Publisher<triton_interfaces::msg::DetectionBoxArray>::SharedPtr publisher_;  
-        rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr subscription_; 
+        image_transport::Subscriber subscription_; 
+        rclcpp::Service<triton_interfaces::srv::ObjectDetection>::SharedPtr service_;
 
-        //Neural Net settings
         std::shared_ptr<cv::dnn::Net> net_;
+
+        //Default Neural Net Parameters (overriden by parameters)
         std::string model_folder_ = "src/triton_object_recognition/models/";
         std::string weights_url_ = "https://pjreddie.com/media/files/yolov3.weights";
         std::string weights_filename_ = "yolov3.weights";
@@ -71,8 +76,6 @@ namespace object_recognition
         cv::dnn::Backend backend_ = cv::dnn::DNN_BACKEND_OPENCV;
         cv::dnn::Target target_ = cv::dnn::DNN_TARGET_CPU;
         std::vector<std::string> classes_;
-        
-        //Parameters
         float conf_threshold_ = 0.2;
         float nms_threshold_ = 0.2;
         float scale_ = 0.00392;

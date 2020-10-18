@@ -1,27 +1,69 @@
 #include "triton_object_recognition/object_recognizer.hpp"
 #include <opencv2/dnn.hpp>
 #include <boost/filesystem.hpp>
+#include <rcl_yaml_param_parser/parser.h>
 using std::placeholders::_1;
+using std::placeholders::_2;
+using std::placeholders::_3;
 using namespace std;
 using namespace cv;
 using namespace dnn;
 
 #define DEBUG_VISUALIZE 1
+
 namespace object_recognition
 {
     ObjectRecognizer::ObjectRecognizer(const rclcpp::NodeOptions & options)
     : Node("object_recognizer", options) 
     {
+        //Create publisher, subscriber, and service
         publisher_ = this->create_publisher<triton_interfaces::msg::DetectionBoxArray>("object_recognizer/out", 10);
+        subscription_ = image_transport::create_subscription(this,"object_recognizer/in",bind(&ObjectRecognizer::subscriberCallback, this, _1),"raw");
+        service_ = create_service<triton_interfaces::srv::ObjectDetection>("object_recognizer/recognize",bind(&ObjectRecognizer::serviceCallback, this, _1,_2));
 
-        subscription_ = this->create_subscription<sensor_msgs::msg::Image>(
-        "object_recognizer/in", 10, bind(&ObjectRecognizer::callback, this, _1));
+        //Populate parameters (values are not modified if parameters have not been declared)
+        this->declare_parameter("model_folder", model_folder_);
+        this->declare_parameter("weights_filename", weights_filename_);
+        this->declare_parameter("cfg_filename", cfg_filename_);
+        this->declare_parameter("weights_url", weights_url_);
+        this->declare_parameter("cfg_url", cfg_url_);
+        this->declare_parameter("classes", classes_);
+        this->declare_parameter("conf_threshold", conf_threshold_);
+        this->declare_parameter("nms_threshold", nms_threshold_);
+        this->declare_parameter("scale", scale_);
+        this->declare_parameter("inp_width", inp_width_);
+        this->declare_parameter("inp_height", inp_height_);
+        this->declare_parameter("swap_rb", swap_rb_);
+        this->declare_parameter("mean", mean_);
+        this->declare_parameter("backend", (int) backend_);
+        this->declare_parameter("target", (int) target_);
 
+        this->get_parameter("model_folder", model_folder_);
+        this->get_parameter("weights_filename", weights_filename_);
+        this->get_parameter("cfg_filename", cfg_filename_);
+        this->get_parameter("weights_url", weights_url_);
+        this->get_parameter("cfg_url", cfg_url_);
+        this->get_parameter("classes", classes_);
+        this->get_parameter("conf_threshold", conf_threshold_);
+        this->get_parameter("nms_threshold", nms_threshold_);
+        this->get_parameter("scale", scale_);
+        this->get_parameter("inp_width", inp_width_);
+        this->get_parameter("inp_height", inp_height_);
+        this->get_parameter("swap_rb", swap_rb_);
+        this->get_parameter("mean", mean_);
+        int backend, target;
+        if (this->get_parameter("backend", backend))
+            backend_ = (Backend) backend;
+        if (this->get_parameter("target", target))
+            target_ = (Target) target;
+
+        //Check model folder exists and creates if it doesn't
         boost::filesystem::path model_folder = boost::filesystem::path(model_folder_);
         if (!boost::filesystem::is_directory(model_folder)){
             create_directories(model_folder);
         }
 
+        //Check cfg file exists and downloads if it doesn't
         boost::filesystem::path model_config = model_folder / cfg_filename_;
         if (!boost::filesystem::exists(model_config)){
             RCLCPP_WARN(get_logger(),"Model weights not found. Downloading from " + cfg_url_);
@@ -32,6 +74,7 @@ namespace object_recognition
             };
         }
         
+        //Check weights file exists and download if it doesn't
         boost::filesystem::path model_weights = model_folder / weights_filename_;
         if (!boost::filesystem::exists(model_weights)){
             RCLCPP_WARN(get_logger(),"Model config not found. Downloading from " + weights_url_);
@@ -42,13 +85,25 @@ namespace object_recognition
             };
         }
         
+        //Load network
         net_ = std::make_shared<Net>();
         *net_ = readNet(model_weights.string(),model_config.string());
         net_->setPreferableBackend(backend_);
         net_->setPreferableTarget(target_);
     }
 
-    void ObjectRecognizer::callback(const sensor_msgs::msg::Image::SharedPtr msg) const
+    void ObjectRecognizer::subscriberCallback(const sensor_msgs::msg::Image::ConstSharedPtr & msg) const
+    {
+        publisher_->publish(process(*msg));
+    }
+
+    void ObjectRecognizer::serviceCallback(const triton_interfaces::srv::ObjectDetection::Request::SharedPtr request, 
+            const triton_interfaces::srv::ObjectDetection::Response::SharedPtr response) const
+    {
+        response->boxes_out = process(request->image_in);
+    }
+
+    triton_interfaces::msg::DetectionBoxArray ObjectRecognizer::process(const sensor_msgs::msg::Image & msg) const
     {
         //Get image from message
         RCLCPP_INFO(this->get_logger(), "In object_recognizer");
@@ -57,7 +112,7 @@ namespace object_recognition
             cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
         } catch (cv_bridge::Exception& e) {
             RCLCPP_ERROR(get_logger(),"cv_bridge exception: %s", e.what());
-            return;
+            return triton_interfaces::msg::DetectionBoxArray();
         }
 
         //Detect objects in image
@@ -117,7 +172,7 @@ namespace object_recognition
             message.boxes.push_back(out);
         }
         message.header.stamp = rclcpp::Time();
-        publisher_->publish(message);
+        return message;
     }
 
     void ObjectRecognizer::preprocess(const Mat& frame) const{
