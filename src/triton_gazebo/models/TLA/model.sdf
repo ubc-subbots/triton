@@ -12,8 +12,7 @@
           <iyz>0.0074537</iyz>
           <izz>0.46996</izz>
         </inertia>
-        <!--pose>-0.000906 -0.015452 0.080349 0 -0 0</pose-->
-        <pose>0.26270274 -0.213699 0.2815934 0 -0 0</pose>
+        <pose>0.26270274 -0.2815934 0.213699 0 -0 0</pose>
       </inertial>
       <gravity>1</gravity>
       <self_collide>0</self_collide>
