@@ -22,6 +22,12 @@ private:
     tuple<float, float, float, float, float, float> gate_pose; // x, y, z, phi, theta, psi
     //featurizer 
     char directorybuf[64];
+    Mat pre;
+    Mat enh;
+    Mat seg;
+    vector<int>* hulls;
+    Mat bound;
+    Mat bound_and_pose; 
 
 
 public:
@@ -39,7 +45,65 @@ public:
         // load data/model.pkl
 
     }
-};
+
+    /**
+     * Detects the gate in a raw image and returns the images associated to the stages
+     * of the algorithm.
+     * @param src: Raw underwater image containing the gate
+     * @returns: Image associated to bounding and posing.
+     */
+    Mat detect(Mat src)
+    {
+        pre = preprocess(src);
+        enh = enhance(pre, 0, 0, 0, 1);
+        seg = morphological(segment(enh), Size(1,1), Size(1,1));
+        hulls = convex_hulls(seg, 1.0/4, 1.0/800);
+        bound = bound_gate_using_poles(hulls, src);
+        bound_and_pose = estimate_gate_pose(bound);
+        return bound_and_pose;
+    }
+
+    /**
+     * 
+     */
+    Mat segment(Mat src)
+    {
+      return src;
+    }
+
+    /**
+     * 
+     */
+    Mat bound_gate_using_poles(vector<int>* hulls, Mat src)
+    {
+      return src;
+    }
+
+    /**
+     * 
+     */
+    array<vector<int>,4> create_gate_contour(int hull_points[], Mat src)
+    {
+      return array<vector<int>,4>{};
+    }
+
+    /**
+     * 
+     */
+    Mat estimate_gate_pose(Mat src, int k=5)
+    {
+      return src;
+    }
+
+    /**
+     * 
+     */
+    tuple<float, float, float, float, float, float> calculate_gate_pose(Mat src)
+    {
+      return tuple<float, float, float, float, float, float>();
+    }
+
+   };
 /**
  * Main for demo and testing purposes
  */
@@ -56,16 +120,10 @@ int main()
     cv::imshow("Grad", gradiented);
     //cv::imwrite("Grad.jpg", gradiented);
 
-    cv::Mat morphed = objdtr.morphological(gradiented);
+    cv::Mat morphed = objdtr.morphological(src);
     cv::imshow("Mor", morphed);
-    //cv::imwrite("Mor.jpg", morphed);
+    cv::imwrite("Mor.jpg", morphed);
     cv::waitKey(0);
-
-     if (__cplusplus == 201703L) std::cout << "C++17\n";
-        else if (__cplusplus == 201402L) std::cout << "C++14\n";
-        else if (__cplusplus == 201103L) std::cout << "C++11\n";
-        else if (__cplusplus == 199711L) std::cout << "C++98\n";
-        else std::cout << "pre-standard C++\n";
 
     return 0;
 }
