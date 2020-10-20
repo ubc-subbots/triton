@@ -1,0 +1,47 @@
+import os
+import unittest
+
+import pytest
+
+import launch_testing
+from launch import LaunchDescription
+from launch.actions import IncludeLaunchDescription
+from launch.launch_description_sources import PythonLaunchDescriptionSource
+from ament_index_python.packages import get_package_share_directory
+
+
+@pytest.mark.rostest
+def generate_test_description():
+    ld = LaunchDescription()
+
+    pkg_name = 'triton_example'
+    launch_file_name = 'example_launch.py'
+
+    gazebo_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(get_package_share_directory(pkg_name), 'launch', launch_file_name)
+        )
+    )
+
+    ld.add_action(gazebo_launch)
+    ld.add_action(launch_testing.actions.ReadyToTest())
+    return ld
+
+
+class TestExampleLaunchInit(unittest.TestCase):
+
+
+    def test_component_one_init(self, proc_info, proc_output):
+        proc_output.assertWaitFor('Component One succesfully started!')
+
+
+    def test_component_two_init(self, proc_info, proc_output):
+        proc_output.assertWaitFor('Component Two succesfully started!')
+
+
+@launch_testing.post_shutdown_test()
+class TestExampleLaunchExit(unittest.TestCase):
+
+
+    def test_exit_code(self, proc_info, proc_output):
+        launch_testing.asserts.assertExitCodes(proc_info)
