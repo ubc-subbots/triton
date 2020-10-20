@@ -10,7 +10,6 @@ using namespace std;
 using namespace cv;
 using namespace vision_utils;
 
-
 ObjectDetector::ObjectDetector(float _im_resize, bool _debug, float _focal)
 {
     im_resize = _im_resize;
@@ -22,12 +21,12 @@ ObjectDetector::ObjectDetector(float _im_resize, bool _debug, float _focal)
 
 Mat ObjectDetector::preprocess(Mat src)
 {
-    im_dims = Size(src.rows*im_resize, src.cols*im_resize);
+    im_dims = Size(src.rows * im_resize, src.cols * im_resize);
     if (im_resize != 1.0)
     {
         Mat srcSplit[3];
         split(src, srcSplit);
-        Size kernel = Size(3,3);
+        Size kernel = Size(3, 3);
         int sig = 1;
         GaussianBlur(srcSplit[0], srcSplit[0], kernel, sig);
         GaussianBlur(srcSplit[1], srcSplit[1], kernel, sig);
@@ -39,18 +38,18 @@ Mat ObjectDetector::preprocess(Mat src)
     return src;
 }
 
-Mat ObjectDetector::enhance(Mat src, int clahe_clr_space_bgr, int clahe_clr_space_hsv,int clahe_clr_space_lab, int clahe_clip_limit)
+Mat ObjectDetector::enhance(Mat src, int clahe_clr_space_bgr, int clahe_clr_space_hsv, int clahe_clr_space_lab, int clahe_clip_limit)
 {
     Ptr<CLAHE> clahe = createCLAHE();
-    clahe->setTilesGridSize(Size(11,11));
+    clahe->setTilesGridSize(Size(11, 11));
     clahe->setClipLimit(clahe_clip_limit);
     Mat parts[3];
     int partsLen = 0;
 
-    if (clahe_clr_space_bgr==1)
+    if (clahe_clr_space_bgr == 1)
     {
         Mat bgr[3];
-        split(src,bgr);
+        split(src, bgr);
         clahe->apply(bgr[0], bgr[0]);
         clahe->apply(bgr[1], bgr[1]);
         clahe->apply(bgr[2], bgr[2]);
@@ -59,10 +58,10 @@ Mat ObjectDetector::enhance(Mat src, int clahe_clr_space_bgr, int clahe_clr_spac
         parts[partsLen] = bgr_clahe;
         partsLen++;
     }
-    if (clahe_clr_space_lab==1)
+    if (clahe_clr_space_lab == 1)
     {
         Mat lab[3];
-        split(src,lab);
+        split(src, lab);
         clahe->apply(lab[0], lab[0]);
         clahe->apply(lab[1], lab[1]);
         clahe->apply(lab[2], lab[2]);
@@ -71,10 +70,10 @@ Mat ObjectDetector::enhance(Mat src, int clahe_clr_space_bgr, int clahe_clr_spac
         parts[partsLen] = lab_clahe;
         partsLen++;
     }
-    if (clahe_clr_space_hsv==1)
+    if (clahe_clr_space_hsv == 1)
     {
         Mat hsv[3];
-        split(src,hsv);
+        split(src, hsv);
         clahe->apply(hsv[0], hsv[0]);
         clahe->apply(hsv[1], hsv[1]);
         clahe->apply(hsv[2], hsv[2]);
@@ -115,7 +114,6 @@ Mat ObjectDetector::gradient(Mat src)
     addWeighted(abs_grad_x, 0.5, abs_grad_y, 0.5, 0, grad);
     return grad;
     // Note: original python version uses np expand_dims(..., axis=2)
-
 }
 
 Mat ObjectDetector::morphological(Mat src, Size open_kernel, Size close_kernel)
@@ -126,14 +124,13 @@ Mat ObjectDetector::morphological(Mat src, Size open_kernel, Size close_kernel)
     morphologyEx(src, opening, MORPH_OPEN, open_k);
     morphologyEx(opening, closing, MORPH_CLOSE, close_k);
     return closing;
-    
 }
 
-vector<int>* ObjectDetector::convex_hulls(Mat src, float upper_area, float lower_area)
+vector<int> *ObjectDetector::convex_hulls(Mat src, float upper_area, float lower_area)
 {
-    vector<int> hulls[HULL_LIST_SIZE];
+    array<vector<int>, HULL_LIST_SIZE>hulls;
     int hullIndex = 0;
-    vector<int> right_size_hulls[HULL_LIST_SIZE];
+    array<vector<int>,HULL_LIST_SIZE> right_size_hulls;
     int right_s_h_index = 0;
 
     // Find contours in the image
@@ -143,15 +140,15 @@ vector<int>* ObjectDetector::convex_hulls(Mat src, float upper_area, float lower
     // Create a convex hull around each connected contour
     for (vector<Point> j : contours)
     {
-        convexHull(j, hulls[hullIndex++],false);
+        convexHull(j, hulls[hullIndex++], false);
     }
 
     // Get the hulls whose area is within some threshold range
     for (vector<int> hull : hulls)
     {
         int hull_area = contourArea(hull);
-        auto im_size = im_dims.height*im_dims.width;
-        if (hull_area > im_size*lower_area && hull_area < im_size*upper_area)
+        auto im_size = im_dims.height * im_dims.width;
+        if (hull_area > im_size * lower_area && hull_area < im_size * upper_area)
         {
             right_size_hulls[right_s_h_index++] = hull;
         }
@@ -159,10 +156,7 @@ vector<int>* ObjectDetector::convex_hulls(Mat src, float upper_area, float lower
     vector<int> right_size_hulls_[right_s_h_index];
     for (int i = 0; i < right_s_h_index; i++)
     {
-            right_size_hulls_[i] = right_size_hulls[i];
+        right_size_hulls_[i] = right_size_hulls[i];
     }
     return right_size_hulls_;
 }
-
-
-

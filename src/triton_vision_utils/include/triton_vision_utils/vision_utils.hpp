@@ -10,21 +10,21 @@ namespace vision_utils
 {
 	class ObjectDetector
 	{
-        private:
-		float im_resize=1.0;
-		bool debug=false;
-		float focal=400.0;
+	private:
+		float im_resize = 1.0;
+		bool debug = false;
+		float focal = 400.0;
 		Size im_dims;
 		Mat curr_image;
 
-		public:
+	public:
 		/**
 		 *  Initializes an object detector
 		 * @param input_im_resize: The scale to resize the image to, default: 1.0
 		 * @param input_debug: If True, adds debug information to output, default: false
 		 * @param input_focol: default: 400.0
 		 */
-		ObjectDetector(float _im_resize=1, bool _debug=false, float _focal=400.0);
+		ObjectDetector(float _im_resize = 1, bool _debug = false, float _focal = 400.0);
 
 		/**
 		 * Detects an object from a raw image
@@ -41,7 +41,7 @@ namespace vision_utils
 		 */
 		Mat preprocess(Mat src);
 
-        /**
+		/**
          * Enhances a raw image to account for underwater artifacts affecting contrast, hue and saturation.
          * Performs CLAHE ton the given input color spaces then blends the equally weighted result across
          * all color spaces used.
@@ -52,14 +52,14 @@ namespace vision_utils
          * @param clahe_clip_limt: The limit at which CLAHE clips the contrast to prevent over-contrasting
          * @return: An enhanced image
          */
-		Mat enhance(Mat src, int clahe_clr_space_bgr=1, int clahe_clr_space_hsv=1,int clahe_clr_space_lab=1, int clahe_clip_limit=1);
+		Mat enhance(Mat src, int clahe_clr_space_bgr = 1, int clahe_clr_space_hsv = 1, int clahe_clr_space_lab = 1, int clahe_clip_limit = 1);
 
-        /**
+		/**
          * Computes the sobel gradient fo a source image
          * @param src: A grayscale image
          * @return The sobel gradient response of the image
          */
-        Mat gradient(Mat src);
+		Mat gradient(Mat src);
 
 		/**
 		 * Smooths a binary image with morphological operations
@@ -67,7 +67,7 @@ namespace vision_utils
 		 * @param open_kernel: Opening kernel dimensions
 		 * @param close_kernel: Closing kernel dimensions
 		 */
-		Mat morphological(Mat src, Size open_kernel = Size(1,1), Size close_kernel = Size(1,1));
+		Mat morphological(Mat src, Size open_kernel = Size(1, 1), Size close_kernel = Size(1, 1));
 
 		/**
 		 * Creates a set of convex hulls from the binary segmented image and which are of 
@@ -76,12 +76,9 @@ namespace vision_utils
 		 * @param upper_area: Upper threshold of area filter
 		 * @param lower_area: Lower threshold of area filter
 		 */
-		vector<int>* convex_hulls(Mat src, float upper_area=1.0/2, float lower_area=1.0/1000);
-
+		vector<int> *convex_hulls(Mat src, float upper_area = 1.0 / 2, float lower_area = 1.0 / 1000);
 	};
 
-
 } // namespace vision_utils
-
 
 #endif // TRITON_VISION_UTILS__VISION_UTILS
