@@ -15,7 +15,7 @@ using namespace vision_utils;
 class GateDetector : public ObjectDetector
 {
 private:
-    array<vector<int>,4> gate_cntr;
+    array<vector<Point>,4> gate_cntr;
     Size gate_dims; // in m
     vector<tuple<float, float, float, float, float, float>> estimated_poses;
     int frame_count;
@@ -25,7 +25,7 @@ private:
     Mat pre;
     Mat enh;
     Mat seg;
-    vector<int>* hulls;
+    vector<Point> *hulls;
     Mat bound;
     Mat bound_and_pose; 
 
@@ -74,7 +74,7 @@ public:
     /**
      * 
      */
-    Mat bound_gate_using_poles(vector<int>* hulls, Mat src)
+    Mat bound_gate_using_poles(vector<Point>* hulls, Mat src)
     {
       return src;
     }
@@ -82,9 +82,9 @@ public:
     /**
      * 
      */
-    array<vector<int>,4> create_gate_contour(int hull_points[], Mat src)
+    array<vector<Point>,4> create_gate_contour(Point hull_points[], Mat src)
     {
-      return array<vector<int>,4>{};
+      return array<vector<Point>,4>{};
     }
 
     /**
@@ -113,17 +113,31 @@ int main()
     ObjectDetector objdtr = ObjectDetector(0.5, true, 400);
 
     src = cv::imread("/home/jared/19.jpg");
-    cv::imshow("Src", src);
+    //cv::imshow("Src", src);
     //cv::imwrite("Src.jpg", src);
+    //cv::waitKey(0);
+
+    cv::Mat enh = objdtr.enhance(src, 1,1,1,1);
+    //cv::imshow("Enh", enh);
+    //cv::waitKey(0);
 
     cv::Mat gradiented = objdtr.gradient(src);
-    cv::imshow("Grad", gradiented);
+    //cv::imshow("Grad", gradiented);
     //cv::imwrite("Grad.jpg", gradiented);
+    //cv::waitKey(0);
 
-    cv::Mat morphed = objdtr.morphological(src);
-    cv::imshow("Mor", morphed);
-    cv::imwrite("Mor.jpg", morphed);
-    cv::waitKey(0);
+    cv::Mat morphed = objdtr.morphological(src, Size(50, 50));
+    //cv::imshow("Mor", morphed);
+    //cv::imwrite("Mor.jpg", morphed);
+    //cv::waitKey(0);
+
+    Mat gray;
+    cvtColor(gradiented, gray,COLOR_BGR2GRAY);
+    vector<Point> *hulls;
+    cout << "hhhelo\n";
+    hulls = objdtr.convex_hulls(gray);
+    cout << "yelo\n";
+    cout << (hulls+1)->size() << endl;
 
     return 0;
 }

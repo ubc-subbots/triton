@@ -61,43 +61,46 @@ Mat ObjectDetector::enhance(Mat src, int clahe_clr_space_bgr, int clahe_clr_spac
     if (clahe_clr_space_lab == 1)
     {
         Mat lab[3];
-        split(src, lab);
+        Mat labMat;
+        cvtColor(src, labMat, COLOR_BGR2YCrCb);
+        split(labMat, lab);
         clahe->apply(lab[0], lab[0]);
         clahe->apply(lab[1], lab[1]);
         clahe->apply(lab[2], lab[2]);
         Mat lab_clahe;
         merge(lab, 3, lab_clahe);
-        parts[partsLen] = lab_clahe;
+        cvtColor(lab_clahe, parts[partsLen], COLOR_YCrCb2BGR);
         partsLen++;
     }
     if (clahe_clr_space_hsv == 1)
     {
         Mat hsv[3];
-        split(src, hsv);
+        Mat hsvMat;
+        cvtColor(src, hsvMat, COLOR_BGR2HSV);
+        split(hsvMat, hsv);
         clahe->apply(hsv[0], hsv[0]);
         clahe->apply(hsv[1], hsv[1]);
         clahe->apply(hsv[2], hsv[2]);
         Mat hsv_clahe;
         merge(hsv, 3, hsv_clahe);
-        parts[partsLen] = hsv_clahe;
+        cvtColor(hsv_clahe, parts[partsLen], COLOR_HSV2BGR);
         partsLen++;
     }
-    /*
     if (partsLen > 0)
     {
-        float weight = 1.0/partsLen;
-        // Create Mat of unsigned 8-bit int with zeros
-        Mat blended = Mat::zeros(im_dims.height, im_dims.width, CV_8U);
+        Mat blended (parts[0].rows, parts[0].cols, 16, Scalar::all(0));
         for (int i = 0; i < partsLen; i++)
         {
-            blended += weight*parts[i];
+            Mat p;
+            parts[i].convertTo(p, 0);
+            blended += p;
         }
+        blended /= partsLen;
         src = blended;
     }
-    */
-    Mat blended;
-    merge(parts, partsLen, blended);
     return src;
+    
+
 }
 
 Mat ObjectDetector::gradient(Mat src)
@@ -124,13 +127,14 @@ Mat ObjectDetector::morphological(Mat src, Size open_kernel, Size close_kernel)
     morphologyEx(src, opening, MORPH_OPEN, open_k);
     morphologyEx(opening, closing, MORPH_CLOSE, close_k);
     return closing;
+    //return opening;
 }
 
-vector<int> *ObjectDetector::convex_hulls(Mat src, float upper_area, float lower_area)
+vector<Point>* ObjectDetector::convex_hulls(Mat src, float upper_area, float lower_area)
 {
-    array<vector<int>, HULL_LIST_SIZE>hulls;
+    array<vector<Point>,HULL_LIST_SIZE>hulls;
     int hullIndex = 0;
-    array<vector<int>,HULL_LIST_SIZE> right_size_hulls;
+    array<vector<Point>,HULL_LIST_SIZE> right_size_hulls;
     int right_s_h_index = 0;
 
     // Find contours in the image
@@ -144,19 +148,19 @@ vector<int> *ObjectDetector::convex_hulls(Mat src, float upper_area, float lower
     }
 
     // Get the hulls whose area is within some threshold range
-    for (vector<int> hull : hulls)
+    for (vector<Point> hull : hulls)
     {
-        int hull_area = contourArea(hull);
+        double hull_area = contourArea(hull);
         auto im_size = im_dims.height * im_dims.width;
         if (hull_area > im_size * lower_area && hull_area < im_size * upper_area)
         {
             right_size_hulls[right_s_h_index++] = hull;
         }
     }
-    vector<int> right_size_hulls_[right_s_h_index];
+    vector<Point> right_size_vector_of_hulls[right_s_h_index];
     for (int i = 0; i < right_s_h_index; i++)
     {
-        right_size_hulls_[i] = right_size_hulls[i];
+        right_size_vector_of_hulls[i] = right_size_hulls[i];
     }
-    return right_size_hulls_;
+    return right_size_vector_of_hulls;
 }
