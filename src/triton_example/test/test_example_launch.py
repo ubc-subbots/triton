@@ -17,13 +17,13 @@ def generate_test_description():
     pkg_name = 'triton_example'
     launch_file_name = 'example_launch.py'
 
-    gazebo_launch = IncludeLaunchDescription(
+    launch_file = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(get_package_share_directory(pkg_name), 'launch', launch_file_name)
         )
     )
 
-    ld.add_action(gazebo_launch)
+    ld.add_action(launch_file)
     ld.add_action(launch_testing.actions.ReadyToTest())
     return ld
 

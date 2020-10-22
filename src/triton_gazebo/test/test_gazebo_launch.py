@@ -1,5 +1,6 @@
 import os
 import unittest
+import subprocess
 
 import pytest
 
@@ -17,22 +18,27 @@ def generate_test_description():
     pkg_name = 'triton_gazebo'
     launch_file_name = 'gazebo_launch.py'
 
-    gazebo_launch = IncludeLaunchDescription(
+    launch_file = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(get_package_share_directory(pkg_name), 'launch', launch_file_name)
         )
     )
 
-    ld.add_action(gazebo_launch)
+    ld.add_action(launch_file)
     ld.add_action(launch_testing.actions.ReadyToTest())
-    return ld
+    return ld 
 
 
 class TestExampleLaunchInit(unittest.TestCase):
 
+    @classmethod
+    def tearDownClass(self):
+        # gzserver and gzclient aren't always killed on exit
+        process = subprocess.call(['pkill gz'], shell=True, stdout=subprocess.PIPE)
+
 
     def test_gazebo_init(self, proc_info, proc_output):
-        proc_output.assertWaitFor('Gazebo multi-robot simulator, version 11.2.0')
+        proc_output.assertWaitFor('Gazebo multi-robot simulator, version 11')
         proc_output.assertWaitFor('Copyright (C) 2012 Open Source Robotics Foundation.')
         proc_output.assertWaitFor('Released under the Apache 2 License.')
         proc_output.assertWaitFor('http://gazebosim.org')
