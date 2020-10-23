@@ -7,9 +7,9 @@ This package contains the Gazebo models, worlds, and plugins needed to create a 
 
 To run a Gazebo simulation with a world file given in the `worlds` directory, use the `gazebo_lanch.py` file as follows
 
-    ros2 launch triton_gazebo gazebo_launch.py world:=<WORLD_FILE_NAME>
+    ros2 launch triton_gazebo gazebo_launch.py world:=<WORLD_FILE_NAME> headless:=<IS_HEADLESS>
 
-Where `<WORLD_FILE_NAME>` is the name of the world file you want to run in Gazebo (e.g `cube.world`). Remember to build this package (i.e `colcon build --packages-select triton_gazebo`) everytime you change a model or world and want that change to propogate when you relaunch Gazebo.
+Where `<WORLD_FILE_NAME>` is the name of the world file you want to run in Gazebo (e.g `cube.world`) and `<IS_HEADLESS>` is true if you don't want to run the GUI (defaults to false). Remember to build this package (i.e `colcon build --packages-select triton_gazebo`) everytime you change a model or world and want that change to propogate when you relaunch Gazebo.
 
 ## Worlds
 

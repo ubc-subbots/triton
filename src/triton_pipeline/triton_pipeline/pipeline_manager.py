@@ -368,7 +368,10 @@ def main(args=None):
     pipeline_manager = PipelineManager()
     executor = MultiThreadedExecutor()
     executor.add_node(pipeline_manager)
-    executor.spin()
+    try:
+        executor.spin()
+    except KeyboardInterrupt:
+        pass # To force exit code 0 
     pipeline_manager.destroy_node()
     executor.shutdown()
     rclpy.shutdown()
