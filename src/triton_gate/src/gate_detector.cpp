@@ -39,7 +39,7 @@ public:
         estimated_poses = {};
         frame_count = 0;
         gate_pose = tuple<float,float,float,float,float,float>(0,0,0,0,0,0);
-    //featurizer = PoleFeaturizer();
+        //featurizer = PoleFeaturizer();
         getcwd(directorybuf, 64);
         string directory(directorybuf);
         // load data/model.pkl
@@ -68,7 +68,34 @@ public:
      */
     Mat segment(Mat src)
     {
-      return src;
+        // Convert to HSV color space
+        Mat hsv;
+        cvtColor(src, hsv, COLOR_BGR2HSV);
+
+        // Compute gradient threshold on saturation channel of HSV image
+        // (seems to have best response)
+        ObjectDetector objdtr = ObjectDetector(0.5, true, 400);
+        Mat hsvChannels[3];
+        split(hsv, hsvChannels);
+        Mat grad = objdtr.gradient(hsvChannels[1]);
+        Scalar grad_mean, grad_std;
+        meanStdDev(grad, grad_mean, grad_std);
+        Mat grad_thres;
+        // Since grad should be single-channel, grad_mean[0] and grad_std[0] should contain the values we need
+        threshold(grad, grad_thres, (double)(grad_mean[0])+4*grad_std[0], 255, THRESH_BINARY);
+
+        // Orange/red hue mask
+        Mat upper_hue_mask, lower_hue_mask, color_mask;
+        inRange(hsvChannels[0], 175, 180, upper_hue_mask);
+        inRange(hsvChannels[0], 0, 30, lower_hue_mask);
+        bitwise_or(upper_hue_mask, lower_hue_mask, color_mask);
+
+        // Combine the two binary image, note that the gradient threshold has the best response from farther away
+        // and the color mask works best at close distances, so by combining them, we have an image that produces
+        // a great response to the poles at all distances to them
+        Mat segmented;
+        bitwise_or(grad_thres, color_mask, segmented);
+        return segmented;
     }
 
     /**
@@ -134,10 +161,11 @@ int main()
     Mat gray;
     cvtColor(gradiented, gray,COLOR_BGR2GRAY);
     vector<Point> *hulls;
-    cout << "hhhelo\n";
     hulls = objdtr.convex_hulls(gray);
-    cout << "yelo\n";
-    cout << (hulls+1)->size() << endl;
+    for (int i = 0; i < 5; i++)
+    {
+      cout << hulls[0].at(i) << endl;
+    }
 
     return 0;
 }

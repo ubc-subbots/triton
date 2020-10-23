@@ -1,8 +1,6 @@
 #include "triton_vision_utils/vision_utils.hpp"
 //#include <opencv2/core/mat.hpp>
 
-#define HULL_LIST_SIZE 50
-
 #include <opencv2/opencv.hpp>
 #include <iostream>
 #include <string>
@@ -132,9 +130,9 @@ Mat ObjectDetector::morphological(Mat src, Size open_kernel, Size close_kernel)
 
 vector<Point>* ObjectDetector::convex_hulls(Mat src, float upper_area, float lower_area)
 {
-    array<vector<Point>,HULL_LIST_SIZE>hulls;
+    vector<vector<Point>>hulls;
     int hullIndex = 0;
-    array<vector<Point>,HULL_LIST_SIZE> right_size_hulls;
+    vector<vector<Point>> right_size_hulls;
     int right_s_h_index = 0;
 
     // Find contours in the image
@@ -142,25 +140,33 @@ vector<Point>* ObjectDetector::convex_hulls(Mat src, float upper_area, float low
     findContours(src, contours, RETR_TREE, CHAIN_APPROX_SIMPLE);
 
     // Create a convex hull around each connected contour
+    //int count = 0;
     for (vector<Point> j : contours)
     {
-        convexHull(j, hulls[hullIndex++], false);
+        vector<Point> h;
+        convexHull(j, h, false);
+        hulls.push_back(h);
+        //count++;
     }
+    //cout << "count " << count << endl;
 
     // Get the hulls whose area is within some threshold range
     for (vector<Point> hull : hulls)
     {
-        double hull_area = contourArea(hull);
-        auto im_size = im_dims.height * im_dims.width;
-        if (hull_area > im_size * lower_area && hull_area < im_size * upper_area)
+        if (hull.size() > 0)
         {
-            right_size_hulls[right_s_h_index++] = hull;
+            double hull_area = contourArea(hull);
+            auto im_size = im_dims.height * im_dims.width;
+            if (hull_area > im_size * lower_area && hull_area < im_size * upper_area)
+            {
+                right_size_hulls.push_back(hull);
+            }
         }
     }
-    vector<Point> right_size_vector_of_hulls[right_s_h_index];
+    vector<Point>* right_size_vector_of_hulls;
     for (int i = 0; i < right_s_h_index; i++)
     {
-        right_size_vector_of_hulls[i] = right_size_hulls[i];
+        *(right_size_vector_of_hulls+i) = right_size_hulls[i];
     }
     return right_size_vector_of_hulls;
 }
