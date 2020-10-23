@@ -370,7 +370,7 @@ def main(args=None):
     executor.add_node(pipeline_manager)
     try:
         executor.spin()
-    except:
+    except KeyboardInterrupt:
         pass # To force exit code 0 
     pipeline_manager.destroy_node()
     executor.shutdown()
