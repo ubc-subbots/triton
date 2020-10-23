@@ -18,23 +18,24 @@ def generate_test_description():
     pkg_name = 'triton_gazebo'
     launch_file_name = 'gazebo_launch.py'
 
-    launch_file = IncludeLaunchDescription(
+    launch_action = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(get_package_share_directory(pkg_name), 'launch', launch_file_name)
         )
     )
 
-    ld.add_action(launch_file)
+    ld.add_action(launch_action)
     ld.add_action(launch_testing.actions.ReadyToTest())
     return ld 
 
 
 class TestExampleLaunchInit(unittest.TestCase):
 
+
     @classmethod
     def tearDownClass(self):
         # gzserver and gzclient aren't always killed on exit
-        process = subprocess.call(['pkill gz'], shell=True, stdout=subprocess.PIPE)
+        subprocess.call(['pkill gz'], shell=True, stdout=subprocess.PIPE)
 
 
     def test_gazebo_init(self, proc_info, proc_output):

@@ -1,11 +1,11 @@
-import launch
+from launch import LaunchDescription
 from launch_ros.actions import ComposableNodeContainer
 from launch_ros.descriptions import ComposableNode
 
 
 def generate_launch_description():
 
-    ld = launch.LaunchDescription()
+    ld = LaunchDescription()
 
     component_one = ComposableNode(
         name='component_one',
