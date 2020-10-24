@@ -59,7 +59,7 @@ def main():
 
     sdf_data = convert_urdf(model_path, args.model)
 
-    with open(os.path.join(REPO_ROOT, "src/triton_gazebo/models", parameters)) as param_file:
+    with open(os.path.join(REPO_ROOT, "src/triton_gazebo/models", args.parameters)) as param_file:
         params = json.load(param_file)
 
 
