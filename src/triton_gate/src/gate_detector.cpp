@@ -64,7 +64,9 @@ public:
     }
 
     /**
-     * 
+     * Segment the image using thresholded saturation gradient and orange/red color mask
+     * @param src: A preprocessed image
+     * @returns: A segmented grayscale image
      */
     Mat segment(Mat src)
     {
@@ -111,6 +113,10 @@ public:
      */
     array<vector<Point>,4> create_gate_contour(Point hull_points[], Mat src)
     {
+      int width = src.cols;
+
+      // Get extrema points of hulls (i.e the points closest/furthest from the top left (0,0) and top right (width, 0) of the image)
+    
       return array<vector<Point>,4>{};
     }
 
@@ -140,24 +146,26 @@ int main()
     ObjectDetector objdtr = ObjectDetector(0.5, true, 400);
 
     src = cv::imread("/home/jared/19.jpg");
-    //cv::imshow("Src", src);
-    //cv::imwrite("Src.jpg", src);
+    cv::imshow("Src", src);
+    cv::imwrite("Src.jpg", src);
     //cv::waitKey(0);
 
     cv::Mat enh = objdtr.enhance(src, 1,1,1,1);
-    //cv::imshow("Enh", enh);
+    cv::imshow("Enh", enh);
+    cv::imwrite("Enh.jpg", enh);
     //cv::waitKey(0);
 
     cv::Mat gradiented = objdtr.gradient(src);
-    //cv::imshow("Grad", gradiented);
-    //cv::imwrite("Grad.jpg", gradiented);
+    cv::imshow("Grad", gradiented);
+    cv::imwrite("Grad.jpg", gradiented);
     //cv::waitKey(0);
 
     cv::Mat morphed = objdtr.morphological(src, Size(50, 50));
-    //cv::imshow("Mor", morphed);
-    //cv::imwrite("Mor.jpg", morphed);
-    //cv::waitKey(0);
+    cv::imshow("Mor", morphed);
+    cv::imwrite("Mor.jpg", morphed);
+    cv::waitKey(0);
 
+    /*
     Mat gray;
     cvtColor(gradiented, gray,COLOR_BGR2GRAY);
     vector<Point> *hulls;
@@ -166,6 +174,7 @@ int main()
     {
       cout << hulls[0].at(i) << endl;
     }
+    */
 
     return 0;
 }
