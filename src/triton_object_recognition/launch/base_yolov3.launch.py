@@ -1,12 +1,9 @@
 import os
-import io
+import pathlib
 from ament_index_python.packages import get_package_share_directory
 import launch
 from launch_ros.actions import ComposableNodeContainer
 from launch_ros.descriptions import ComposableNode
-import pathlib
-import yaml
-from launch_ros.utilities import normalize_parameters
 
 def generate_launch_description():
 
@@ -15,7 +12,7 @@ def generate_launch_description():
     config = os.path.join(
         get_package_share_directory('triton_object_recognition'),
         'config',
-        'yolov3.yaml'
+        'base_yolov3.yaml'
     )
     print(config)
     print("Parameters file exists: ", pathlib.Path(config).exists())
@@ -24,7 +21,10 @@ def generate_launch_description():
         name='object_recognizer',
         namespace='/triton/object_recognition',
         package='triton_object_recognition',
-        parameters=[config],
+        parameters=[
+            config,
+            {"model_folder": os.path.join(get_package_share_directory('triton_object_recognition'),'models')}
+        ],
         plugin='object_recognition::ObjectRecognizer'
     )
 

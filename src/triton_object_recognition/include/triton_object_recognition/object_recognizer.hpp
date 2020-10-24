@@ -10,6 +10,10 @@
 #include "triton_interfaces/srv/object_detection.hpp"
 #include <opencv2/opencv.hpp>
 
+#ifndef DEBUG_VISUALIZE
+    #define DEBUG_VISUALIZE 1
+#endif
+
 namespace object_recognition
 {      
 
@@ -18,22 +22,9 @@ namespace object_recognition
 
     public:
 
-        /** Brief description of function.
+        /** Object recognition ROS2 node to detect objects within an image
          * 
-         * Longer description in which you describe more in depth about
-         * the way the function performs the task mentioned in the brief
-         * description above.
-         * 
-         * @pre precondition of this method, if any
-         * 
-         * @param options ros2 node options.
-         * @param other_param another param
-         * 
-         * @returns what this function returns, if anything
-         * 
-         * @post postcondition of this method, if any
-         * 
-         * @note something of particular note about this function
+         * Has a publisher/subscriber and a service to take image inputs and output bounding boxes/classes
          * 
          */
         explicit ObjectRecognizer(const rclcpp::NodeOptions & options);
@@ -47,8 +38,6 @@ namespace object_recognition
          * @param msg message containing image data
          * 
          * @returns DetectionBoxArray message containing the bounding boxes of detected objects
-         * 
-         * @note something of particular note about this function
          * 
          */
         triton_interfaces::msg::DetectionBoxArray process(const sensor_msgs::msg::Image & msg) const;
@@ -64,6 +53,9 @@ namespace object_recognition
         rclcpp::Publisher<triton_interfaces::msg::DetectionBoxArray>::SharedPtr publisher_;  
         image_transport::Subscriber subscription_; 
         rclcpp::Service<triton_interfaces::srv::ObjectDetection>::SharedPtr service_;
+        #if DEBUG_VISUALIZE
+            image_transport::Publisher debug_publisher_;
+        #endif
 
         std::shared_ptr<cv::dnn::Net> net_;
 
@@ -85,12 +77,16 @@ namespace object_recognition
         float mean_ = 0.5;
 
         //Processing code adapted from https://github.com/opencv/opencv/blob/master/samples/dnn/object_detection.cpp
+        /** Loads image data into network and runs model
+         */
         void preprocess(const cv::Mat& frame) const;
+        /** Gets relevant data from network output
+         */
         void postprocess(std::vector<int> & classIds, std::vector<float> & confidences, std::vector<cv::Rect> & boxes, 
                 cv::Mat & frame, const std::vector<cv::Mat>& outs) const;
     };
     
-} // namespace example
+} // namespace object_recognition
 
 #include "rclcpp_components/register_node_macro.hpp"
 RCLCPP_COMPONENTS_REGISTER_NODE(object_recognition::ObjectRecognizer)

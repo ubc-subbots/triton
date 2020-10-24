@@ -9,8 +9,6 @@ using namespace std;
 using namespace cv;
 using namespace dnn;
 
-#define DEBUG_VISUALIZE 1
-
 namespace object_recognition
 {
     ObjectRecognizer::ObjectRecognizer(const rclcpp::NodeOptions & options)
@@ -20,6 +18,10 @@ namespace object_recognition
         publisher_ = this->create_publisher<triton_interfaces::msg::DetectionBoxArray>("object_recognizer/out", 10);
         subscription_ = image_transport::create_subscription(this,"object_recognizer/in",bind(&ObjectRecognizer::subscriberCallback, this, _1),"raw");
         service_ = create_service<triton_interfaces::srv::ObjectDetection>("object_recognizer/recognize",bind(&ObjectRecognizer::serviceCallback, this, _1,_2));
+
+        #if DEBUG_VISUALIZE
+            debug_publisher_ = image_transport::create_publisher(this, "object_recognizer/debug");
+        #endif
 
         //Populate parameters (values are not modified if parameters have not been declared)
         this->declare_parameter("model_folder", model_folder_);
@@ -57,10 +59,10 @@ namespace object_recognition
         if (this->get_parameter("target", target))
             target_ = (Target) target;
 
-        //Check model folder exists and creates if it doesn't
+        //Check model folder exists
         boost::filesystem::path model_folder = boost::filesystem::path(model_folder_);
         if (!boost::filesystem::is_directory(model_folder)){
-            create_directories(model_folder);
+            RCLCPP_ERROR(get_logger(),"Model folder not found");
         }
 
         //Check cfg file exists and downloads if it doesn't
@@ -127,8 +129,8 @@ namespace object_recognition
         postprocess(classIds,confidences,boxes,cv_ptr->image, outs);
 
         // Visualize when debugging
-        if (DEBUG_VISUALIZE)
-        {
+        #if DEBUG_VISUALIZE
+            //Draw prediction boxes on input image
             auto drawPred = [&](int classId, float conf, int left, int top, int right, int bottom, Mat& frame)
             {
                 rectangle(frame, Point(left, top), Point(right, bottom), Scalar(0, 255, 0));
@@ -155,9 +157,12 @@ namespace object_recognition
                 drawPred(classIds[idx], confidences[idx], box.x, box.y,
                          box.x + box.width, box.y + box.height, frame);
             }
-            cv::imshow("Object",frame);
-            cv::waitKey(0);
-        }
+            sensor_msgs::msg::Image debug_msg;
+            cv_bridge::CvImage debug_image;
+            debug_image.image = frame;
+            debug_image.toImageMsg(debug_msg);
+            debug_publisher_.publish(debug_msg);
+        #endif
 
         //Publish message with detected boxes
         auto message = triton_interfaces::msg::DetectionBoxArray();

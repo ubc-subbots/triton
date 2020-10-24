@@ -63,6 +63,7 @@ install(TARGETS
 
 install(DIRECTORY
   config
+  models
   launch
   DESTINATION share/${PROJECT_NAME}/
 )

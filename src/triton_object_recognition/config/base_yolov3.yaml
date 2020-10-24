@@ -1,7 +1,6 @@
 #There is an issue with ComposableNode where it doesn't understand the typical nested YAML structure
 #https://github.com/ros2/rclcpp/issues/715
 
-model_folder: "src/triton_object_recognition/models/"
 weights_filename: "yolov3.weights"
 cfg_filename: "yolov3.cfg"
 weights_url: "https://pjreddie.com/media/files/yolov3.weights"
