@@ -4,6 +4,7 @@ import sys
 import json
 import argparse
 
+
 # Needs to change
 REPO_ROOT = subprocess.check_output(['git', 'rev-parse', '--show-toplevel']).decode('utf-8')[:-1]
 
@@ -41,6 +42,27 @@ def convert_urdf(model_path, model_name):
     return sdf_data.splitlines()
 
 
+def append_parameters(sdf_description, parameters, insert_idx):
+    """
+    Recusively Adds data for sdf file
+    """
+    for key, data in parameters.items():
+        if isinstance(data, dict):
+            str_occ = [i for i, s in enumerate(sdf_description) if '<'+key in s]
+            if str_occ == []: section_idx = -1
+            else: section_idx = str_occ[0]
+            print(section_idx, key)
+            append_parameters(sdf_description, data, section_idx+1)
+        else:
+            if isinstance(data, list):
+                xml_string = '<'+key+'>'+' '.join(map(str, data))+'</'+key+'>'
+            else:
+                xml_string = '<'+key+'>'+str(data)+'</'+key+'>'
+            sdf_description.insert(insert_idx, xml_string)
+
+    return sdf_description
+
+
 def main():
     parser = argparse.ArgumentParser(description='Creates a Gazebo model using a .STL file and a .urdf description.')
     parser.add_argument('--model', '-m', dest='model', required=True, 
@@ -61,8 +83,12 @@ def main():
 
     sdf_data = convert_urdf(model_path, args.model)
 
-    with open(os.path.join(REPO_ROOT, 'src/triton_gazebo/models', args.parameters)) as param_file:
+    with open(os.path.join(REPO_ROOT, 'src/triton_gazebo/scripts/', args.parameters)) as param_file:
         params = json.load(param_file)
+
+    new_sdf = append_parameters(sdf_data, params, 0)
+    #for line in new_sdf:
+    #    print(line)
 
 
 if __name__ == '__main__': 
