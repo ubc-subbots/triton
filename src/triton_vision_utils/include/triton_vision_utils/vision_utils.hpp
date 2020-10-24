@@ -76,7 +76,7 @@ namespace vision_utils
 		 * @param upper_area: Upper threshold of area filter
 		 * @param lower_area: Lower threshold of area filter
 		 */
-		vector<Point>* convex_hulls(Mat src, float upper_area = 1.0 / 2, float lower_area = 1.0 / 1000);
+		vector<vector<Point>> convex_hulls(Mat src, float upper_area = 1.0 / 2, float lower_area = 1.0 / 1000);
 	};
 
 } // namespace vision_utils

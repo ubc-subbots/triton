@@ -25,7 +25,8 @@ private:
     Mat pre;
     Mat enh;
     Mat seg;
-    vector<Point> *hulls;
+    //vector<Point> *hulls;
+    vector<vector<Point>> hulls;
     Mat bound;
     Mat bound_and_pose; 
 
@@ -103,8 +104,9 @@ public:
     /**
      * 
      */
-    Mat bound_gate_using_poles(vector<Point>* hulls, Mat src)
+    Mat bound_gate_using_poles(vector<vector<Point>> hulls, Mat src)
     {
+      //ignore featurize first, let all hulls be pole hulls
       return src;
     }
 
@@ -146,39 +148,47 @@ int main()
     ObjectDetector objdtr = ObjectDetector(0.5, true, 400);
     GateDetector gatedtr = GateDetector();
 
-    src = cv::imread("/home/jared/19.jpg");
-    cv::imshow("Src", src);
+    src = cv::imread("/home/jared/subbot/triton/4.jpg");
+    /*
     cv::imwrite("Src.jpg", src);
     //cv::waitKey(0);
 
     cv::Mat enh = objdtr.enhance(src, 1,1,1,1);
-    cv::imshow("Enh", enh);
     cv::imwrite("Enh.jpg", enh);
     //cv::waitKey(0);
 
     cv::Mat gradiented = objdtr.gradient(src);
-    cv::imshow("Grad", gradiented);
     cv::imwrite("Grad.jpg", gradiented);
     //cv::waitKey(0);
 
     cv::Mat morphed = objdtr.morphological(src, Size(50, 50));
-    cv::imshow("Mor", morphed);
     cv::imwrite("Mor.jpg", morphed);
 
-    cv::Mat segmented = gatedtr.segment(src);
-    cv::imshow("Seg", segmented);
-    cv::imwrite("Seg.jpg", segmented);
-    cv::waitKey(0);
-    /*
-    Mat gray;
-    cvtColor(gradiented, gray,COLOR_BGR2GRAY);
-    vector<Point> *hulls;
-    hulls = objdtr.convex_hulls(gray);
-    for (int i = 0; i < 5; i++)
-    {
-      cout << hulls[0].at(i) << endl;
-    }
     */
+    cv::Mat segmented = gatedtr.segment(src);
+    cv::imwrite("Seg.jpg", segmented);
+
+/*
+    cv::imshow("Src", src);
+    cv::imshow("Enh", enh);
+    cv::imshow("Grad", gradiented);
+    cv::imshow("Mor", morphed);
+    cv::imshow("Seg", segmented);
+    cv::waitKey(0);
+    */
+    vector<vector<Point>> hulls;
+    hulls = objdtr.convex_hulls(segmented);
+    Mat drawing = Mat::zeros( segmented.size(), CV_8UC3 );
+    for( size_t i = 0; i<hulls.size(); i++ )
+    {
+        Scalar color = Scalar(255,255,255);
+        drawContours( drawing, hulls, (int)i, color );
+    }
+        imshow("drawing", drawing);
+        imwrite("draw.jpg", drawing);
+        imshow("seg", segmented);
+        cv::waitKey(0);
+
 
     return 0;
 }

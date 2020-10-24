@@ -128,7 +128,7 @@ Mat ObjectDetector::morphological(Mat src, Size open_kernel, Size close_kernel)
     //return opening;
 }
 
-vector<Point>* ObjectDetector::convex_hulls(Mat src, float upper_area, float lower_area)
+vector<vector<Point>> ObjectDetector::convex_hulls(Mat src, float upper_area, float lower_area)
 {
     vector<vector<Point>>hulls;
     int hullIndex = 0;
@@ -140,15 +140,12 @@ vector<Point>* ObjectDetector::convex_hulls(Mat src, float upper_area, float low
     findContours(src, contours, RETR_TREE, CHAIN_APPROX_SIMPLE);
 
     // Create a convex hull around each connected contour
-    //int count = 0;
     for (vector<Point> j : contours)
     {
         vector<Point> h;
         convexHull(j, h, false);
         hulls.push_back(h);
-        //count++;
     }
-    //cout << "count " << count << endl;
 
     // Get the hulls whose area is within some threshold range
     for (vector<Point> hull : hulls)
@@ -156,17 +153,18 @@ vector<Point>* ObjectDetector::convex_hulls(Mat src, float upper_area, float low
         if (hull.size() > 0)
         {
             double hull_area = contourArea(hull);
-            auto im_size = im_dims.height * im_dims.width;
+            float im_size = src.cols * src.rows;
             if (hull_area > im_size * lower_area && hull_area < im_size * upper_area)
             {
                 right_size_hulls.push_back(hull);
             }
         }
     }
-    vector<Point>* right_size_vector_of_hulls;
-    for (int i = 0; i < right_s_h_index; i++)
+    vector<vector<Point>> right_size_vector_of_hulls;
+    for (int i = 0; i < right_size_hulls.size(); i++)
     {
-        *(right_size_vector_of_hulls+i) = right_size_hulls[i];
+        //*(right_size_vector_of_hulls+i) = right_size_hulls[i];
+        right_size_vector_of_hulls.push_back(right_size_hulls.at(i));
     }
     return right_size_vector_of_hulls;
 }
