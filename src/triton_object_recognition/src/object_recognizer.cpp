@@ -89,9 +89,14 @@ namespace object_recognition
         
         //Load network
         net_ = std::make_shared<Net>();
+        try {
         *net_ = readNet(model_weights.string(),model_config.string());
+        } catch(Exception &e){
+            RCLCPP_ERROR(get_logger(),e.what());
+        }
         net_->setPreferableBackend(backend_);
         net_->setPreferableTarget(target_);
+        RCLCPP_INFO(get_logger(),"ObjectRecognizer loaded successfully");
     }
 
     void ObjectRecognizer::subscriberCallback(const sensor_msgs::msg::Image::ConstSharedPtr & msg) const

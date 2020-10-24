@@ -1,39 +1,29 @@
-# triton_example
+# triton_object_recognition
 ## Description
 
-This package serves as an example package displaying how to write component nodes to be used in the pipeline and also to show the style conventions that are expected to be followed.
+This package contains a ROS2 node that can use a YOLOv3 network to detect and classify objects within an image.
 
 ## Usage
 
-Follow the usage of the `triton_pipeline` package with `<PIPELINE_TYPE> = example` and `<PIPELINE_INPUT> = 0`. You can then use the following command to send data to the example pipeline and see output from each node in the same terminal where the `triton_pipeline.launch.py` launch file was launched.
+You can use the following command to run the node:
 
-    ros2 topic pub /triton/example/component_one/in std_msgs/String '{data: "Hello World"}'
+    ros2 launch triton_object_recognition base_yolov3.launch.py
 
-You can also see the final output of the pipeline using the command
-
-    ros2 topic echo /triton/example/component_two/out
-
-You should see the string `"Hello World from ComponentOne and ComponentTwo"` being output from the above command. Once this message is output 25 times, the second component notifies the pipeline manager that the example pipeline has been successfully run and it is unloaded from the pipeline.
+You should see `ObjectRecognizer loaded successfully` if successful.
 
 ## Nodes
 
-- `component_one` : A component node (`example::ComponentOne`) which adds `"from ComponentOne"` to any string it recieves.
+- `object_recognizer` : A component node (`object_recognition::ObjectRecognizer`) which recognizes objects in a received image.
 
     ### Subscribed Topics
-    - `component_one/in` (`std_msgs/msg/String.msg`) : Input string.
+    - `object_recognizer/in` (`sensor_msgs::msg::Image`) : Input image.
     
     ### Published Topics
-    - `component_one/out` (`std_msgs/msg/String.msg`) : Output string.
+    - `object_recognizer/out` (`triton_interfaces::msg::DetectionBoxArray`) : Output detection boxes.
     
-- `component_two` : A component node (`example::ComponentTwo`) which adds `"and ComponentTwo"` to any string it recieves. Also notifies pipeline of success once it recieves 25 string messages.
-
-    ### Subscribed Topics
-    - `component_two/in` (`std_msgs/msg/String.msg`) : Input string.
-    
-    ### Published Topics
-    - `component_two/out` (`std_msgs/msg/String.msg`) : Output string.
-    - `/triton/pipeline_feedback` (`triton_interfaces/msg/PipelineFeedback.msg`) : Pipeline feedback.
+    ### Service
+    - `object_recognizer/recognize` (Input: `sensor_msgs::msg::Image`, Output, `triton_interfaces::msg::DetectionBoxArray`)
 
 ## Contributors
 
-- Logan Fillo (logan.fillo@gmail.com)
+- Kevin Huang (kevinh42@student.ubc.ca)
