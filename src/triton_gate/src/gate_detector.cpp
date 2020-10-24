@@ -144,6 +144,7 @@ int main()
 {
     cv::Mat src;
     ObjectDetector objdtr = ObjectDetector(0.5, true, 400);
+    GateDetector gatedtr = GateDetector();
 
     src = cv::imread("/home/jared/19.jpg");
     cv::imshow("Src", src);
@@ -163,8 +164,11 @@ int main()
     cv::Mat morphed = objdtr.morphological(src, Size(50, 50));
     cv::imshow("Mor", morphed);
     cv::imwrite("Mor.jpg", morphed);
-    cv::waitKey(0);
 
+    cv::Mat segmented = gatedtr.segment(src);
+    cv::imshow("Seg", segmented);
+    cv::imwrite("Seg.jpg", segmented);
+    cv::waitKey(0);
     /*
     Mat gray;
     cvtColor(gradiented, gray,COLOR_BGR2GRAY);
