@@ -1,0 +1,79 @@
+{
+    "model":{
+        "link": {
+            "gravity": 1,
+            "self_collide": 0,
+            "kinematic": 0,
+            "enable_wind": 0,
+            "visual": {
+                "material": {
+                    "lighting": 1, 
+                    "script": {
+                        "uri": "file://media/materials/scripts/gazebo.material",
+                        "name": "Gazebo/Gray"
+                    },
+                    "shader": {
+                        "normal_map": "__default__"
+                    },
+                    "ambient": [0.3, 0.3, 0.3, 1],
+                    "diffuse": [0.7, 0.7, 0.7, 1],
+                    "specular": [0.01, 0.01, 0.01, 1],
+                    "emissive": [0, 0, 0, 1]
+                },
+                "transparency": 0,
+                "cast_shadows": 1
+            },
+            "collision": {
+                "laser_retro": 0,
+                "max_contacts": 10,
+                "surface": {
+                    "friction": {
+                        "ode":{
+                            "mu": 1,
+                            "mu2": 1,
+                            "fdir1": [0, 0, 0],
+                            "slip1": 0,
+                            "slip2": 0
+                        },
+                        "torsional":{
+                            "coefficient": 1,
+                            "patch_radius": 0,
+                            "surface_radius": 0,
+                            "use_patch_radius": 1,
+                            "ode": {
+                                "slip": 0
+                            }
+                        }
+                    },
+                    "bounce": {
+                        "restitution_coefficient": 0,
+                        "threshold": 1e+06
+                    },
+                    "contact": {
+                        "collide_without_contact": 0,
+                        "collide_without_contact_bitmask": 1,
+                        "collide_bitmask": 1,
+                        "ode": {
+                            "soft_cfm": 0,
+                            "soft_erp": 0.2,
+                            "kp": 1e+13,
+                            "kd": 1,
+                            "max_vel": 0.01,
+                            "min_depth": 0
+                        },
+                        "bullet":{
+                            "split_impulse": 1,
+                            "split_impulse_penetration_threshold": -0.01,
+                            "soft_cfm": 0,
+                            "soft_erp": 0.2,
+                            "kp": 1e+13,
+                            "kd": 1
+                        }
+                    }
+                }
+            }
+        },
+        "static": 0,
+        "allow_auto_disable": 1
+    }
+}
