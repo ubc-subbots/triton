@@ -5,7 +5,7 @@ This package serves as an example package displaying how to write component node
 
 ## Usage
 
-Follow the usage of the `triton_pipeline` package with `<PIPELINE_TYPE> = example` and `<PIPELINE_INPUT> = 0`. You can then use the following command to send data to the example pipeline and see output from each node in the same terminal where the `triton_pipeline.launch.py` launch file was launched.
+Follow the usage of the `triton_pipeline` package with `<PIPELINE_TYPE> = example` and `<PIPELINE_INPUT> = 0`. You can then use the following command to send data to the example pipeline and see output from each node in the same terminal where the `pipeline_launch.py` launch file was launched.
 
     ros2 topic pub /triton/example/component_one/in std_msgs/String '{data: "Hello World"}'
 

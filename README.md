@@ -89,7 +89,7 @@ Navigate to the bottom of the file and add the following three lines, be sure to
     
 The last line is helpful in that it colorizes ROS2 logging so that info/warn/error messages are easier to differentiate. Once this is done, open a new terminal for the `.bashrc` to be executed and the required scripts be sourced. To perform a sanity check that everything is working, launch the pipeline as such
 
-    ros2 launch triton_pipeline triton_pipeline.launch.py
+    ros2 launch triton_pipeline pipeline_launch.py
    
 If this command executes successfully, you are ready to develop!
 

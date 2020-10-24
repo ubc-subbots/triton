@@ -12,6 +12,8 @@ ComponentOne::ComponentOne(const rclcpp::NodeOptions & options)
 
     subscription_ = this->create_subscription<std_msgs::msg::String>(
       "component_one/in", 10, std::bind(&ComponentOne::callback, this, _1));
+
+    RCLCPP_INFO(this->get_logger(), "Component One succesfully started!");
 }
 
 

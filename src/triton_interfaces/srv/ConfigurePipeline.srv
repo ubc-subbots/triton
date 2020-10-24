@@ -1,3 +1,11 @@
-PipelineType pipeline_type # must be one of the constants in PipelineType.msg
+# The type of the pipeline, must be one of the constants in PipelineType.msg
+PipelineType pipeline_type 
+
+# Name of config file to be used, mainly used for testing purposes, the config file
+# should have the name of the pipeline type (i.e example pipeline has 'example.yaml'
+# as its config file)
+string config_file_name ""
 ---
+
+# True if and only if the pipeline configuration was succesful and can now be run
 bool success

@@ -1,5 +1,8 @@
+# Input value into the pipeline (currently is not meaningful)
 int32 input
 ---
+# Output value from the pipeline (currently is not meaningful)
 int32 output
 ---
+# Message regarding the status of the pipeline 
 string status

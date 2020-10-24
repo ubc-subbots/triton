@@ -104,10 +104,10 @@ class AnotherExampleClass:
         self.member_var = arg_one
 
 
-"""
-Description of main program
-"""
 def main():
+    """
+    Description of main program
+    """
     example_class_obj = ExampleClass(1, 2)
     example_class_obj.member_function(3)
 
