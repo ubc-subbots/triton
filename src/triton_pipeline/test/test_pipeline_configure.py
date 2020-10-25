@@ -130,7 +130,7 @@ class TestPipeline(unittest.TestCase):
                 res = future.result()
                 if res.success is False:
                     proc_output.assertWaitFor(
-                        expected_output='Could not parse {}.yaml'.format(bad_yaml_type))
+                        expected_output='Could not parse {}.yaml'.format(test_file_name))
                 else:
                     self.fail('Expected configure pipeline service to fail'
                                 ' due to bad yaml associated to pipeline type')
@@ -161,6 +161,8 @@ class TestPipeline(unittest.TestCase):
 
 
     def test_configure_valid_type_yaml_no_param(self, pipeline_manager, proc_info, proc_output):
+        param = 'no_param_for_this'
+
         req = ConfigurePipeline.Request()
         pipeline_type = PipelineType()
         test_type = 'example'
@@ -175,7 +177,7 @@ class TestPipeline(unittest.TestCase):
                 res = future.result()
                 if res.success is False:
                     proc_output.assertWaitFor(
-                        expected_output='Could not get the pipeline parameter "{}", does not exist'.format(no_param_type))
+                        expected_output='Could not get the pipeline parameter "{}", does not exist'.format(param))
                 else:
                     self.fail('Expected configure pipeline service to fail'
                                 ' due to no parameter for yaml item'
