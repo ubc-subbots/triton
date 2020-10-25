@@ -3,7 +3,7 @@ import subprocess
 import sys
 import json
 import argparse
-
+import re
 
 # Needs to change
 REPO_ROOT = subprocess.check_output(['git', 'rev-parse', '--show-toplevel']).decode('utf-8')[:-1]
@@ -42,33 +42,30 @@ def convert_urdf(model_path, model_name):
     return sdf_data.splitlines()
 
 
-def append_parameters(sdf_description, parameters, insert_idx):
+def dict_to_sdf(parameters, sdf_fmt=[], depth=1):
     """
-    Recusively Adds data for sdf file
+    converts a dictionary to a section of xml code
     """
     for key, data in parameters.items():
+        indent = '\t'.join(['']*(depth+1))
         if isinstance(data, dict):
-            str_occ = [i for i, s in enumerate(sdf_description) if '<'+key in s]
-            if str_occ == []: section_idx = -1
-            else: section_idx = str_occ[0]
-            print(section_idx, key)
-            append_parameters(sdf_description, data, section_idx+1)
+            sdf_fmt.append(indent + '<'+key+'>')
+            dict_to_sdf(data, sdf_fmt, depth+1)
+            sdf_fmt.append(indent + '</'+key+'>')
+        elif isinstance(data, list):
+            sdf_fmt.append(indent + '<'+key+'>'+' '.join(map(str, data))+'</'+key+'>')
         else:
-            if isinstance(data, list):
-                xml_string = '<'+key+'>'+' '.join(map(str, data))+'</'+key+'>'
-            else:
-                xml_string = '<'+key+'>'+str(data)+'</'+key+'>'
-            sdf_description.insert(insert_idx, xml_string)
-
-    return sdf_description
+            sdf_fmt.append(indent + '<'+key+'>'+str(data)+'</'+key+'>')
+    
+    return sdf_fmt
 
 
 def main():
     parser = argparse.ArgumentParser(description='Creates a Gazebo model using a .STL file and a .urdf description.')
-    parser.add_argument('--model', '-m', dest='model', required=True, 
+    parser.add_argument('--model', '-m', dest='model', required=True,
                         help='The name of the model directory')
-    parser.add_argument('--params', '-p', dest='parameters', required=False, 
-                        default='import_mesh/config/default_parameters.json', 
+    parser.add_argument('--params', '-p', dest='parameters', required=False,
+                        default='import_mesh/config/default_parameters.json',
                         help='json file containing model parameters')
 
     args = parser.parse_args()
@@ -86,9 +83,6 @@ def main():
     with open(os.path.join(REPO_ROOT, 'src/triton_gazebo/scripts/', args.parameters)) as param_file:
         params = json.load(param_file)
 
-    new_sdf = append_parameters(sdf_data, params, 0)
-    #for line in new_sdf:
-    #    print(line)
 
 
 if __name__ == '__main__': 
