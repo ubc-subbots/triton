@@ -72,10 +72,10 @@ class TestPipeline(unittest.TestCase):
 
     def test_configure_invalid_type(self, pipeline_manager, proc_info, proc_output):
         req = ConfigurePipeline.Request()
-        pipeline_type =  PipelineType()
-        ne_type = 'non-existent-type'
-        pipeline_type.type = ne_type
-        req.pipeline_type =pipeline_type
+        pipeline_type = PipelineType()
+        test_type = 'no_exist'
+        pipeline_type.type = test_type
+        req.pipeline_type = pipeline_type
         future = self.configure_client.call_async(req)
         while rclpy.ok():
             rclpy.spin_once(self.node)
@@ -84,7 +84,7 @@ class TestPipeline(unittest.TestCase):
                 if res.success is False:
                     proc_output.assertWaitFor(
                         expected_output='Configuration of pipeline type "{}"' \
-                                        ' is not allowed, no such type'.format(ne_type),
+                                        ' is not allowed, no such type'.format(test_type),
                         process=pipeline_manager
                     )
                 else:
@@ -95,10 +95,12 @@ class TestPipeline(unittest.TestCase):
 
     def test_configure_valid_type_no_yaml(self, pipeline_manager, proc_info, proc_output):
         req = ConfigurePipeline.Request()
-        pipeline_type =  PipelineType()
-        no_yaml_type = 'test_no_yaml'
-        pipeline_type.type = no_yaml_type
-        req.pipeline_type =pipeline_type
+        pipeline_type = PipelineType()
+        test_type = 'example'
+        pipeline_type.type = test_type
+        req.pipeline_type = pipeline_type
+        test_file_name = 'test_no_yaml'
+        req.config_file_name = test_file_name;
         future = self.configure_client.call_async(req)
         while rclpy.ok():
             rclpy.spin_once(self.node)
@@ -106,7 +108,7 @@ class TestPipeline(unittest.TestCase):
                 res = future.result()
                 if res.success is False:
                     proc_output.assertWaitFor(
-                        expected_output='Could not find {}.yaml'.format(no_yaml_type))
+                        expected_output='Could not find {}.yaml'.format(test_file_name))
                 else:
                     self.fail('Expected configure pipeline service to fail' \
                                 ' due to no yaml associated to pipeline type')
@@ -115,10 +117,12 @@ class TestPipeline(unittest.TestCase):
 
     def test_configure_valid_type_bad_yaml(self, pipeline_manager, proc_info, proc_output):
         req = ConfigurePipeline.Request()
-        pipeline_type =  PipelineType()
-        bad_yaml_type = 'test_bad_yaml'
-        pipeline_type.type = bad_yaml_type
-        req.pipeline_type =pipeline_type
+        pipeline_type = PipelineType()
+        test_type = 'example'
+        pipeline_type.type = test_type
+        req.pipeline_type = pipeline_type
+        test_file_name = 'test_bad_yaml'
+        req.config_file_name = test_file_name;
         future = self.configure_client.call_async(req)
         while rclpy.ok():
             rclpy.spin_once(self.node)
@@ -128,7 +132,53 @@ class TestPipeline(unittest.TestCase):
                     proc_output.assertWaitFor(
                         expected_output='Could not parse {}.yaml'.format(bad_yaml_type))
                 else:
-                    self.fail('Expected configure pipeline service to fail' \
+                    self.fail('Expected configure pipeline service to fail'
                                 ' due to bad yaml associated to pipeline type')
+                break
+
+
+    def test_configure_valid_type_yaml_no_namespace(self, pipeline_manager, proc_info, proc_output):
+        req = ConfigurePipeline.Request()
+        pipeline_type = PipelineType()
+        test_type = 'example'
+        pipeline_type.type = test_type
+        req.pipeline_type = pipeline_type
+        test_file_name = 'test_no_namespace'
+        req.config_file_name = test_file_name;
+        future = self.configure_client.call_async(req)
+        while rclpy.ok():
+            rclpy.spin_once(self.node)
+            if future.done():
+                res = future.result()
+                if res.success is False:
+                    proc_output.assertWaitFor(
+                        expected_output='Pipeline config YAML needs pipeline namespace')
+                else:
+                    self.fail('Expected configure pipeline service to fail'
+                                ' due to no pipeline parameter namespace in yaml'
+                                ' associated to pipeline type')
+                break
+
+
+    def test_configure_valid_type_yaml_no_param(self, pipeline_manager, proc_info, proc_output):
+        req = ConfigurePipeline.Request()
+        pipeline_type = PipelineType()
+        test_type = 'example'
+        pipeline_type.type = test_type
+        req.pipeline_type = pipeline_type
+        test_file_name = 'test_no_param'
+        req.config_file_name = test_file_name;
+        future = self.configure_client.call_async(req)
+        while rclpy.ok():
+            rclpy.spin_once(self.node)
+            if future.done():
+                res = future.result()
+                if res.success is False:
+                    proc_output.assertWaitFor(
+                        expected_output='Could not get the pipeline parameter "{}", does not exist'.format(no_param_type))
+                else:
+                    self.fail('Expected configure pipeline service to fail'
+                                ' due to no parameter for yaml item'
+                                ' associated to pipeline type')
                 break
 

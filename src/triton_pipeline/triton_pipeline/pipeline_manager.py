@@ -91,7 +91,7 @@ class PipelineManager(Node):
             self.configure_pipeline
         )
         self.get_logger().info('Pipeline manager succesfully started!')
-            
+
 
     def feedback_callback(self, msg):
         """
@@ -139,7 +139,7 @@ class PipelineManager(Node):
                     try:
                         config_yaml = yaml.safe_load(stream)
                     except yaml.YAMLError as e:
-                        self.get_logger().warn('Could not parse {}.yaml'.format(pipeline_type))
+                        self.get_logger().warn('Could not parse {}.yaml'.format(config_file_name))
                         self.get_logger().error(str(e))
                 if config_yaml is not None:
                     response.success = self._load_params_from_yaml(config_yaml)
@@ -147,7 +147,7 @@ class PipelineManager(Node):
                 else:
                     response.success = False
             else:
-                self.get_logger().warn('Could not find {}.yaml'.format(pipeline_type))
+                self.get_logger().warn('Could not find {}.yaml'.format(config_file_name))
                 response.success = False
         if response.success is True:
             self.get_logger().info('Pipeline configured for {}!'.format(pipeline_type))
@@ -303,16 +303,20 @@ class PipelineManager(Node):
                     self.get_logger().warn('Could not get the pipeline parameter "{}", does not exist'
                                             .format(param_name))
                     self.get_logger().error(str(e))
+                    return False # I added return here so it won't get stuck
             try:
                 self.set_parameters(params_list)
-                if (len(self.get_parameter('pipeline.components').value) ==
+                self.get_logger().info('params listed')
+                self.get_logger().info('param list: {}'.format(self.list_parameters()))
+                if (len(self.get_parameter('pipeline.components').value) !=
                       len(self.get_parameter('pipeline.pkg_names').value)):
-                    return True
-                else:
                     self.get_logger().warn('Number of components and package names do not match, {} and {} respectively'
                                             .format(len(self.get_parameter('pipeline.components').value),
                                              len(self.get_parameter('pipeline.pkg_names').value)))
                     return False
+
+                else:
+                    return True
             except rclpy.exceptions.ParameterException as e:
                 self.get_logger().warn('Could not set pipeline parameters')
                 self.get_logger().error(str(e))
