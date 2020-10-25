@@ -1,5 +1,4 @@
 import os
-import pathlib
 from ament_index_python.packages import get_package_share_directory
 import launch
 from launch_ros.actions import ComposableNodeContainer
@@ -14,8 +13,6 @@ def generate_launch_description():
         'config',
         'base_yolov3.yaml'
     )
-    print(config)
-    print("Parameters file exists: ", pathlib.Path(config).exists())
 
     object_recognizer = ComposableNode(
         name='object_recognizer',

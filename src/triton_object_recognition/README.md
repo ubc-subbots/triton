@@ -9,7 +9,7 @@ You can use the following command to run the node:
 
     ros2 launch triton_object_recognition base_yolov3.launch.py
 
-You should see `ObjectRecognizer loaded successfully` if successful.
+You should see `ObjectRecognizer successfully started!` if successful.
 
 ## Nodes
 

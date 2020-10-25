@@ -96,7 +96,7 @@ namespace object_recognition
         }
         net_->setPreferableBackend(backend_);
         net_->setPreferableTarget(target_);
-        RCLCPP_INFO(get_logger(),"ObjectRecognizer loaded successfully");
+        RCLCPP_INFO(get_logger(),"ObjectRecognizer successfully started!");
     }
 
     void ObjectRecognizer::subscriberCallback(const sensor_msgs::msg::Image::ConstSharedPtr & msg) const

@@ -69,6 +69,13 @@ install(DIRECTORY
 )
 
 if(BUILD_TESTING)
+  find_package(launch_testing_ament_cmake REQUIRED)
+  add_launch_test(
+    test/test_object_recognition_launch.py
+  )
+endif()
+
+if(BUILD_TESTING)
   # find_package(ament_lint_auto REQUIRED)
   # the following line skips the linter which checks for copyrights
   # uncomment the line when a copyright and license is not present in all source files
