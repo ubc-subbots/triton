@@ -21,6 +21,8 @@ ComponentTwo::ComponentTwo(const rclcpp::NodeOptions & options)
       );
 
     counter_ = 0;
+
+    RCLCPP_INFO(this->get_logger(), "Component Two succesfully started!");
 }
 
 

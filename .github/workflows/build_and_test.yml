@@ -28,6 +28,7 @@ jobs:
       - name: Source setup and build then test using colcon
         run: |
           source /opt/ros/foxy/setup.bash
+          source /usr/share/gazebo/setup.sh
           colcon build
           colcon test
           colcon test-result --verbose
