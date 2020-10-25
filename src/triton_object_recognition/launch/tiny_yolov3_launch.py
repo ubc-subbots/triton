@@ -11,17 +11,14 @@ def generate_launch_description():
     config = os.path.join(
         get_package_share_directory('triton_object_recognition'),
         'config',
-        'base_yolov3.yaml'
+        'tiny_yolov3.yaml'
     )
 
     object_recognizer = ComposableNode(
         name='object_recognizer',
         namespace='/triton/object_recognition',
         package='triton_object_recognition',
-        parameters=[
-            config,
-            {"model_folder": os.path.join(get_package_share_directory('triton_object_recognition'),'models')}
-        ],
+        parameters=[config], 
         plugin='object_recognition::ObjectRecognizer'
     )
 

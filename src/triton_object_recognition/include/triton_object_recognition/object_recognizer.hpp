@@ -60,7 +60,6 @@ namespace object_recognition
         std::shared_ptr<cv::dnn::Net> net_;
 
         //Default Neural Net Parameters (overriden by parameters)
-        std::string model_folder_ = "src/triton_object_recognition/models/";
         std::string weights_url_ = "https://pjreddie.com/media/files/yolov3.weights";
         std::string weights_filename_ = "yolov3.weights";
         std::string cfg_url_ = "https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/yolov3.cfg";
