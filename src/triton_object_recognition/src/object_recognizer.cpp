@@ -2,6 +2,7 @@
 #include <opencv2/dnn.hpp>
 #include <boost/filesystem.hpp>
 #include <rcl_yaml_param_parser/parser.h>
+#include "ament_index_cpp/get_package_share_directory.hpp"
 using std::placeholders::_1;
 using std::placeholders::_2;
 using std::placeholders::_3;
@@ -22,9 +23,7 @@ namespace object_recognition
         #if DEBUG_VISUALIZE
             debug_publisher_ = image_transport::create_publisher(this, "object_recognizer/debug");
         #endif
-
         //Populate parameters (values are not modified if parameters have not been declared)
-        this->declare_parameter("model_folder", model_folder_);
         this->declare_parameter("weights_filename", weights_filename_);
         this->declare_parameter("cfg_filename", cfg_filename_);
         this->declare_parameter("weights_url", weights_url_);
@@ -40,7 +39,6 @@ namespace object_recognition
         this->declare_parameter("backend", (int) backend_);
         this->declare_parameter("target", (int) target_);
 
-        this->get_parameter("model_folder", model_folder_);
         this->get_parameter("weights_filename", weights_filename_);
         this->get_parameter("cfg_filename", cfg_filename_);
         this->get_parameter("weights_url", weights_url_);
@@ -59,31 +57,29 @@ namespace object_recognition
         if (this->get_parameter("target", target))
             target_ = (Target) target;
 
-        //Check model folder exists
-        boost::filesystem::path model_folder = boost::filesystem::path(model_folder_);
-        if (!boost::filesystem::is_directory(model_folder)){
-            RCLCPP_ERROR(get_logger(),"Model folder not found");
-        }
+        //Get model folder as the install directory of this package
+        boost::filesystem::path model_folder = boost::filesystem::path(
+            ament_index_cpp::get_package_share_directory("triton_object_recognition"));
 
         //Check cfg file exists and downloads if it doesn't
         boost::filesystem::path model_config = model_folder / cfg_filename_;
         if (!boost::filesystem::exists(model_config)){
-            RCLCPP_WARN(get_logger(),"Model weights not found. Downloading from " + cfg_url_);
+            RCLCPP_WARN(get_logger(),"Model config not found. Downloading from " + cfg_url_);
             //Warning: This command is not portable
             string command = "wget -O " + model_config.string() + " " + cfg_url_;
             if (system(command.c_str())){
-                RCLCPP_ERROR(get_logger(),"Model weights failed to download");
+                RCLCPP_ERROR(get_logger(),"Model config failed to download");
             };
         }
         
         //Check weights file exists and download if it doesn't
         boost::filesystem::path model_weights = model_folder / weights_filename_;
         if (!boost::filesystem::exists(model_weights)){
-            RCLCPP_WARN(get_logger(),"Model config not found. Downloading from " + weights_url_);
+            RCLCPP_WARN(get_logger(),"Model weights not found. Downloading from " + weights_url_);
             //Warning: This command is not portable
-            string command = "wget -O " + model_config.string() + " " + weights_url_;
+            string command = "wget -O " + model_weights.string() + " " + weights_url_;
             if (system(command.c_str())){
-                RCLCPP_ERROR(get_logger(),"Model config failed to download");
+                RCLCPP_ERROR(get_logger(),"Model weights failed to download");
             };
         }
         
