@@ -22,7 +22,7 @@
         <pose>0 0 0 1.5708 -0 0</pose>
         <geometry>
           <mesh>
-            <uri>/home/jake/triton/src/triton_gazebo/models/triton_auv/meshes/triton_auv.dae</uri>
+            <uri>model://triton_auv/meshes/triton_auv.dae</uri>
             <scale>1 1 1</scale>
           </mesh>
         </geometry>
@@ -49,7 +49,7 @@
         <pose>0 0 0 1.5708 -0 0</pose>
         <geometry>
           <mesh>
-            <uri>/home/jake/triton/src/triton_gazebo/models/triton_auv/meshes/triton_auv.dae</uri>
+            <uri>model://triton_auv/meshes/triton_auv.dae</uri>
             <scale>1 1 1</scale>
           </mesh>
         </geometry>
