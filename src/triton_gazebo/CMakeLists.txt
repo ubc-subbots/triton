@@ -21,7 +21,27 @@ find_package(gazebo_ros_pkgs REQUIRED)
 find_package(gazebo REQUIRED)
 find_package(gazebo_dev REQUIRED)
 find_package(gazebo_ros REQUIRED)
+find_package(image_transport REQUIRED)
+find_package(sensor_msgs REQUIRED)
 find_package(rclcpp REQUIRED)
+
+add_executable(underwater_camera 
+  src/underwater_camera.cpp
+)
+target_include_directories(underwater_camera PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+)
+ament_target_dependencies(
+  underwater_camera
+  "image_transport"
+  "sensor_msgs"
+  "rclcpp"
+)
+
+install(TARGETS underwater_camera
+  DESTINATION lib/${PROJECT_NAME})
+
 
 install(DIRECTORY
   launch
@@ -51,6 +71,11 @@ if(BUILD_TESTING)
     test/test_gazebo_launch.py
     TARGET test_gazebo_launch_cube_world
     ARGS "headless:=true" "world:=cube.world"
+  )
+
+  add_launch_test(
+    test/test_underwater_camera_launch.py
+    TARGET test_underwater_camera_launch
   )
 
 endif()
