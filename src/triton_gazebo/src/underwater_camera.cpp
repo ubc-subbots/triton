@@ -7,6 +7,9 @@ namespace gazebo_nodes
     UnderwaterCamera::UnderwaterCamera(const rclcpp::NodeOptions & options)
     : Node("underwater_camera", options) 
     {
+        image_buf_.set_capacity(buf_size_);
+        depth_buf_.set_capacity(buf_size_);
+
         rmw_qos_profile_t subscriber_qos_profile = rmw_qos_profile_sensor_data;
         rmw_qos_profile_t publisher_qos_profile = rmw_qos_profile_default;
 
@@ -21,14 +24,14 @@ namespace gazebo_nodes
 
         img_sub_ = image_transport::create_subscription(this, 
             "/triton/gazebo_drivers/front_camera/image_raw",
-            std::bind(&UnderwaterCamera::img_callback, this, _1),
+            std::bind(&UnderwaterCamera::imgCallback, this, _1),
             "raw",
             subscriber_qos_profile
         );
 
         depth_sub_ = image_transport::create_subscription(this, 
             "/triton/gazebo_drivers/front_camera/depth/image_raw",
-            std::bind(&UnderwaterCamera::depth_callback, this, _1),
+            std::bind(&UnderwaterCamera::depthCallback, this, _1),
             "raw",
             subscriber_qos_profile
         );
@@ -37,20 +40,28 @@ namespace gazebo_nodes
     }
 
 
-    void UnderwaterCamera::img_callback(const sensor_msgs::msg::Image::ConstSharedPtr & msg) 
+    void UnderwaterCamera::imgCallback(const sensor_msgs::msg::Image::ConstSharedPtr & msg) 
     {
-        float time = msg->header.stamp.sec +  msg->header.stamp.nanosec*1e-9;
-        RCLCPP_INFO(this->get_logger(), "Image Raw Time: [%f]", time);
         img_pub_.publish(msg);
+        image_buf_.push_back(msg);
+        std::pair<ImageMsg, ImageMsg> pair = findClosestPair(); 
     }
 
 
-    void UnderwaterCamera::depth_callback(const sensor_msgs::msg::Image::ConstSharedPtr & msg) 
+    void UnderwaterCamera::depthCallback(const sensor_msgs::msg::Image::ConstSharedPtr & msg) 
     {
-        float time = msg->header.stamp.sec +  msg->header.stamp.nanosec*1e-9;
-        RCLCPP_INFO(this->get_logger(), "Depth Image Time: [%f]", time);
         depth_pub_.publish(msg);
+        depth_buf_.push_back(msg);
     }
+
+
+    std::pair<ImageMsg, ImageMsg> UnderwaterCamera::findClosestPair()
+    {
+        std::pair<ImageMsg, ImageMsg> pair;
+        // TODO
+        return pair;
+    }
+
 
     
 } // namespace gazebo_nodes
