@@ -13,7 +13,7 @@ You should see `ObjectRecognizer successfully started!` if successful.
 
 ## Nodes
 
-- `object_recognizer` : A component node (`object_recognition::ObjectRecognizer`) which recognizes objects in a received image.
+- `object_recognizer` : A component node (`triton_object_recognition::ObjectRecognizer`) which recognizes objects in a received image.
 
     ### Subscribed Topics
     - `object_recognizer/in` (`sensor_msgs::msg::Image`) : Input image.

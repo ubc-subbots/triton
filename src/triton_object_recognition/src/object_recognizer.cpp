@@ -10,7 +10,7 @@ using namespace std;
 using namespace cv;
 using namespace dnn;
 
-namespace object_recognition
+namespace triton_object_recognition
 {
     ObjectRecognizer::ObjectRecognizer(const rclcpp::NodeOptions & options)
     : Node("object_recognizer", options) 
@@ -316,4 +316,4 @@ namespace object_recognition
             confidences = nmsConfidences;
         }
     }
-} // namespace object_recognition
+} // namespace triton_object_recognition

@@ -19,7 +19,7 @@ def generate_launch_description():
         namespace='/triton/object_recognition',
         package='triton_object_recognition',
         parameters=[config], 
-        plugin='object_recognition::ObjectRecognizer'
+        plugin='triton_object_recognition::ObjectRecognizer'
     )
 
     object_recognizer_container = ComposableNodeContainer(
