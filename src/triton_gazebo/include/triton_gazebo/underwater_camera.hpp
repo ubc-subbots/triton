@@ -1,15 +1,20 @@
 #ifndef TRITON_GAZEBO__UNDERWATER_CAMERA
 #define TRITON_GAZEBO__UNDERWATER_CAMERA
 
-#include <utility>
+#include <memory>
 
-#include <boost/circular_buffer.hpp>
-
-#include "rclcpp/rclcpp.hpp"
+#include "message_filters/subscriber.h"
+#include "message_filters/sync_policies/approximate_time.h"
+#include "message_filters/synchronizer.h"
 #include "image_transport/image_transport.hpp"
+#include "image_transport/subscriber_filter.hpp"
+#include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/image.hpp"
 
+typedef sensor_msgs::msg::Image Image;
 typedef sensor_msgs::msg::Image::ConstSharedPtr ImageMsg;
+typedef message_filters::sync_policies::ApproximateTime<Image, Image> ApproxPolicy;
+typedef message_filters::Synchronizer<ApproxPolicy> ApproxSync;
 
 namespace gazebo_nodes
 {      
@@ -32,47 +37,37 @@ namespace gazebo_nodes
     private:
 
 
-        /** Gazebo image callback
+        /** Synced image/depth message callback
          * 
-         * Adds the message to the image buffer and publishes it. Also
-         * find the closest depth/image message pair, performs the
-         * underwater algorithm on the pair and publishes the result.
+         * Called whenever a pair of image/depth message have approximatley
+         * equal timestamps. Publishes each image through an rqt image view compatible 
+         * publisher then performs the underwater algorithm on the pair and publishes 
+         * the result
          * 
-         * @param msg image message 
+         * @param image_msg image message 
+         * @param depth_msg depth message 
          */
-        void imgCallback(const sensor_msgs::msg::Image::ConstSharedPtr & msg);
+        void syncCallback(const ImageMsg & image_msg, const ImageMsg & depth_msg);
 
 
-        /** Gazebo depth image callback
+        /** Performs underwater synthesis on a image/depth pair, publishes result
          * 
-         * Adds the message to the depth buffer and publishes it
+         * TODO: Further description of the algorithm
          * 
-         * @param msg image message 
+         * @param image_msg image message 
+         * @param depth_msg depth message 
          */
-        void depthCallback(const sensor_msgs::msg::Image::ConstSharedPtr & msg);
+        void underwaterImageSynthesis(const ImageMsg & image_msg, const ImageMsg & depth_msg);
 
 
-        /** Finds the closest temporal pair of depth/image message pairs
-         * 
-         * If both buffers are full, given the middle image message in the 
-         * image buffer, finds the depth message in the depth buffer which is 
-         * closest temporally and returns the pair of messages.
-         * 
-         * @returns pair of image message, first being raw image, second being depth
-         */
-        std::pair<ImageMsg, ImageMsg> findClosestPair();
-
-
-        image_transport::Publisher underwater_img_pub_;
-        image_transport::Publisher img_pub_;
+        image_transport::Publisher underwater_image_pub_;
+        image_transport::Publisher image_pub_;
         image_transport::Publisher depth_pub_;
 
-        image_transport::Subscriber img_sub_;
-        image_transport::Subscriber depth_sub_;   
+        image_transport::SubscriberFilter image_sub_;
+        image_transport::SubscriberFilter depth_sub_;  
 
-        int buf_size_ = 3; // MUST be an odd integer
-        boost::circular_buffer<ImageMsg> image_buf_;
-        boost::circular_buffer<ImageMsg> depth_buf_;
+        std::shared_ptr<ApproxSync> approx_sync_; 
 
     };
     

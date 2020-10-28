@@ -23,6 +23,7 @@ find_package(gazebo_dev REQUIRED)
 find_package(gazebo_ros REQUIRED)
 find_package(image_transport REQUIRED)
 find_package(sensor_msgs REQUIRED)
+find_package(message_filters REQUIRED)
 find_package(rclcpp REQUIRED)
 
 add_executable(underwater_camera 
@@ -36,6 +37,7 @@ ament_target_dependencies(
   underwater_camera
   "image_transport"
   "sensor_msgs"
+  "message_filters"
   "rclcpp"
 )
 
