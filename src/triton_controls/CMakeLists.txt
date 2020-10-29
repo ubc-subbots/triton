@@ -23,6 +23,7 @@ find_package(Eigen3 REQUIRED)
 find_package(triton_interfaces REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
+find_package(OpenCV 4.2 REQUIRED)
 
 include_directories(include ${catkin_INCLUDE_DIRS})
 
@@ -41,6 +42,7 @@ ament_target_dependencies(
   "triton_interfaces"
   "geometry_msgs"
   "sensor_msgs"
+  "OpenCV"
 )
 install(TARGETS thrust_allocator
   DESTINATION lib/${PROJECT_NAME}
@@ -63,6 +65,7 @@ ament_target_dependencies(triton_controls
   "triton_interfaces"
   "geometry_msgs"
   "sensor_msgs"
+  "OpenCV"
 )
 
 install(TARGETS
