@@ -25,6 +25,9 @@ find_package(image_transport REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(message_filters REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(rclcpp_components REQUIRED)
+
+include_directories(include)
 
 add_executable(underwater_camera 
   src/underwater_camera.cpp
@@ -33,16 +36,44 @@ target_include_directories(underwater_camera PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
 )
-ament_target_dependencies(
-  underwater_camera
+ament_target_dependencies(underwater_camera
   "image_transport"
   "sensor_msgs"
   "message_filters"
   "rclcpp"
 )
 
-install(TARGETS underwater_camera
-  DESTINATION lib/${PROJECT_NAME})
+install(TARGETS 
+  underwater_camera
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+add_library(triton_gazebo SHARED
+  src/underwater_camera.cpp
+)
+
+rclcpp_components_register_nodes(triton_gazebo "triton_gazebo::UnderwaterCamera")
+
+target_compile_definitions(triton_gazebo
+  PRIVATE "triton_gazebo_CPP_BUILDING_DLL"
+)
+
+ament_target_dependencies(triton_gazebo
+  "rclcpp"
+  "rclcpp_components"
+  "image_transport"
+  "sensor_msgs"
+  "message_filters"
+)
+
+install(TARGETS
+  triton_gazebo
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+)
+
+
 
 
 install(DIRECTORY

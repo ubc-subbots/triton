@@ -16,7 +16,7 @@ typedef sensor_msgs::msg::Image::ConstSharedPtr ImageMsg;
 typedef message_filters::sync_policies::ApproximateTime<Image, Image> ApproxPolicy;
 typedef message_filters::Synchronizer<ApproxPolicy> ApproxSync;
 
-namespace gazebo_nodes
+namespace triton_gazebo
 {      
 
     class UnderwaterCamera : public rclcpp::Node
@@ -33,9 +33,7 @@ namespace gazebo_nodes
          */
         explicit UnderwaterCamera(const rclcpp::NodeOptions & options);
 
-
     private:
-
 
         /** Synced image/depth message callback
          * 
@@ -49,7 +47,6 @@ namespace gazebo_nodes
          */
         void syncCallback(const ImageMsg & image_msg, const ImageMsg & depth_msg);
 
-
         /** Performs underwater synthesis on a image/depth pair, publishes result
          * 
          * TODO: Further description of the algorithm
@@ -58,7 +55,6 @@ namespace gazebo_nodes
          * @param depth_msg depth message 
          */
         void underwaterImageSynthesis(const ImageMsg & image_msg, const ImageMsg & depth_msg);
-
 
         image_transport::Publisher underwater_image_pub_;
         image_transport::Publisher image_pub_;
@@ -71,9 +67,9 @@ namespace gazebo_nodes
 
     };
     
-} // namespace gazebo_nodes
+} // namespace triton_gazebo
 
 #include "rclcpp_components/register_node_macro.hpp"
-RCLCPP_COMPONENTS_REGISTER_NODE(gazebo_nodes::UnderwaterCamera)
+RCLCPP_COMPONENTS_REGISTER_NODE(triton_gazebo::UnderwaterCamera)
 
 #endif  //TRITON_GAZEBO__UNDERWATER_CAMERA

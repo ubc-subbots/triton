@@ -4,7 +4,7 @@ using std::placeholders::_1;
 using std::placeholders::_2;
 
 
-namespace gazebo_nodes
+namespace triton_gazebo
 {
 
     UnderwaterCamera::UnderwaterCamera(const rclcpp::NodeOptions & options)
@@ -74,14 +74,14 @@ namespace gazebo_nodes
 
 
     
-} // namespace gazebo_nodes
+} // namespace triton_gazebo
 
 
 int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
   auto options = rclcpp::NodeOptions();
-  rclcpp::spin(std::make_shared<gazebo_nodes::UnderwaterCamera>(options));
+  rclcpp::spin(std::make_shared<triton_gazebo::UnderwaterCamera>(options));
   rclcpp::shutdown();
   return 0;
 }
