@@ -120,6 +120,7 @@ class PipelineManager(Node):
         @param request: A service request
         @param response: A service response
         """
+        self.get_logger().info('Starting configure')              ###
         pipeline_type = request.pipeline_type.type
         self.get_logger().info('Configuring pipeline for {}...'.format(pipeline_type))
         if pipeline_type not in self.pipeline_types:
@@ -303,11 +304,9 @@ class PipelineManager(Node):
                     self.get_logger().warn('Could not get the pipeline parameter "{}", does not exist'
                                             .format(param_name))
                     self.get_logger().error(str(e))
-                    return False # I added return here so it won't get stuck
+                    return False
             try:
                 self.set_parameters(params_list)
-                self.get_logger().info('params listed')
-                self.get_logger().info('param list: {}'.format(self.list_parameters()))
                 if (len(self.get_parameter('pipeline.components').value) !=
                       len(self.get_parameter('pipeline.pkg_names').value)):
                     self.get_logger().warn('Number of components and package names do not match, {} and {} respectively'
@@ -353,6 +352,9 @@ class PipelineManager(Node):
         param_name = 'pipeline.' + param_name
         curr_param_val = self.get_parameter(param_name).value
         param_type = rclpy.Parameter.Type.from_parameter_value(curr_param_val)
+        self.get_logger().info('{} type param'.format(param_type))                      ###
+        param_val_type = rclpy.Parameter.Type.from_parameter_value(param_val)
+        self.get_logger().info('{} type param val'.format(param_type))                  ###
         new_param = rclpy.parameter.Parameter(
             param_name,
             param_type,

@@ -184,3 +184,29 @@ class TestPipeline(unittest.TestCase):
                                 ' associated to pipeline type')
                 break
 
+
+    def test_configure_valid_type_yaml_component_package_mismatch(self, pipeline_manager, proc_info, proc_output):
+        compnum = 1
+        packnum = 2
+
+        req = ConfigurePipeline.Request()
+        pipeline_type = PipelineType()
+        test_type = 'example'
+        pipeline_type.type = test_type
+        req.pipeline_type = pipeline_type
+        test_file_name = 'test_comp_pack_mismatch'
+        req.config_file_name = test_file_name;
+        future = self.configure_client.call_async(req)
+        while rclpy.ok():
+            rclpy.spin_once(self.node)
+            if future.done():
+                res = future.result()
+                if res.success is False:
+                    proc_output.assertWaitFor(
+                        expected_output='Number of components and package names do not match, {} and {} respectively'.format(compnum, packnum))
+                else:
+                    self.fail('Expected configure pipeline service to fail'
+                                ' due to nonmatching component and'
+                                ' package name numbers')
+                break
+
