@@ -15,7 +15,7 @@ using namespace vision_utils;
 class GateDetector : public ObjectDetector
 {
 private:
-    array<vector<Point>,4> gate_cntr;
+    vector<vector<Point>> gate_cntr;
     Size gate_dims; // in m
     vector<tuple<float, float, float, float, float, float>> estimated_poses;
     int frame_count;
@@ -29,12 +29,14 @@ private:
     vector<vector<Point>> hulls;
     Mat bound;
     Mat bound_and_pose; 
+    bool debug;
 
 
 public:
-    GateDetector(float im_resize=1.0, bool debug=false, float focal=400)
+    GateDetector(float im_resize=1.0, bool _debug=false, float focal=400)
     {
-        ObjectDetector(im_resize, debug, focal);
+        ObjectDetector(im_resize, _debug, focal);
+        debug = _debug;
         gate_cntr = {};
         gate_dims = Size(1.2192, 3.2004);
         estimated_poses = {};
@@ -107,19 +109,86 @@ public:
     Mat bound_gate_using_poles(vector<vector<Point>> hulls, Mat src)
     {
       //ignore featurize first, let all hulls be pole hulls
+      // Resize src to match the image the hulls were found on
+      resize(src, src, seg.size(), 0,0,INTER_CUBIC);
+
+      // We can't do anything if we aren't given any hulls
+      if (hulls.size() == 0)
+      {
+          return src;
+      }
+
+      // Featurize hulls, predict using model and get classified pole hulls
+      // (assuming all hulls are poles we want)
+      vector<vector<Point>> pole_hulls = hulls;
+
+      // Get 2D array of all the points of the pole hulls (to determine extrema)
+      vector<Point> hull_points;
+      for (vector<Point> h : pole_hulls)
+      {
+          for (Point p : h)
+          {
+          hull_points.push_back(p);
+          }
+      }
+
+      // If we have detected a hull associated to a pole
+      if (hull_points.size() > 0)
+      {
+          vector<vector<Point>>_gate_cntr = create_gate_contour(hull_points, src);
+
+          // Get bounding box of contour to get it's approximate width/height
+          Rect box = boundingRect(_gate_cntr);
+          int w = box.width;
+          int h = box.height;
+
+          // If the bounding rectangle is more wide than high, most likely we have detected both poles
+          if ((float)w/h >= 1)
+          {
+              if (gate_cntr.size() == 0)
+              {
+                  // We make the strong assumption that the first time we detect the gate, it is accurate
+                  gate_cntr = _gate_cntr;
+              }
+              else
+              {
+                  // we make sure the area hasn't changed too much (50%) between frames to account for outliers
+                  vector<vector<Point>> prev_cntr = gate_cntr;
+                  double prev_area = contourArea(prev_cntr);
+                  double curr_area = contourArea(_gate_cntr);
+                  if (curr_area <= 1.5*prev_area && curr_area >= 0.5*prev_area)
+                  {
+                      gate_cntr = _gate_cntr;
+                  }
+              }
+              
+          }
+      }
+      // Draw the gate if we have detected it
+      if (gate_cntr.size() != 0)
+      {
+          polylines(src, gate_cntr, true, Scalar(0,0,255),2);
+      }
+
+      // Draw all non pole hulls and pole hulls on src for debug purposes
+      if (debug)
+      {
+          polylines(src, hulls, true, Scalar(0,0,255), 2);
+          polylines(src, pole_hulls, true, Scalar(255,255,255), 2);
+      }
       return src;
     }
 
     /**
      * 
      */
-    array<vector<Point>,4> create_gate_contour(Point hull_points[], Mat src)
+    vector<vector<Point>> create_gate_contour(vector<Point> hull_points, Mat src)
     {
       int width = src.cols;
 
       // Get extrema points of hulls (i.e the points closest/furthest from the top left (0,0) and top right (width, 0) of the image)
     
-      return array<vector<Point>,4>{};
+      return vector<vector<Point>>{};
     }
 
     /**
