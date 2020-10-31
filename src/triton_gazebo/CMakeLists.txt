@@ -26,8 +26,11 @@ find_package(sensor_msgs REQUIRED)
 find_package(message_filters REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_components REQUIRED)
+find_package(OpenCV 4.2 REQUIRED)
+find_package(cv_bridge REQUIRED)
 
 include_directories(include)
+include_directories(${OpenCV_INCLUDE_DIRS})
 
 add_executable(underwater_camera 
   src/underwater_camera.cpp
@@ -41,6 +44,8 @@ ament_target_dependencies(underwater_camera
   "sensor_msgs"
   "message_filters"
   "rclcpp"
+  "OpenCV"
+  "cv_bridge"
 )
 
 install(TARGETS 
