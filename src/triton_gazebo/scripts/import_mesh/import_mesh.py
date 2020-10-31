@@ -4,7 +4,6 @@ import sys
 import shutil
 import json
 import argparse
-import re
 
 from xml_combiner import XMLCombiner
 
@@ -118,7 +117,7 @@ def main():
 
     result = '<?xml version=\'1.0\'?>\n' + XMLCombiner((os.path.join(model_path, 'temp', 'model_org.sdf'),
                                                         os.path.join(model_path, 'temp', 'params.sdf'))
-                                                        ).combine().decode('utf-8')[:-1]
+                                                        ).combine().decode('utf-8')
 
     with open(os.path.join(model_path, 'model.sdf'), 'w') as sdf_file:
         sdf_file.write(result)
@@ -148,6 +147,7 @@ def main():
         shutil.rmtree(os.path.join(model_path, 'temp'))
         shutil.rmtree(os.path.join(model_path, 'urdf'))
         os.remove(os.path.join(model_path, 'meshes', args.model+'.STL'))
+        os.remove(os.path.join(model_path, 'manifest.xml'))
 
 
 if __name__ == '__main__': 
