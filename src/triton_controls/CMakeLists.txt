@@ -81,6 +81,13 @@ install(DIRECTORY
   DESTINATION share/${PROJECT_NAME}/
 )
 
+ 
+install(DIRECTORY
+  test/config
+  DESTINATION share/${PROJECT_NAME}/test
+)
+
+
 if(BUILD_TESTING)
   find_package(launch_testing_ament_cmake REQUIRED)
   add_launch_test(

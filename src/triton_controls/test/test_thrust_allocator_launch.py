@@ -3,6 +3,7 @@ import unittest
 
 import pytest
 
+from geometry_msgs.msg import Wrench
 import launch_testing
 from launch import LaunchDescription
 from launch.actions import IncludeLaunchDescription
@@ -32,6 +33,31 @@ class TestThrustAllocatorLaunchInit(unittest.TestCase):
 
     def test_thrust_allocator_init(self, proc_info, proc_output):
         proc_output.assertWaitFor('Thrust Allocator succesfully started!')
+
+
+class TestThrustAllocator(unittest.TestCase):
+
+
+    @classmethod
+    def setUpClass(cls):
+        rclpy.init()
+
+
+    @classmethod
+    def tearDownClass(cls):
+        rclpy.shutdown()
+
+
+    def setUp(self):
+        self.node = rclpy.create_node('test_node')
+        self.forces_pub = self.node.create_publisher(
+            Wrench,
+            "/triton/controls/input_forces",
+            10)
+
+
+    def tearDown(self):
+        self.node.destroy_node()
 
 
 @launch_testing.post_shutdown_test()
