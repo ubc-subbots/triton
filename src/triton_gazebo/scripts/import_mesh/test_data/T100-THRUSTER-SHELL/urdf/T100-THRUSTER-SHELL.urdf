@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.5.1-0-g916b5db  Build Version: 1.5.7152.31018
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot
+  name="T100-THRUSTER-SHELL">
+  <link
+    name="T100-THRUSTER-SHELL">
+    <inertial>
+      <origin
+        xyz="-1.0143E-05 -0.0040791 0.00053156"
+        rpy="0 0 0" />
+      <mass
+        value="0.16979" />
+      <inertia
+        ixx="0.00015509"
+        ixy="2.851E-08"
+        ixz="-1.8979E-09"
+        iyy="0.00017378"
+        iyz="7.73359999999999E-07"
+        izz="0.00015085" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="-1.0143E-05 -0.0040791 0.00053156"
+        rpy="1.5707963267949 0 0" />
+      <geometry>
+        <mesh
+          filename="package://T100-THRUSTER-SHELL/meshes/T100-THRUSTER-SHELL.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.79216 0.81961 0.93333 1" />
+        <texture
+          filename="package://T100-THRUSTER-SHELL/textures/" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="-1.0143E-05 -0.0040791 0.00053156"
+        rpy="1.5707963267949 0 0" />
+      <geometry>
+        <mesh
+          filename="package://T100-THRUSTER-SHELL/meshes/T100-THRUSTER-SHELL.STL" />
+      </geometry>
+    </collision>
+  </link>
+</robot>
