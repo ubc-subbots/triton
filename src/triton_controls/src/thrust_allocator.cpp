@@ -4,39 +4,55 @@ using std::placeholders::_1;
 namespace triton_controls
 {
 
-
   ThrustAllocator::ThrustAllocator(const rclcpp::NodeOptions & options)
-  : Node("thrust_allocator", options) 
+  : Node("thrust_allocator", options),
+    x_lens_ (MAX_THRUSTERS, 0),
+    y_lens_ (MAX_THRUSTERS, 0),
+    z_lens_ (MAX_THRUSTERS, 0),
+    contribs_ (3, std::vector<double>(MAX_THRUSTERS))
   {
+      this->declare_parameter<int>("num_thrusters", num_thrusters_);
+      this->get_parameter("num_thrusters", num_thrusters_);
 
-      double alpha = 45.0;
-      std::pair<double, double> l1(10.833*cosd(52.704), 10.833*sind(52.704));
-      std::pair<double, double> l2(11.238*cosd(54.261), 11.238*sind(54.261));
-      std::pair<double, double> l3(11.466*cosd(48.73), 11.466*sind(48.73));
-      std::pair<double, double> l4(11.85*cosd(50.34), 11.85*sind(50.34));
-      double l5 = 8.744;
-      double l6 = 8.239;
+      std::string names[MAX_THRUSTERS] = {"t1", "t2", "t3", "t4", "t5", "t6"};
+    
+      for (int i = 0; i < MAX_THRUSTERS; i++)
+      {
+        this->declare_parameter(names[i]+".contrib.x", contribs_[0][i]);
+        this->declare_parameter(names[i]+".contrib.y", contribs_[1][i]);
+        this->declare_parameter(names[i]+".contrib.z", contribs_[2][i]);
+        this->declare_parameter(names[i]+".lx", x_lens_[i]);
+        this->declare_parameter(names[i]+".ly", y_lens_[i]);
+        this->declare_parameter(names[i]+".lz", z_lens_[i]);
 
-      double alloc_arr[10][10] = {
-          {-1, 0, -1, 0, 1, 0, 1, 0, 0, 0},
-          {0, -1, 0, 1, 0, -1, 0 ,1, 0, 0},
-          {0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
-          {0, 0, 0, 0, 0, 0, 0, 0, -l5, l6},
-          {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-          {-l1.first,-l1.second,l2.first,l2.second,
-            l3.first,l3.second,-l4.first,-l4.second,0,0},
-          {1/cosd(alpha), -1/sind(alpha), 0, 0, 0, 0, 0, 0, 0, 0},
-          {0, 0, 1/cosd(alpha), -1/sind(alpha), 0, 0, 0, 0, 0, 0},
-          {0, 0, 0, 0, 1/cosd(alpha), -1/sind(alpha), 0, 0, 0, 0},
-          {0, 0, 0, 0, 0, 0, 1/cosd(alpha), -1/sind(alpha), 0, 0}
-      };
+        this->get_parameter(names[i]+".contrib.x", contribs_[0][i]);
+        this->get_parameter(names[i]+".contrib.y", contribs_[1][i]);
+        this->get_parameter(names[i]+".contrib.z", contribs_[2][i]);
+        this->get_parameter(names[i]+".lx", x_lens_[i]);
+        this->get_parameter(names[i]+".ly", y_lens_[i]);
+        this->get_parameter(names[i]+".lz", z_lens_[i]);
+      } 
 
-      cv::Mat alloc_mat (10,10, CV_64F);
-      for (int i = 0; i < 10; i++)
-        for (int j = 0; j < 10; j++)
-          alloc_mat.at<double>(i,j) = alloc_arr[i][j];
+      std::vector<std::vector<double>> alloc_vec;
+      alloc_vec.push_back(contribs_[0]);
+      alloc_vec.push_back(contribs_[1]);
+      alloc_vec.push_back(contribs_[2]);
+      alloc_vec.push_back(addVecs(mulVecs(contribs_[2], y_lens_),
+                                  mulVecs(contribs_[1], z_lens_)));
+      alloc_vec.push_back(addVecs(mulVecs(contribs_[2], x_lens_),
+                                  mulVecs(contribs_[0], z_lens_)));
+      alloc_vec.push_back(addVecs(mulVecs(contribs_[1], x_lens_),
+                                  mulVecs(contribs_[0], y_lens_)));
 
-      cv::invert(alloc_mat, alloc, cv::DECOMP_SVD);
+      cv::Mat alloc_mat (alloc_vec.size(), alloc_vec[0].size(), CV_64FC1);
+      for (int i = 0; i < alloc_mat.rows; i++)
+        for (int j = 0; j < alloc_mat.cols; j++)
+          alloc_mat.at<double>(i,j) = alloc_vec[i][j];
+      
+      RCLCPP_INFO(this->get_logger(), "Allocation Matrix:");
+      std::cout << alloc_mat << std::endl;
+
+      cv::invert(alloc_mat, pinv_alloc_, cv::DECOMP_SVD);
 
       forces_pub_ = this->create_publisher<std_msgs::msg::Float64MultiArray>(
         "output_forces", 10);
@@ -53,33 +69,46 @@ namespace triton_controls
 
   void ThrustAllocator::wrenchCallback(const geometry_msgs::msg::Wrench::SharedPtr msg) const
   {
-      double tau_arr[10] = {
+      double tau_arr[6] = {
         msg->force.x, msg->force.y, msg->force.z,
         msg->torque.x, msg->torque.y, msg->torque.z,
-        0,0,0,0
       };
 
-      cv::Mat tau_mat (10, 1, CV_64F);
-      for (int i = 0; i < 10; i++)
+      cv::Mat tau_mat (6, 1, CV_64F);
+      for (int i = 0; i < 6; i++)
         tau_mat.at<double>(i, 0) = tau_arr[i];
 
-      cv::Mat u_mat =  alloc*tau_mat;
+      cv::Mat thrust_mat =  pinv_alloc_*tau_mat;
 
-      std::vector<double> u;
-      for (int i = 0; i < 10; i++)
-        u.push_back(u_mat.at<double>(i,0));
-
-      double thrust_arr[6] = {
-        getThrust(u[0], u[1]), getThrust(u[2], u[3]),
-        getThrust(u[4], u[5]), getThrust(u[6], u[7]),
-        u[8], u[9]
-      };
-      std::vector<double> thrust (
-        thrust_arr, thrust_arr + sizeof(thrust_arr)/sizeof(thrust_arr[0]));
+      std::vector<double> thrust;
+      for (int i = 0; i < 6 ; i++)
+        thrust.push_back(thrust_mat.at<double>(i,0));
 
       auto forces_msg = std_msgs::msg::Float64MultiArray();
       forces_msg.data = thrust;
       forces_pub_->publish(forces_msg);
+  }
+
+
+  std::vector<double> ThrustAllocator::mulVecs(std::vector<double> u, std::vector<double> v)
+  {   
+      std::vector<double> w;
+      for (size_t i = 0; i < u.size(); i++)
+      {
+        w.push_back(u[i]*v[i]);
+      }
+      return w;
+  }
+
+
+  std::vector<double> ThrustAllocator::addVecs(std::vector<double> u, std::vector<double> v)
+  {   
+      std::vector<double> w;
+      for (size_t i = 0; i < u.size(); i++)
+      {
+        w.push_back(u[i]+v[i]);
+      }
+      return w;
   }
     
 } // namespace triton_controls
