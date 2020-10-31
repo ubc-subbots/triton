@@ -11,7 +11,7 @@ using namespace std;
 
 int main(int argc, char ** argv)
 {
-  cv::Ptr<cv::ml::SVM> svm = cv::ml::SVM::load("/home/logan/Projects/underwater-object-detection/src/accuracyopencv_model.xml");
+  cv::Ptr<cv::ml::SVM> svm = cv::ml::SVM::load("/home/logan/Projects/triton/src/svm_opencv/accuracy_opencv_model.xml");
 
   float X_hat_vec[7][10] = {
     {  0.09385864 ,  0.11278195,   1.06720508  , 0.08767594  , 0.19329583,
@@ -33,12 +33,6 @@ int main(int argc, char ** argv)
   cv::Mat y_pred;
   svm->predict(X_hat, y_pred);
 
-  cout << "Weights " << endl << " "  << svm->getClassWeights() << endl << endl;
   cout << "Predictions " << endl << " "  << y_pred << endl << endl;
-  for (int i=0; i < 7; i++)
-  {
-    cout << "Is correct prediction for y_hat[" << i << "]: " << endl;
-    printf(y_pred.at<cv::Scalar>(i) == cv::Scalar(y_hat[i]) ? "true" : "false");
-  }
   return 0;
 }
