@@ -40,7 +40,7 @@ class PipelineManager(Node):
         self.pipeline_types = []
         for typename in re.findall(r'TYPE_+.*', PipelineType.__doc__):
             self.pipeline_types.append(getattr(PipelineType, str(typename)))
-        
+
         self.declare_parameters(
             namespace='pipeline',
             parameters=[
@@ -120,7 +120,6 @@ class PipelineManager(Node):
         @param request: A service request
         @param response: A service response
         """
-        self.get_logger().info('Starting configure')              ###
         pipeline_type = request.pipeline_type.type
         self.get_logger().info('Configuring pipeline for {}...'.format(pipeline_type))
         if pipeline_type not in self.pipeline_types:
@@ -144,7 +143,6 @@ class PipelineManager(Node):
                         self.get_logger().error(str(e))
                 if config_yaml is not None:
                     response.success = self._load_params_from_yaml(config_yaml)
-                    # TODO: should we check if the parameter types are correct?
                 else:
                     response.success = False
             else:
@@ -188,7 +186,7 @@ class PipelineManager(Node):
                 prev_msg = self.pipeline_feedback_msg
         if self.pipeline_abort:
             goal_handle.abort()
-        else: 
+        else:
             goal_handle.succeed()
         self._unload_components()
         res = RunPipeline.Result()
@@ -305,6 +303,11 @@ class PipelineManager(Node):
                                             .format(param_name))
                     self.get_logger().error(str(e))
                     return False
+                except TypeError as e:
+                    self.get_logger().warn('Could not get the pipeline parameter "{}", wrong type'
+                                            .format(param_name))
+                    self.get_logger().error(str(e))
+                    return False
             try:
                 self.set_parameters(params_list)
                 if (len(self.get_parameter('pipeline.components').value) !=
@@ -352,9 +355,9 @@ class PipelineManager(Node):
         param_name = 'pipeline.' + param_name
         curr_param_val = self.get_parameter(param_name).value
         param_type = rclpy.Parameter.Type.from_parameter_value(curr_param_val)
-        self.get_logger().info('{} type param'.format(param_type))                      ###
         param_val_type = rclpy.Parameter.Type.from_parameter_value(param_val)
-        self.get_logger().info('{} type param val'.format(param_type))                  ###
+        if param_type is not param_val_type:
+            raise TypeError('Parameter {} is of type {}, not {}'.format(param_name, param_val_type, param_type))
         new_param = rclpy.parameter.Parameter(
             param_name,
             param_type,

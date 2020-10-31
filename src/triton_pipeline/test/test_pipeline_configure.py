@@ -83,12 +83,12 @@ class TestPipeline(unittest.TestCase):
                 res = future.result()
                 if res.success is False:
                     proc_output.assertWaitFor(
-                        expected_output='Configuration of pipeline type "{}"' \
+                        expected_output='Configuration of pipeline type "{}"'
                                         ' is not allowed, no such type'.format(test_type),
                         process=pipeline_manager
                     )
                 else:
-                    self.fail('Expected configure pipeline service to fail' \
+                    self.fail('Expected configure pipeline service to fail'
                                 ' due to non existent type')
                 break
 
@@ -110,7 +110,7 @@ class TestPipeline(unittest.TestCase):
                     proc_output.assertWaitFor(
                         expected_output='Could not find {}.yaml'.format(test_file_name))
                 else:
-                    self.fail('Expected configure pipeline service to fail' \
+                    self.fail('Expected configure pipeline service to fail'
                                 ' due to no yaml associated to pipeline type')
                 break
 
@@ -208,5 +208,31 @@ class TestPipeline(unittest.TestCase):
                     self.fail('Expected configure pipeline service to fail'
                                 ' due to nonmatching component and'
                                 ' package name numbers')
+                break
+
+
+    def test_configure_valid_type_param_mismatch(self, pipeline_manager, proc_info, proc_output):
+        param = 'components'
+
+        req = ConfigurePipeline.Request()
+        pipeline_type = PipelineType()
+        test_type = 'example'
+        pipeline_type.type = test_type
+        req.pipeline_type = pipeline_type
+        test_file_name = 'test_param_mismatch'
+        req.config_file_name = test_file_name;
+        future = self.configure_client.call_async(req)
+        while rclpy.ok():
+            rclpy.spin_once(self.node)
+            if future.done():
+                res = future.result()
+                if res.success is False:
+                    proc_output.assertWaitFor(
+                        expected_output='Could not get the pipeline parameter "{}", wrong type'.format(param))
+
+                else:
+                    self.fail('Expected configure pipeline service to fail'
+                                ' due to no parameter for yaml item'
+                                ' associated to pipeline type')
                 break
 
