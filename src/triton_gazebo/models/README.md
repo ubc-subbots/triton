@@ -6,7 +6,11 @@ This guide details how we import models mesh files and kinematic information fro
 
 ## Requirements
 1. Solidworks (Windows)
-2. 
+2. Blender (Ubuntu)
+
+## Setup
+
+
 
 ## Usage
 
