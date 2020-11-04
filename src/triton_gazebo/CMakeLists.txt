@@ -23,6 +23,28 @@ find_package(gazebo_dev REQUIRED)
 find_package(gazebo_ros REQUIRED)
 find_package(rclcpp REQUIRED)
 
+link_directories(${gazebo_dev_LIBRARY_DIRS})
+
+add_library(hydrodynamics_plugin SHARED
+  src/hydrodynamics_plugin.cpp
+)
+target_include_directories(hydrodynamics_plugin PUBLIC
+  include
+)
+ament_target_dependencies(hydrodynamics_plugin
+  "gazebo_dev"
+  "gazebo_ros"
+)
+ament_export_libraries(hydrodynamics_plugin)
+target_link_libraries(hydrodynamics_plugin ${GAZEBO_LIBRARIES})
+
+install(TARGETS
+  hydrodynamics_plugin
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+)
+
 install(DIRECTORY
   launch
   DESTINATION share/${PROJECT_NAME}/
