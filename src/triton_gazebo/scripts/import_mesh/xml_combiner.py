@@ -1,3 +1,8 @@
+"""
+This object was borrowed for a StackOverflow solution here: 
+https://stackoverflow.com/questions/14878706/merge-xml-files-with-nested-elements-without-external-libraries
+"""
+
 from xml.etree import ElementTree as et
 
 class XMLCombiner(object):

@@ -7,8 +7,23 @@ import argparse
 
 from xml_combiner import XMLCombiner
 
-# Needs to change
+# Needs to change, script can only be ran inside repo, we want to run it from anywhere
 REPO_ROOT = subprocess.check_output(['git', 'rev-parse', '--show-toplevel']).decode('utf-8')[:-1]
+
+def get_git_credentials():
+    """
+    Returns git name and email
+    """
+    credentials = {'name': 'N/A', 'email': 'N/A'}
+
+    name = subprocess.check_output(['git', 'config', 'user.name']).decode()[:-1]
+    email = subprocess.check_output(['git', 'config', 'user.email']).decode()[:-1]
+
+    if name: credentials['name'] = name
+    if email: credentials['email'] = email
+
+    return credentials
+    
 
 def convert_mesh(model_path, model):
     """
@@ -67,10 +82,13 @@ def dict_to_sdf(model_name, parameters, sdf_fmt=[], depth=1):
                 sdf_fmt.append(indent + '<'+key+' type=\'pixel\'>')
             else:
                 sdf_fmt.append(indent + '<'+key+'>')
+
             dict_to_sdf(model_name, data, sdf_fmt, depth+1)
             sdf_fmt.append(indent + '</'+key+'>')
+
         elif isinstance(data, list):
             sdf_fmt.append(indent + '<'+key+'>'+' '.join(map(str, data))+'</'+key+'>')
+
         else:
             sdf_fmt.append(indent + '<'+key+'>'+str(data)+'</'+key+'>')
     
@@ -89,15 +107,16 @@ def main():
                         help='remove old files after successful conversion')
     args = parser.parse_args()
 
-    model_path = os.path.join(REPO_ROOT, 'src/triton_gazebo/models', args.model)
+    # Change directory to where models are located
+    os.chdir(os.path.join(REPO_ROOT, 'src/triton_gazebo/models'))
 
-    if not os.path.exists(model_path): 
-        print('ERROR: model %s not found, exiting' % model_path)
+    if not os.path.exists(args.model): 
+        print('ERROR: model %s not found, exiting' % args.model)
         sys.exit(1)
 
-    convert_mesh(model_path, args.model)
+    convert_mesh(args.model, args.model)
 
-    sdf_data = ['<?xml version=\'1.0\'?>'] + convert_urdf(model_path, args.model)
+    sdf_data = ['<?xml version=\'1.0\'?>'] + convert_urdf(args.model, args.model)
 
     with open(os.path.join(REPO_ROOT, 'src/triton_gazebo/scripts/', args.parameters), 'r') as param_file:
         params = json.load(param_file)
@@ -106,21 +125,24 @@ def main():
     params_sdf += dict_to_sdf(args.model, params)
     params_sdf += ['</sdf>']
 
-    if not os.path.exists(os.path.join(model_path, 'temp')):
-        os.makedirs(os.path.join(model_path, 'temp'))
+    if not os.path.exists(os.path.join(args.model, 'temp')):
+        os.makedirs(os.path.join(args.model, 'temp'))
 
-    with open(os.path.join(model_path, 'temp', 'params.sdf'), 'w') as sdf_file:
+    with open(os.path.join(args.model, 'temp', 'params.sdf'), 'w') as sdf_file:
         sdf_file.write('\n'.join(params_sdf))
-    with open(os.path.join(model_path, 'temp', 'model_org.sdf'), 'w') as sdf_file:
+    with open(os.path.join(args.model, 'temp', 'model_org.sdf'), 'w') as sdf_file:
         sdf_file.write('\n'.join(sdf_data))
 
 
-    result = '<?xml version=\'1.0\'?>\n' + XMLCombiner((os.path.join(model_path, 'temp', 'model_org.sdf'),
-                                                        os.path.join(model_path, 'temp', 'params.sdf'))
+    result = '<?xml version=\'1.0\'?>\n' + XMLCombiner((os.path.join(args.model, 'temp', 'model_org.sdf'),
+                                                        os.path.join(args.model, 'temp', 'params.sdf'))
                                                         ).combine().decode('utf-8')
 
-    with open(os.path.join(model_path, 'model.sdf'), 'w') as sdf_file:
+    with open(os.path.join(args.model, 'model.sdf'), 'w') as sdf_file:
         sdf_file.write(result)
+
+    # Use git credentials to create config file 
+    git_cred = get_git_credentials()
 
     model_config = [
         '<?xml version=\'1.0\'?>',
@@ -131,8 +153,8 @@ def main():
         '  <sdf version=\'1.7\'>model.sdf</sdf>',
         '',
         '  <author>',
-        '    <name></name>',
-        '    <email></email>',
+        '    <name>%s</name>' % git_cred['name'],
+        '    <email>%s</email>' % git_cred['email'],
         '  </author>',
         '',
         '  <description>',
@@ -140,14 +162,22 @@ def main():
         '</model>'
         ]
 
-    with open(os.path.join(model_path, 'model.config'), 'w') as config_file:
+    with open(os.path.join(args.model, 'model.config'), 'w') as config_file:
         config_file.write('\n'.join(model_config))
 
     if args.cleanup:
-        shutil.rmtree(os.path.join(model_path, 'temp'))
-        shutil.rmtree(os.path.join(model_path, 'urdf'))
-        os.remove(os.path.join(model_path, 'meshes', args.model+'.STL'))
-        os.remove(os.path.join(model_path, 'manifest.xml'))
+        # removed temp files if they exist
+        if os.path.exists(os.path.join(args.model, 'temp')):
+            shutil.rmtree(os.path.join(args.model, 'temp'))
+        # Remove urdf if it exists
+        if os.path.exists(os.path.join(args.model, 'urdf')):
+            shutil.rmtree(os.path.join(args.model, 'urdf'))
+        # Remove stl file if it exists
+        if os.path.exists(os.path.join(args.model, 'meshes', args.model+'.STL')):
+            os.remove(os.path.join(args.model, 'meshes', args.model+'.STL'))
+        # Remove manifest
+        if os.path.exists(os.path.join(args.model, 'manifest.xml')):
+            os.remove(os.path.join(args.model, 'manifest.xml'))
 
 
 if __name__ == '__main__': 
