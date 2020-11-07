@@ -18,17 +18,17 @@ This guide explains how we import mesh files and kinematic information from Soli
 3. Boot your machine into Linux
 4. Access the files saved remotely mentioned in the previous step, save these to `triton/src/triton_gazebo/models/`
 6. To run the script for importing packages containing a .STL file and .urdf description, navigate to the triton repository and execute the command:
-    python3 <path-to-scripts>/scripts/import_mesh/import_mesh.py --model <model-name> --clean-up <True/False>
+    `python3 <path-to-scripts>/scripts/import_mesh/import_mesh.py --model <model-name> --clean-up <True/False>`
    This command:
     - Converts the stl file into a dae using blender
     - converts the urdf to sdf
     - Adds additional information to make sure the model interacts with its environment properly
     - removed folders no longer needed
 At this point your model should be ready to be added to a Gazebo world, you can view your model by running:
-        ros2 launch triton_gazebo gazebo_launch.py
+        `ros2 launch triton_gazebo gazebo_launch.py`
     and placing your model into the scene.
 
 ## Referenced Material
-
+[How to import Solidworks model into Gazebo](https://docs.google.com/document/d/1LrzAUCPOdZPh-uzIDg-aMNJGaX13d3AJjA7XWy2pFQQ/edit)
 ## Contributors
 - Jake Cronin (jcronin97@live.ca)
