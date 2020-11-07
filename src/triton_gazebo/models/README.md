@@ -24,6 +24,7 @@ This guide explains how we import mesh files and kinematic information from Soli
     - converts the urdf to sdf
     - Adds additional information to make sure the model interacts with its environment properly
     - removed folders no longer needed
+
 At this point your model should be ready to be added to a Gazebo world, you can view your model by running:
         `ros2 launch triton_gazebo gazebo_launch.py`
     and placing your model into the scene.
