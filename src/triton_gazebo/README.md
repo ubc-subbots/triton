@@ -23,15 +23,17 @@ Where `<WORLD_FILE_NAME>` is the name of the world file you want to run in Gazeb
         ros2 topic pub /triton/gazebo_drivers/force geometry_msgs/msg/Wrench "{force: {x: 1}}"
 
 # Importing Models From SolidWorks 
-
 ## Description
+
 This guide explains how we import mesh files and kinematic information from Solidworks into a Gazebo model.
 
 ## Required Software
+
 1. Solidworks (Windows)
 2. Blender 2.80 or higher(Ubuntu)
 
 ## Process
+
 1. In Windows, install the SolidWorks [URDF exporter](http://wiki.ros.org/sw_urdf_exporter) and follow the default installation instructions.
 2. In SolidWorks, open the part you wish to export.
     - In the "Evaluate" tab, open "Mass Properites" and verify that the inertia tensor, mass and center of mass are correct and in SI units. 
@@ -53,6 +55,7 @@ At this point your model should be ready to be added to a Gazebo world, you can 
     and placing your model into the scene.
 
 ## Referenced Material
+
 [How to import Solidworks model into Gazebo](https://docs.google.com/document/d/1LrzAUCPOdZPh-uzIDg-aMNJGaX13d3AJjA7XWy2pFQQ/edit)
 
 ## Contributors
