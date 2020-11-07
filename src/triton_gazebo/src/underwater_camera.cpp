@@ -138,14 +138,15 @@ namespace triton_gazebo
             float Beta_cd = log(trapz(25,num_cd)/trapz(25,den_cd))/d;
             float T_cd = exp(Beta_cd*-d);
             for (int i = 0; i<depth.rows; i++){
-                for (int j = 0; j<depth.rows; j++){
+                for (int j = 0; j<depth.cols; j++){
                     float z = depth_data[i*depth.cols+j];
                     Array13f num_cz = S_c* rho * E_0 * (Beta * -d).exp();
                     Array13f den_cz = S_c * rho * E_0 * (Beta * -(d+z)).exp();
                     float Beta_cz = log(trapz(25,num_cz)/trapz(25,den_cz))/z;
                     float T_cz = exp(Beta_cz*-z);
                     
-                    synth_data[i*depth.cols+j] = ((float) synth_data[i*depth.cols+j])*T_cd*T_cz+B_c*T_cd*(1-T_cz);
+                    float pix_normalized = (float) synth_data[i*depth.cols+j] /255;
+                    synth_data[i*depth.cols+j] = 255.0f*(pix_normalized*T_cd*T_cz+B_c*T_cd*(1-T_cz));
                 }
             }
             return synth;
