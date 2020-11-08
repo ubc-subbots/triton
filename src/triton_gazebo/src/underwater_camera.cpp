@@ -1,7 +1,7 @@
 #include "triton_gazebo/underwater_camera.hpp"
 #include "cv_bridge/cv_bridge.h"
 #include <opencv2/opencv.hpp>
-#include <eigen3/Eigen/Core>
+#include <rclcpp/time.hpp>
 
 using std::placeholders::_1;
 using std::placeholders::_2;
@@ -47,6 +47,81 @@ namespace triton_gazebo
         approx_sync_->registerCallback(
             std::bind(&UnderwaterCamera::syncCallback, this, _1, _2));
 
+        this->declare_parameter("rho");
+        this->declare_parameter("irradiance_transmission");
+        this->declare_parameter("spectral_sensitivity_blue");
+        this->declare_parameter("spectral_sensitivity_red");
+        this->declare_parameter("spectral_sensitivity_green");
+        this->declare_parameter("illumination_irradiance");
+
+        std::vector<double> rho_vals;
+        std::vector<double> Beta_vals;
+        std::vector<double> S_b_vals;
+        std::vector<double> S_g_vals;
+        std::vector<double> S_r_vals;
+        std::vector<double> E_0_vals;
+
+        this->get_parameter("rho", rho_vals);
+        this->get_parameter("irradiance_transmission", Beta_vals);
+        this->get_parameter("spectral_sensitivity_blue", S_b_vals);
+        this->get_parameter("spectral_sensitivity_red", S_g_vals);
+        this->get_parameter("spectral_sensitivity_green", S_r_vals);
+        this->get_parameter("illumination_irradiance", E_0_vals);
+
+        if (rho_vals.size() != 13||
+            Beta_vals.size() != 13||
+            S_b_vals.size() != 13||
+            S_g_vals.size() != 13||
+            S_r_vals.size() != 13||
+            E_0_vals.size() != 13)
+        {
+            RCLCPP_ERROR(this->get_logger(), "Parameters are incorrect.");
+        }
+        rho_ = Array13f(13);
+        Beta_ = Array13f(13);
+        S_b_ = Array13f(13);
+        S_g_ = Array13f(13);
+        S_r_ = Array13f(13);
+        E_0_ = Array13f(13);
+        for (int i = 0; i < 13; i++){
+            rho_(i) = rho_vals[i];
+            Beta_(i) = Beta_vals[i];
+            S_b_(i) = S_b_vals[i];
+            S_g_(i) = S_g_vals[i];
+            S_r_(i) = S_r_vals[i];
+            E_0_(i) = E_0_vals[i];
+        }
+        Beta_/=100.0;
+
+        //Randomize parameters
+        float d_min = 0.5;
+        float d_max = 1.0;
+        d_ = ((float) rand())/RAND_MAX *(d_max-d_min) + d_min;
+
+        auto preCalculate = [](float B_c_max, float B_c_min){
+            float B_c = ((float) rand())/RAND_MAX *(B_c_max-B_c_min) + B_c_min;
+            return B_c;
+        };
+        
+        B_b_ = preCalculate(0.7,0.8);
+        B_g_ = preCalculate(0.7,0.8);
+        B_r_ = preCalculate(0.4,0.5);
+        
+        //Precalculate integrals
+        auto preCalculate2 = [&](Array13f& S_c, float& log_trapz_num_cz, float& T_cd){
+            Array13f num_cd = S_c * rho_ * E_0_;
+            Array13f den_cd = S_c * rho_ * E_0_ * (Beta_ * -d_).exp();
+            float Beta_cd = log(trapz(num_cd)/trapz(den_cd))/d_;
+            T_cd = exp(Beta_cd*-d_);
+
+            Array13f num_cz = S_c* rho_ * E_0_ * (Beta_ * -d_).exp();
+            log_trapz_num_cz = log(trapz(num_cz));
+        };
+
+        preCalculate2(S_b_, log_trapz_num_bz_, T_bd_);
+        preCalculate2(S_g_, log_trapz_num_gz_, T_gd_);
+        preCalculate2(S_r_, log_trapz_num_rz_, T_rd_);
+
         RCLCPP_INFO(this->get_logger(), "Underwater Camera succesfully started!");
     }
 
@@ -69,6 +144,8 @@ namespace triton_gazebo
 
     void UnderwaterCamera::underwaterImageSynthesis(const ImageMsg & image_msg, const ImageMsg & depth_msg)
     {
+        auto timer = this->get_clock()->now();
+
         auto message = sensor_msgs::msg::Image();
 
         cv_bridge::CvImagePtr rgb_ptr;
@@ -101,72 +178,40 @@ namespace triton_gazebo
         //split bgr channels
         std::array<cv::Mat,3> channels;
         cv::split(rgb,channels);
-
-        //from 400 to 700 nm in intervals of 25 nm
-        typedef Eigen::Array<float,13,1> Array13f;
-
-        //trapezoidal integration of evenly spaced vector
-        auto trapz = [](float dx, Array13f & funk){
-            Eigen::ArrayXf traps = (funk.tail(funk.size()-1) + funk.head(funk.size()-1))/2;
-            return traps.sum()*dx;
-        };
     
-        Array13f rho = Array13f::Ones();
-        Array13f Beta(13);
-        Beta<<97.2,97.8,98.1,98.2,97.2,96.1,94.2,92,85,74,70,66,59;
-        Beta/=100.0;
-        Array13f S_b(13);
-        S_b<<0.35,0.55,0.675,0.65,0.45,0.2,0.1,0.05,0.03,0.03,0.05,0.075,0.09;
-        Array13f S_g(13);
-        S_g<<0.05,0.04,0.06,0.45,0.85,0.93,0.9,0.79,0.5,0.25,0.18,0.2,0.31;
-        Array13f S_r(13);
-        S_r<<0.075,0.045,0.025,0.04,0.05,0.09,0.075,0.5,1,0.975,0.925,0.8,0.725;
-        Array13f E_0(13);
-        E_0<<0.83989,0.99312,1.2881,1.3755,1.3391,1.3859,1.3648,1.3225,1.3278,1.2667,1.2299,1.2639,1.1636;
-
-        float d_min = 0.5;
-        float d_max = 1.0;
-        float d = ((float) rand())/RAND_MAX *(d_max-d_min) + d_min;
-
         float * depth_data = (float *) depth.data;
-        auto synthesizeChannel = [&](float B_c_min, float B_c_max, Array13f& S_c, cv::Mat& channel){
-            cv::Mat synth = channel.clone();
-            uint8_t * synth_data = (uint8_t*) synth.data;
-            float B_c = ((float) rand())/RAND_MAX *(B_c_max-B_c_min) + B_c_min;
-            Array13f num_cd = S_c * rho * E_0;
-            Array13f den_cd = S_c * rho * E_0 * (Beta * -d).exp();
-            float Beta_cd = log(trapz(25,num_cd)/trapz(25,den_cd))/d;
-            float T_cd = exp(Beta_cd*-d);
+        auto synthesizeChannel = [&](float log_trapz_num_cz, float T_cd, float B_c, Array13f& S_c, cv::Mat& channel){
+            uint8_t * synth_data = (uint8_t*) channel.data;
             for (int i = 0; i<depth.rows; i++){
                 for (int j = 0; j<depth.cols; j++){
                     float z = depth_data[i*depth.cols+j];
-                    Array13f num_cz = S_c* rho * E_0 * (Beta * -d).exp();
-                    Array13f den_cz = S_c * rho * E_0 * (Beta * -(d+z)).exp();
-                    float Beta_cz = log(trapz(25,num_cz)/trapz(25,den_cz))/z;
+                    Array13f den_cz = S_c * rho_ * E_0_ * (Beta_ * -(d_+z)).exp();
+                    float Beta_cz = (log_trapz_num_cz-log(trapz(den_cz)))/z;
                     float T_cz = exp(Beta_cz*-z);
                     
                     float pix_normalized = (float) synth_data[i*depth.cols+j] /255;
                     synth_data[i*depth.cols+j] = 255.0f*(pix_normalized*T_cd*T_cz+B_c*T_cd*(1-T_cz));
                 }
             }
-            return synth;
         };
 
         std::array<cv::Mat,3> synth_channels;
-        synth_channels[0] = synthesizeChannel(0.7,0.8,S_b,channels[0]);
-        synth_channels[1] = synthesizeChannel(0.7,0.8,S_g,channels[1]);
-        synth_channels[2] = synthesizeChannel(0.4,0.5,S_r,channels[2]);
-
+        synthesizeChannel(log_trapz_num_bz_,T_bd_,B_b_,S_b_,channels[0]);
+        synthesizeChannel(log_trapz_num_gz_,T_gd_,B_g_,S_g_,channels[1]);
+        synthesizeChannel(log_trapz_num_rz_,T_rd_,B_r_,S_r_,channels[2]);
+        
         cv_bridge::CvImage pub_image;
         pub_image.image = cv::Mat(rgb.rows,rgb.cols,CV_8UC3);
-        cv::merge(synth_channels,pub_image.image);
+        cv::merge(channels,pub_image.image);
         pub_image.encoding = sensor_msgs::image_encodings::BGR8;
         pub_image.toImageMsg(message);
         underwater_image_pub_.publish(message);
+
+        auto runtime = this->get_clock()->now() - timer;
+        RCLCPP_INFO(this->get_logger(),"Processing took: "+ std::to_string(runtime.seconds()) + "s");
     }
 
 } // namespace triton_gazebo
-
 
 int main(int argc, char * argv[])
 {

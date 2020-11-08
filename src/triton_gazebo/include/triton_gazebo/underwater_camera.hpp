@@ -2,6 +2,7 @@
 #define TRITON_GAZEBO__UNDERWATER_CAMERA
 
 #include <memory>
+#include <eigen3/Eigen/Core>
 
 #include "message_filters/subscriber.h"
 #include "message_filters/sync_policies/approximate_time.h"
@@ -64,6 +65,37 @@ namespace triton_gazebo
         image_transport::SubscriberFilter depth_sub_;  
 
         std::shared_ptr<ApproxSync> approx_sync_; 
+
+        //From 400 to 700 nm in intervals of 25 nm
+        typedef Eigen::Array<float,13,1> Array13f;
+
+        //Physical parameters
+        Array13f rho_;
+        Array13f Beta_;
+        Array13f S_b_;
+        Array13f S_g_;
+        Array13f S_r_;
+        Array13f E_0_;
+
+        //Randomized parameters when node is initialized
+        float B_b_;
+        float B_g_;
+        float B_r_;
+        float d_;
+        
+        //Precomputed values when parameters are loaded
+        float log_trapz_num_bz_;
+        float T_bd_;
+        float log_trapz_num_gz_;
+        float T_gd_;
+        float log_trapz_num_rz_;
+        float T_rd_;
+
+        //trapezoidal integration of evenly spaced vector with dx=1
+        float trapz(Array13f & vec){
+            Eigen::ArrayXf traps = (vec.tail(vec.size()-1) + vec.head(vec.size()-1))/2;
+            return traps.sum();
+        };
 
     };
     
