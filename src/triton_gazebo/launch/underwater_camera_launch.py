@@ -16,6 +16,10 @@ def generate_launch_description():
 
     params = yaml.load(open(config,"r"), Loader=yaml.FullLoader)
 
+    camera_type = "SONY_IMX322"
+    water_type = "1C"
+    irradiance_type = "ASTM_G173_03"
+
     underwater_camera = Node(
         name='underwater_camera',
         namespace='/triton/drivers/front_camera',
@@ -24,11 +28,11 @@ def generate_launch_description():
         output='screen',
         parameters=[
             {"rho": params["rho"]["default"]},
-            {"irradiance_transmission": params["irradiance_transmission"]["I"]},
-            {"spectral_sensitivity_blue": params["spectral_sensitivity"]["SONY_IMX322"][0]},
-            {"spectral_sensitivity_red": params["spectral_sensitivity"]["SONY_IMX322"][1]},
-            {"spectral_sensitivity_green": params["spectral_sensitivity"]["SONY_IMX322"][2]},
-            {"illumination_irradiance": params["illumination_irradiance"]["ASTM_G173_03"]}
+            {"irradiance_transmission": params["irradiance_transmission"][water_type]},
+            {"spectral_sensitivity_blue": params["spectral_sensitivity"][camera_type][0]},
+            {"spectral_sensitivity_red": params["spectral_sensitivity"][camera_type][1]},
+            {"spectral_sensitivity_green": params["spectral_sensitivity"][camera_type][2]},
+            {"illumination_irradiance": params["illumination_irradiance"][irradiance_type]}
         ]
     )
 
