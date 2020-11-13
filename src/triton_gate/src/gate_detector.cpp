@@ -6,6 +6,7 @@
 using namespace std;
 //namespace fs = std::filesystem;
 using namespace cv;
+using namespace cv::ml;
 using namespace vision_utils;
 
 /**
@@ -15,7 +16,7 @@ using namespace vision_utils;
 class GateDetector : public ObjectDetector
 {
 private:
-    vector<vector<Point>> gate_cntr;
+    vector<Point> gate_cntr;
     Size gate_dims; // in m
     vector<tuple<float, float, float, float, float, float>> estimated_poses;
     int frame_count;
@@ -108,19 +109,43 @@ public:
      */
     Mat bound_gate_using_poles(vector<vector<Point>> hulls, Mat src)
     {
-      //ignore featurize first, let all hulls be pole hulls
-      // Resize src to match the image the hulls were found on
-      resize(src, src, seg.size(), 0,0,INTER_CUBIC);
+        //ignore featurize first, let all hulls be pole hulls
+        // Resize src to match the image the hulls were found on
+        //resize(src, src, seg.size(), 0,0,INTER_CUBIC);
 
-      // We can't do anything if we aren't given any hulls
-      if (hulls.size() == 0)
-      {
-          return src;
+        // We can't do anything if we aren't given any hulls
+        if (hulls.size() == 0)
+        {
+            return src;
+        }
+
+        // Featurize hulls, predict using model and get classified pole hulls
+        vector<vector<Point>> pole_hulls;
+        Ptr<SVM> svm = SVM::create();
+        svm->setType(SVM::Types::C_SVC);
+        svm->setKernel(SVM::KernelTypes::LINEAR);
+        svm->load("/home/jared/subbot/triton/accuracy_opencv_model.xml");
+        vector<float> y_hat;
+        cout << "helo\n";
+        /*
+        sort(hulls.begin(), hulls.end(), 
+            [] (vector<Point> a, vector<Point>b)
+            {return a.size()>b.size();});
+            */
+        svm->predict(hulls, y_hat);
+        cout << "hi\n";
+        for (int i = 0; i < hulls.size(); i++)
+        {
+            if (y_hat.at(i) == 1)
+            {
+                pole_hulls.push_back(hulls.at(i));
+            }
+            else 
+            {
+                cout << "Not a hull!\n";
+            }
+          
       }
-
-      // Featurize hulls, predict using model and get classified pole hulls
-      // (assuming all hulls are poles we want)
-      vector<vector<Point>> pole_hulls = hulls;
 
       // Get 2D array of all the points of the pole hulls (to determine extrema)
       vector<Point> hull_points;
@@ -135,10 +160,11 @@ public:
       // If we have detected a hull associated to a pole
       if (hull_points.size() > 0)
       {
-          vector<vector<Point>>_gate_cntr = create_gate_contour(hull_points, src);
+          vector<Point>_gate_cntr = create_gate_contour(hull_points, src);
 
           // Get bounding box of contour to get it's approximate width/height
           Rect box = boundingRect(_gate_cntr);
+          //Rect box = boundingRect(hull_points);
           int w = box.width;
           int h = box.height;
 
@@ -153,7 +179,7 @@ public:
               else
               {
                   // we make sure the area hasn't changed too much (50%) between frames to account for outliers
-                  vector<vector<Point>> prev_cntr = gate_cntr;
+                  vector<Point> prev_cntr = gate_cntr;
                   double prev_area = contourArea(prev_cntr);
                   double curr_area = contourArea(_gate_cntr);
                   if (curr_area <= 1.5*prev_area && curr_area >= 0.5*prev_area)
@@ -182,13 +208,44 @@ public:
     /**
      * 
      */
-    vector<vector<Point>> create_gate_contour(vector<Point> hull_points, Mat src)
+    vector<Point> create_gate_contour(vector<Point> hull_points, Mat src)
     {
-      int width = src.cols;
+        //int width = src.cols;
 
-      // Get extrema points of hulls (i.e the points closest/furthest from the top left (0,0) and top right (width, 0) of the image)
-    
-      return vector<vector<Point>>{};
+        // Get extrema points of hulls (i.e the points closest/furthest from the top left (0,0) and top right (width, 0) of the image)
+        Point top_left = *min_element(hull_points.begin(), hull_points.end(),
+            [] (Point a, Point b)
+            {
+                return (a.x < b.x || a.y < b.y);
+            });
+        Point top_right = *min_element(hull_points.begin(), hull_points.end(),
+            [] (Point a, Point b)
+            {
+                return (a.x > b.x || a.y < b.y);
+            });
+        Point bot_left = *min_element(hull_points.begin(), hull_points.end(),
+            [] (Point a, Point b)
+            {
+                return (a.x < b.x || a.y > b.y);
+            });
+        Point bot_right = *min_element(hull_points.begin(), hull_points.end(),
+            [] (Point a, Point b)
+            {
+                return (a.x > b.x || a.y > b.y);
+            });
+
+        if (debug)
+        {
+            circle(src, top_left, 8, Scalar(0,128,0), 4);
+            circle(src, top_right, 8, Scalar(0,128,0), 4);
+            circle(src, bot_left, 8, Scalar(0,128,0), 4);
+            circle(src, bot_right, 8, Scalar(0,128,0), 4);
+        }
+        gate_cntr.push_back(top_left);
+        gate_cntr.push_back(top_right);
+        gate_cntr.push_back(bot_left);
+        gate_cntr.push_back(bot_right);
+        return gate_cntr;
     }
 
     /**
@@ -214,10 +271,10 @@ public:
 int main()
 {
     cv::Mat src;
-    ObjectDetector objdtr = ObjectDetector(0.5, true, 400);
-    GateDetector gatedtr = GateDetector();
+    ObjectDetector objdtr = ObjectDetector(1, true, 400);
+    GateDetector gatedtr = GateDetector(1, true, 400);
 
-    src = cv::imread("/home/jared/subbot/triton/4.jpg");
+    src = cv::imread("/home/jared/subbot/triton/19.jpg");
     /*
     cv::imwrite("Src.jpg", src);
     //cv::waitKey(0);
@@ -247,6 +304,7 @@ int main()
     */
     vector<vector<Point>> hulls;
     hulls = objdtr.convex_hulls(segmented);
+    /*
     Mat drawing = Mat::zeros( segmented.size(), CV_8UC3 );
     for( size_t i = 0; i<hulls.size(); i++ )
     {
@@ -257,6 +315,11 @@ int main()
         imwrite("draw.jpg", drawing);
         imshow("seg", segmented);
         cv::waitKey(0);
+        */
+    gatedtr.bound_gate_using_poles(hulls,src);
+    imshow("bounded using poles", src);
+    imwrite("bounded_using_poles.jpg", src);
+    waitKey(0);
 
 
     return 0;
