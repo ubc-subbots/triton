@@ -37,6 +37,8 @@ class PipelineManager(Node):
         self.pipeline_success = False
         self.pipeline_abort = False
         self.pipeline_feedback_msg = ""
+        self.pipeline_configured = False
+        
         self.pipeline_types = []
         for typename in re.findall(r'TYPE_+.*', PipelineType.__doc__):
             self.pipeline_types.append(getattr(PipelineType, str(typename)))
@@ -90,7 +92,7 @@ class PipelineManager(Node):
             'configure_pipeline',
             self.configure_pipeline
         )
-        self.get_logger().info('Pipeline manager succesfully started!')
+        self.get_logger().info('Pipeline manager successfully started!')
 
 
     def feedback_callback(self, msg):
@@ -150,6 +152,7 @@ class PipelineManager(Node):
                 response.success = False
         if response.success is True:
             self.get_logger().info('Pipeline configured for {}!'.format(pipeline_type))
+            self.pipeline_configured = True
         return response
 
 
@@ -161,21 +164,28 @@ class PipelineManager(Node):
         manager has been configured for into the pipeline, then waits until 
         the pipeline manager recieves feedback indicating that the loaded 
         pipeline has succeded or has had to abort. Succeeds or aborts the 
-        goal handle accordingle then returns the output value using the 
+        goal handle accordingly then returns the output value using the 
         goal handle.
 
         @param goal_handle: An action goal handle
         """
         self.get_logger().info('Running pipeline...')
         self.pipeline_success = False
-        self.pipeline_abort = False
+        self.pipeline_abort = not self.pipeline_configured
         self.pipeline_feedback_msg = ""
-        pipeline_components = self.get_parameter('pipeline.components').value
-        pipeline_pkg_names = self.get_parameter('pipeline.pkg_names').value
-        for component, pkg_name in zip(pipeline_components, pipeline_pkg_names):
-            self._load_component(component, pkg_name)
+
+        output = 0
         feedback = RunPipeline.Feedback()
         prev_msg = ""
+
+        if self.pipeline_configured:
+            pipeline_components = self.get_parameter('pipeline.components').value
+            pipeline_pkg_names = self.get_parameter('pipeline.pkg_names').value
+            for component, pkg_name in zip(pipeline_components, pipeline_pkg_names):
+                self._load_component(component, pkg_name)
+        else:
+            self.get_logger().warn('Pipeline is not configured')
+
         while not self.pipeline_success and not self.pipeline_abort:
             time.sleep(1)
             if len(self.pipeline_feedback_msg) > 0 and self.pipeline_feedback_msg is not prev_msg:
@@ -186,11 +196,14 @@ class PipelineManager(Node):
                 prev_msg = self.pipeline_feedback_msg
         if self.pipeline_abort:
             goal_handle.abort()
+            output = 1 # Show pipeline has aborted
+            self.get_logger().warn('Aborting the pipeline')
         else:
             goal_handle.succeed()
         self._unload_components()
         res = RunPipeline.Result()
-        res.output = 0
+        res.output = output
+        return res
 
 
     def _load_component(self, component, pkg_name):
@@ -219,12 +232,13 @@ class PipelineManager(Node):
         while rclpy.ok() and res is None:
             time.sleep(0.1)
         if not res.success:
-            self.get_logger().warn('The component {} was not loaded succesfully'
+            self.get_logger().warn('The component {} was not loaded successfully'
                                     .format(component))
+            self.pipeline_abort = True
         else:
             node_name = res.full_node_name
             self.nodes_in_pipeline.append(node_name)
-            self.get_logger().info(node_name + ' loaded succesfully')
+            self.get_logger().info(node_name + ' loaded successfully')
 
 
     def _unload_components(self):
@@ -276,9 +290,9 @@ class PipelineManager(Node):
         while rclpy.ok() and res is None:
             time.sleep(0.1)
         if not res.success:
-            self.get_logger().warn('{} was not unloaded succesfully'.format(node_name))
+            self.get_logger().warn('{} was not unloaded successfully'.format(node_name))
         else:
-            self.get_logger().info('{} was unloaded succesfully'.format(node_name))
+            self.get_logger().info('{} was unloaded successfully'.format(node_name))
 
 
     def _load_params_from_yaml(self, config_yaml):
@@ -314,7 +328,7 @@ class PipelineManager(Node):
                       len(self.get_parameter('pipeline.pkg_names').value)):
                     self.get_logger().warn('Number of components and package names do not match, {} and {} respectively'
                                             .format(len(self.get_parameter('pipeline.components').value),
-                                             len(self.get_parameter('pipeline.pkg_names').value)))
+                                            len(self.get_parameter('pipeline.pkg_names').value)))
                     return False
 
                 else:

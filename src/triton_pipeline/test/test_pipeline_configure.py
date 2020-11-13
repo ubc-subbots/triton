@@ -89,7 +89,7 @@ class TestPipeline(unittest.TestCase):
                     )
                 else:
                     self.fail('Expected configure pipeline service to fail'
-                                ' due to non existent type')
+                              ' due to non existent type')
                 break
 
 
@@ -111,7 +111,7 @@ class TestPipeline(unittest.TestCase):
                         expected_output='Could not find {}.yaml'.format(test_file_name))
                 else:
                     self.fail('Expected configure pipeline service to fail'
-                                ' due to no yaml associated to pipeline type')
+                              ' due to no yaml associated to pipeline type')
                 break
 
 
@@ -133,7 +133,7 @@ class TestPipeline(unittest.TestCase):
                         expected_output='Could not parse {}.yaml'.format(test_file_name))
                 else:
                     self.fail('Expected configure pipeline service to fail'
-                                ' due to bad yaml associated to pipeline type')
+                              ' due to bad yaml associated to pipeline type')
                 break
 
 
@@ -155,8 +155,8 @@ class TestPipeline(unittest.TestCase):
                         expected_output='Pipeline config YAML needs pipeline namespace')
                 else:
                     self.fail('Expected configure pipeline service to fail'
-                                ' due to no pipeline parameter namespace in yaml'
-                                ' associated to pipeline type')
+                              ' due to no pipeline parameter namespace in yaml'
+                              ' associated to pipeline type')
                 break
 
 
@@ -180,8 +180,8 @@ class TestPipeline(unittest.TestCase):
                         expected_output='Could not get the pipeline parameter "{}", does not exist'.format(param))
                 else:
                     self.fail('Expected configure pipeline service to fail'
-                                ' due to no parameter for yaml item'
-                                ' associated to pipeline type')
+                              ' due to no parameter for yaml item'
+                              ' associated to pipeline type')
                 break
 
 
@@ -206,8 +206,8 @@ class TestPipeline(unittest.TestCase):
                         expected_output='Number of components and package names do not match, {} and {} respectively'.format(compnum, packnum))
                 else:
                     self.fail('Expected configure pipeline service to fail'
-                                ' due to nonmatching component and'
-                                ' package name numbers')
+                              ' due to nonmatching component and'
+                              ' package name numbers')
                 break
 
 
@@ -232,7 +232,7 @@ class TestPipeline(unittest.TestCase):
 
                 else:
                     self.fail('Expected configure pipeline service to fail'
-                                ' due to no parameter for yaml item'
-                                ' associated to pipeline type')
+                              ' due to no parameter for yaml item'
+                              ' associated to pipeline type')
                 break
 
