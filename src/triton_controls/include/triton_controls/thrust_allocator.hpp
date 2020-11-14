@@ -22,7 +22,7 @@ namespace triton_controls
 
         /** Constructor
          * 
-         * Creates the allocation matrix from the given parameters, then takes the 
+         * Creates the allocation matrix from the given parameters, then stores the 
          * pseudoinverse of that matrix and sets up pubs/subs
          * 
          * @param options ros2 node options.
