@@ -3,6 +3,7 @@
 //#include <filesystem> //for filepath, can be used in C++17
 #include <opencv2/opencv.hpp>
 #include "triton_vision_utils/vision_utils.hpp"
+#include "featurize.cpp"
 using namespace std;
 //namespace fs = std::filesystem;
 using namespace cv;
@@ -21,7 +22,7 @@ private:
     vector<tuple<float, float, float, float, float, float>> estimated_poses;
     int frame_count;
     tuple<float, float, float, float, float, float> gate_pose; // x, y, z, phi, theta, psi
-    //featurizer 
+    PoleFeaturizer featurizer;
     char directorybuf[64];
     Mat pre;
     Mat enh;
@@ -43,7 +44,7 @@ public:
         estimated_poses = {};
         frame_count = 0;
         gate_pose = tuple<float,float,float,float,float,float>(0,0,0,0,0,0);
-        //featurizer = PoleFeaturizer();
+        featurizer = PoleFeaturizer();
         getcwd(directorybuf, 64);
         string directory(directorybuf);
         // load data/model.pkl
@@ -105,7 +106,11 @@ public:
     }
 
     /**
-     * 
+     * Finds the convex hulls associated to the poles and uses this to draw a bounding box around the poles
+     * of the gate onto the raw image
+     * @param hulls: A set of the convex hulls to search
+     * @param src: The raw unscaled image
+     * @returns: The raw scaled image with the bounding box around the gate location drawn on
      */
     Mat bound_gate_using_poles(vector<vector<Point>> hulls, Mat src)
     {
@@ -126,14 +131,8 @@ public:
         svm->setKernel(SVM::KernelTypes::LINEAR);
         svm->load("/home/jared/subbot/triton/accuracy_opencv_model.xml");
         vector<float> y_hat;
-        cout << "helo\n";
-        /*
-        sort(hulls.begin(), hulls.end(), 
-            [] (vector<Point> a, vector<Point>b)
-            {return a.size()>b.size();});
-            */
-        svm->predict(hulls, y_hat);
-        cout << "hi\n";
+        vector<vector<float>> X_hat = featurizer.featurize_for_classification(hulls);
+        svm->predict(X_hat, y_hat);
         for (int i = 0; i < hulls.size(); i++)
         {
             if (y_hat.at(i) == 1)
@@ -206,7 +205,10 @@ public:
     }
 
     /**
-     * 
+     * Creates the estimated gate contour from the given hull points, draws debug info on src if activated
+     * @param hull_points: 2D array of points
+     * @param src: The raw image
+     * @returns: The gate contour drawn on the src image with debug info if activated
      */
     vector<Point> create_gate_contour(vector<Point> hull_points, Mat src)
     {
