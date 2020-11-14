@@ -130,12 +130,19 @@ public:
         svm->setType(SVM::Types::C_SVC);
         svm->setKernel(SVM::KernelTypes::LINEAR);
         svm->load("/home/jared/subbot/triton/accuracy_opencv_model.xml");
-        vector<float> y_hat;
-        vector<vector<float>> X_hat = featurizer.featurize_for_classification(hulls);
+        //vector<float> y_hat;
+        Mat X_hat = featurizer.featurize_for_classification(hulls);
+        Mat y_hat = Mat::zeros(1, X_hat.rows, CV_32F);
+        cout << "ready to predict" << endl;
+        cout << "X num of rows " << X_hat.rows << endl;
+        cout << "X num of cols " << X_hat.cols << endl;
+        cout << "y num of rows " << y_hat.rows << endl;
+        cout << "y num of cols " << y_hat.cols << endl;
         svm->predict(X_hat, y_hat);
         for (int i = 0; i < hulls.size(); i++)
         {
-            if (y_hat.at(i) == 1)
+            //if (svm->predict(X_hat.at(i)) == 1)
+            if (y_hat.at<float>(0,i) == 1)
             {
                 pole_hulls.push_back(hulls.at(i));
             }
