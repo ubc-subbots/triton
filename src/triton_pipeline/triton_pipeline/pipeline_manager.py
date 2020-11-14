@@ -38,7 +38,7 @@ class PipelineManager(Node):
         self.pipeline_abort = False
         self.pipeline_feedback_msg = ""
         self.pipeline_configured = False
-        
+
         self.pipeline_types = []
         for typename in re.findall(r'TYPE_+.*', PipelineType.__doc__):
             self.pipeline_types.append(getattr(PipelineType, str(typename)))

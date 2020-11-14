@@ -101,7 +101,7 @@ class TestPipeline(unittest.TestCase):
                         self.fail('Should abort due to unconfigured pipeline')
                     break
 
-
+    '''
     def test_run_comp_not_valid(self, pipeline_manager, proc_info, proc_output):
         component = 'example::DoesNotExist'
 
@@ -166,4 +166,4 @@ class TestPipeline(unittest.TestCase):
                     else:
                         self.fail('Should abort from component not able to load')
                     break
-
+    '''
