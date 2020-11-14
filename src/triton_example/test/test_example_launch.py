@@ -15,7 +15,7 @@ def generate_test_description():
     ld = LaunchDescription()
 
     pkg_name = 'triton_example'
-    components = ['example::ComponentOne', 'example::ComponentTwo']
+    components = ['triton_example::ComponentOne', 'triton_example::ComponentTwo']
 
     example_container = ComposableNodeContainer(
         name='example_container',

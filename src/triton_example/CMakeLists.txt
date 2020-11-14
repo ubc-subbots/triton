@@ -29,8 +29,8 @@ add_library(triton_example SHARED
   src/component_two.cpp
 )
 
-rclcpp_components_register_nodes(triton_example "example::ComponentOne")
-rclcpp_components_register_nodes(triton_example "example::ComponentTwo")
+rclcpp_components_register_nodes(triton_example "triton_example::ComponentOne")
+rclcpp_components_register_nodes(triton_example "triton_example::ComponentTwo")
 
 target_compile_definitions(triton_example
   PRIVATE "triton_example_CPP_BUILDING_DLL"
