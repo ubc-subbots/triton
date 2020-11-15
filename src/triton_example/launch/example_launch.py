@@ -11,14 +11,14 @@ def generate_launch_description():
         name='component_one',
         namespace='/triton/example',
         package='triton_example',
-        plugin='example::ComponentOne'
+        plugin='triton_example::ComponentOne'
     )
 
     component_two = ComposableNode(
         name='component_two',
         namespace='/triton/example',
         package='triton_example',
-        plugin='example::ComponentTwo'
+        plugin='triton_example::ComponentTwo'
     )
 
     example_container = ComposableNodeContainer(

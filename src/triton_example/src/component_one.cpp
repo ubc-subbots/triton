@@ -1,7 +1,7 @@
 #include "triton_example/component_one.hpp"
 using std::placeholders::_1;
 
-namespace example
+namespace triton_example
 {
 
 
@@ -26,4 +26,4 @@ void ComponentOne::callback(const std_msgs::msg::String::SharedPtr msg) const
 }
 
     
-} // namespace example
+} // namespace triton_example
