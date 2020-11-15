@@ -15,11 +15,10 @@
         <pose>0 0 0 0 -0 0</pose>
       </inertial>
       <visual name='visual'>
-        <!--pose>-0.21424 -0.1763 -0.19368 0 -0 0</pose-->
-        <pose>-0.21424 -0.18 -0.215 0 -0 0</pose>
+        <pose>0 0 0 0 -0 0</pose>
         <geometry>
           <mesh>
-            <uri>/home/jake/triton/src/triton_gazebo/models/triton_frame/meshes/triton_frame.dae</uri>
+            <uri>model://triton_frame/meshes/triton_frame.dae</uri>
             <scale>1 1 1</scale>
           </mesh>
         </geometry>
@@ -37,11 +36,10 @@
       <collision name='collision'>
         <laser_retro>0</laser_retro>
         <max_contacts>10</max_contacts>
-        <!--pose>-0.21424 -0.1763 -0.19368 0 -0 0</pose-->
-        <pose>-0.21424 -0.18 -0.215 0 -0 0</pose>
+        <pose>0 0 0 0 -0 0</pose>
         <geometry>
           <mesh>
-            <uri>/home/jake/triton/src/triton_gazebo/models/triton_frame/meshes/triton_frame.dae</uri>
+            <uri>model://triton_frame/meshes/triton_frame.dae</uri>
             <scale>1 1 1</scale>
           </mesh>
         </geometry>
