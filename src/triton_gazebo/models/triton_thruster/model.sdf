@@ -1,7 +1,7 @@
 <?xml version='1.0'?>
 <sdf version='1.7'>
   <model name='triton_thruster'>
-    <link name='link_0'>
+    <link name='thruster'>
       <inertial>
         <mass>0.38044</mass>
         <inertia>

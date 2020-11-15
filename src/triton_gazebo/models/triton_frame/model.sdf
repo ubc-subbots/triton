@@ -1,7 +1,7 @@
 <?xml version='1.0'?>
 <sdf version='1.7'>
   <model name='triton_frame'>
-    <link name='link_0'>
+    <link name='frame'>
       <inertial>
         <mass>17.43388</mass>
         <inertia>
