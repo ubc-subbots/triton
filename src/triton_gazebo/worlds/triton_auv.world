@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<sdf version="1.7">
+  <world name="default">
+    <include>
+      <uri>model://triton_full</uri>
+    </include>
+    <grid>0</grid>
+  </world>
+</sdf>
