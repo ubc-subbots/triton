@@ -2,6 +2,7 @@
 <sdf version='1.7'>
   <model name='triton_frame'>
     <link name='frame'>
+      <!-- pose relaive to STL file origin, was moved to AUV center using Blender -->
       <inertial>
         <mass>17.43388</mass>
         <inertia>
@@ -14,6 +15,8 @@
         </inertia>
         <pose>0 0 0 0 -0 0</pose>
       </inertial>
+
+      <!-- Visual Data -->
       <visual name='visual'>
         <pose>0 0 0 0 -0 0</pose>
         <geometry>
@@ -33,6 +36,8 @@
         <transparency>0</transparency>
         <cast_shadows>1</cast_shadows>
       </visual>
+
+      <!-- Collision Data-->
       <collision name='collision'>
         <laser_retro>0</laser_retro>
         <max_contacts>10</max_contacts>
@@ -43,6 +48,7 @@
             <scale>1 1 1</scale>
           </mesh>
         </geometry>
+        <!-- Surface Data consists of default value, we should reseach better numbers-->
         <surface>
           <friction>
             <ode>
