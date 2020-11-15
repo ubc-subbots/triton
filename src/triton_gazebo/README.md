@@ -11,6 +11,12 @@ To run a Gazebo simulation with a world file given in the `worlds` directory, us
 
 Where `<WORLD_FILE_NAME>` is the name of the world file you want to run in Gazebo (e.g `cube.world`) and `<IS_HEADLESS>` is true if you don't want to run the GUI (defaults to false). Remember to build this package (i.e `colcon build --packages-select triton_gazebo`) everytime you change a model or world and want that change to propogate when you relaunch Gazebo.
 
+To run the underwater camera node, use the following
+
+        ros2 launch triton_gazebo underwater_camera_launch.py
+
+Sets of parameters for the underwater camera node (water transmission, spectral sensitivity, etc.) are stored in `config/underwater_camera.yaml`. To change which parameters are used, `launch/underwater_camera_launch.py` can be modified
+
 ## Worlds
 
 `cube.world` 
