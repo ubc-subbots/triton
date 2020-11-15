@@ -17,7 +17,7 @@ def generate_launch_description():
     params = yaml.load(open(config,"r"), Loader=yaml.FullLoader)
 
     camera_type = "SONY_IMX322"
-    water_type = "1C"
+    water_type = "I"
     irradiance_type = "ASTM_G173_03"
 
     underwater_camera = Node(

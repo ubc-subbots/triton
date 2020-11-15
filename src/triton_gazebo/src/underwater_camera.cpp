@@ -92,8 +92,10 @@ namespace triton_gazebo
             E_0_(i) = E_0_vals[i];
         }
         Beta_/=100.0;
+        Beta_ = Array13f::Ones()-Beta_;//We input the irradiance transmission %, but we want the attenuation factor
 
         //Randomize parameters
+        srand(time(NULL));//set seed
         float d_min = 0.5;
         float d_max = 1.0;
         d_ = ((float) rand())/RAND_MAX *(d_max-d_min) + d_min;
@@ -106,16 +108,16 @@ namespace triton_gazebo
         B_b_ = preCalculate(0.7,0.8);
         B_g_ = preCalculate(0.7,0.8);
         B_r_ = preCalculate(0.4,0.5);
-        
+
         //Precalculate integrals
         auto preCalculate2 = [&](Array13f& S_c, float& log_trapz_num_cz, float& T_cd){
             Array13f num_cd = S_c * rho_ * E_0_;
             Array13f den_cd = S_c * rho_ * E_0_ * (Beta_ * -d_).exp();
-            float Beta_cd = log(trapz(num_cd)/trapz(den_cd))/d_;
+            float Beta_cd = log(simps(num_cd)/simps(den_cd))/d_;
             T_cd = exp(Beta_cd*-d_);
 
             Array13f num_cz = S_c* rho_ * E_0_ * (Beta_ * -d_).exp();
-            log_trapz_num_cz = log(trapz(num_cz));
+            log_trapz_num_cz = log(simps(num_cz));
         };
 
         preCalculate2(S_b_, log_trapz_num_bz_, T_bd_);
@@ -182,14 +184,15 @@ namespace triton_gazebo
         float * depth_data = (float *) depth.data;
         auto synthesizeChannel = [&](float log_trapz_num_cz, float T_cd, float B_c, Array13f& S_c, cv::Mat& channel){
             uint8_t * synth_data = (uint8_t*) channel.data;
+            Array13f S_c_rho_E_0 = S_c * rho_ * E_0_;
             for (int i = 0; i<depth.rows; i++){
                 for (int j = 0; j<depth.cols; j++){
                     float z = depth_data[i*depth.cols+j];
-                    Array13f den_cz = S_c * rho_ * E_0_ * (Beta_ * -(d_+z)).exp();
-                    float Beta_cz = (log_trapz_num_cz-log(trapz(den_cz)))/z;
+                    Array13f den_cz = S_c_rho_E_0 * (Beta_ * -(d_+z)).exp();
+                    float Beta_cz = (log_trapz_num_cz-log(simps(den_cz)))/z;
                     float T_cz = exp(Beta_cz*-z);
                     
-                    float pix_normalized = (float) synth_data[i*depth.cols+j] /255;
+                    float pix_normalized = (float) synth_data[i*depth.cols+j]/255.0f;
                     synth_data[i*depth.cols+j] = 255.0f*(pix_normalized*T_cd*T_cz+B_c*T_cd*(1-T_cz));
                 }
             }

@@ -96,7 +96,21 @@ namespace triton_gazebo
             Eigen::ArrayXf traps = (vec.tail(vec.size()-1) + vec.head(vec.size()-1))/2;
             return traps.sum();
         };
-
+        //Simpson's rule integration of evenly spaced vector with dx=1
+        float simps(Array13f & vec){
+            float sum = 0;
+            int size = vec.size();
+            sum = vec(1) + vec(size-1);
+            for (int i = 0; i < (size-2)/2; i++){
+                sum += 4*vec(1+2*i);
+                sum += 2*vec(2+2*i);
+            }
+            if (size & 1) {//odd
+                sum += 4*vec(size-2);
+            }
+            return sum/3;
+        };
+        
     };
     
 } // namespace triton_gazebo
