@@ -1,716 +1,680 @@
 <?xml version='1.0'?>
 <sdf version='1.7'>
   <model name='triton_full'>
-    <model name='triton_frame'>
-      <link name='frame'>
-        <inertial>
-          <mass>17.4339</mass>
-          <inertia>
-            <ixx>0.426592</ixx>
-            <ixy>0.000913</ixy>
-            <ixz>-0.00614</ixz>
-            <iyy>0.478627</iyy>
-            <iyz>-0.00225</iyz>
-            <izz>0.425751</izz>
-          </inertia>
-          <pose>0 0 0 0 -0 0</pose>
-        </inertial>
-        <visual name='visual'>
-          <!--pose>-0.21424 -0.18 -0.215 0 -0 0</pose-->
-          <pose>0 0 0 0 -0 0</pose>
-          <geometry>
-            <mesh>
-              <uri>/home/jake/triton/src/triton_gazebo/models/triton_frame/meshes/triton_frame.dae</uri>
-              <scale>1 1 1</scale>
-            </mesh>
-          </geometry>
-          <material>
-            <lighting>1</lighting>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/White</name>
-            </script>
-            <shader type='pixel'/>
-          </material>
-          <transparency>0</transparency>
-          <cast_shadows>1</cast_shadows>
-        </visual>
-        <collision name='collision'>
-          <laser_retro>0</laser_retro>
-          <max_contacts>10</max_contacts>
-          <pose>0 0 0 0 -0 0</pose>
-          <geometry>
-            <mesh>
-              <uri>/home/jake/triton/src/triton_gazebo/models/triton_frame/meshes/triton_frame.dae</uri>
-              <scale>1 1 1</scale>
-            </mesh>
-          </geometry>
-          <surface>
-            <friction>
+    <link name='frame'>
+      <inertial>
+        <mass>17.4339</mass>
+        <inertia>
+          <ixx>0.426592</ixx>
+          <ixy>0.000913</ixy>
+          <ixz>-0.00614</ixz>
+          <iyy>0.478627</iyy>
+          <iyz>-0.00225</iyz>
+          <izz>0.425751</izz>
+        </inertia>
+        <pose>0 0 0 0 -0 0</pose>
+      </inertial>
+      <visual name='visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>/home/jake/triton/src/triton_gazebo/models/triton_frame/meshes/triton_frame.dae</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+        <material>
+          <lighting>1</lighting>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/White</name>
+          </script>
+          <shader type='pixel'/>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
+      </visual>
+      <collision name='collision'>
+        <laser_retro>0</laser_retro>
+        <max_contacts>10</max_contacts>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>/home/jake/triton/src/triton_gazebo/models/triton_frame/meshes/triton_frame.dae</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>1</mu>
+              <mu2>1</mu2>
+              <fdir1>0 0 0</fdir1>
+              <slip1>0</slip1>
+              <slip2>0</slip2>
+            </ode>
+            <torsional>
+              <coefficient>1</coefficient>
+              <patch_radius>0</patch_radius>
+              <surface_radius>0</surface_radius>
+              <use_patch_radius>1</use_patch_radius>
               <ode>
-                <mu>1</mu>
-                <mu2>1</mu2>
-                <fdir1>0 0 0</fdir1>
-                <slip1>0</slip1>
-                <slip2>0</slip2>
+                <slip>0</slip>
               </ode>
-              <torsional>
-                <coefficient>1</coefficient>
-                <patch_radius>0</patch_radius>
-                <surface_radius>0</surface_radius>
-                <use_patch_radius>1</use_patch_radius>
-                <ode>
-                  <slip>0</slip>
-                </ode>
-              </torsional>
-            </friction>
-            <bounce>
-              <restitution_coefficient>0</restitution_coefficient>
-              <threshold>1e+06</threshold>
-            </bounce>
-            <contact>
-              <collide_without_contact>0</collide_without_contact>
-              <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
-              <collide_bitmask>1</collide_bitmask>
-              <ode>
-                <soft_cfm>0</soft_cfm>
-                <soft_erp>0.2</soft_erp>
-                <kp>1e+13</kp>
-                <kd>1</kd>
-                <max_vel>0.01</max_vel>
-                <min_depth>0</min_depth>
-              </ode>
-              <bullet>
-                <split_impulse>1</split_impulse>
-                <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
-                <soft_cfm>0</soft_cfm>
-                <soft_erp>0.2</soft_erp>
-                <kp>1e+13</kp>
-                <kd>1</kd>
-              </bullet>
-            </contact>
-          </surface>
-        </collision>
-      </link>
-      <static>0</static>
-      <allow_auto_disable>1</allow_auto_disable>
-      <pose>0 0 0 0 -0 0</pose>
-    </model>
-    <model name='triton_thruster1'>
-      <link name='thruster'>
-        <inertial>
-          <mass>0.38044</mass>
-          <inertia>
-            <ixx>0.00030988</ixx>
-            <ixy>5.5564e-08</ixy>
-            <ixz>3.9324e-07</ixz>
-            <iyy>0.0003498</iyy>
-            <iyz>1.7659e-06</iyz>
-            <izz>0.00030001</izz>
-          </inertia>
-        </inertial>
-        <pose>-0 0 0 0 -0 0</pose>
-        <visual name='visual'>
-          <pose>0 0 0 0 -0 0</pose>
-          <geometry>
-            <mesh>
-              <uri>/home/jake/triton/src/triton_gazebo/models/triton_thruster/meshes/triton_thruster.dae</uri>
-              <scale>1 1 1</scale>
-            </mesh>
-          </geometry>
-          <material>
-            <lighting>1</lighting>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/Black</name>
-            </script>
-            <shader type='pixel'/>
-          </material>
-          <transparency>0</transparency>
-          <cast_shadows>1</cast_shadows>
-        </visual>
-        <collision name='collision'>
-          <laser_retro>0</laser_retro>
-          <max_contacts>10</max_contacts>
-          <pose>0 0 0 0 -0 0</pose>
-          <geometry>
-            <mesh>
-              <uri>/home/jake/triton/src/triton_gazebo/models/triton_thruster/meshes/triton_thruster.dae</uri>
-              <scale>1 1 1</scale>
-            </mesh>
-          </geometry>
-          <surface>
-            <friction>
-              <ode>
-                <mu>1</mu>
-                <mu2>1</mu2>
-                <fdir1>0 0 0</fdir1>
-                <slip1>0</slip1>
-                <slip2>0</slip2>
-              </ode>
-              <torsional>
-                <coefficient>1</coefficient>
-                <patch_radius>0</patch_radius>
-                <surface_radius>0</surface_radius>
-                <use_patch_radius>1</use_patch_radius>
-                <ode>
-                  <slip>0</slip>
-                </ode>
-              </torsional>
-            </friction>
-            <bounce>
-              <restitution_coefficient>0</restitution_coefficient>
-              <threshold>1e+06</threshold>
-            </bounce>
-            <contact>
-              <collide_without_contact>0</collide_without_contact>
-              <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
-              <collide_bitmask>1</collide_bitmask>
-              <ode>
-                <soft_cfm>0</soft_cfm>
-                <soft_erp>0.2</soft_erp>
-                <kp>1e+13</kp>
-                <kd>1</kd>
-                <max_vel>0.01</max_vel>
-                <min_depth>0</min_depth>
-              </ode>
-              <bullet>
-                <split_impulse>1</split_impulse>
-                <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
-                <soft_cfm>0</soft_cfm>
-                <soft_erp>0.2</soft_erp>
-                <kp>1e+13</kp>
-                <kd>1</kd>
-              </bullet>
-            </contact>
-          </surface>
-        </collision>
-      </link>
-      <plugin name="gazebo_force_controller" filename="libgazebo_ros_force.so">
-          <ros>
-              <namespace>/triton/gazebo_drivers</namespace>
-              <remapping>gazebo_ros_force:=force_t1</remapping>
-          </ros>
-          <link_name>thruster</link_name>
-          <force_frame>world</force_frame>
-      </plugin>
-      <static>0</static>
-      <allow_auto_disable>1</allow_auto_disable>
+            </torsional>
+          </friction>
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e+06</threshold>
+          </bounce>
+          <contact>
+            <collide_without_contact>0</collide_without_contact>
+            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
+            <collide_bitmask>1</collide_bitmask>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+            <bullet>
+              <split_impulse>1</split_impulse>
+              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+            </bullet>
+          </contact>
+        </surface>
+      </collision>
+    </link>
+    <link name='thruster1'>
+      <inertial>
+        <mass>0.38044</mass>
+        <inertia>
+          <ixx>0.00030988</ixx>
+          <ixy>5.5564e-08</ixy>
+          <ixz>3.9324e-07</ixz>
+          <iyy>0.0003498</iyy>
+          <iyz>1.7659e-06</iyz>
+          <izz>0.00030001</izz>
+        </inertia>
+      </inertial>
       <pose>0.2035 -0.18 0 0 -1.5707 0.785398</pose>
-    </model>
-    <model name='triton_thruster2'>
-      <link name='thruster'>
-        <inertial>
-          <mass>0.38044</mass>
-          <inertia>
-            <ixx>0.00030988</ixx>
-            <ixy>5.5564e-08</ixy>
-            <ixz>3.9324e-07</ixz>
-            <iyy>0.0003498</iyy>
-            <iyz>1.7659e-06</iyz>
-            <izz>0.00030001</izz>
-          </inertia>
-        </inertial>
-        <pose>-0 0 0 0 -0 0</pose>
-        <visual name='visual'>
-          <pose>0 0 0 0 -0 0</pose>
-          <geometry>
-            <mesh>
-              <uri>/home/jake/triton/src/triton_gazebo/models/triton_thruster/meshes/triton_thruster.dae</uri>
-              <scale>1 1 1</scale>
-            </mesh>
-          </geometry>
-          <material>
-            <lighting>1</lighting>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/Black</name>
-            </script>
-            <shader type='pixel'/>
-          </material>
-          <transparency>0</transparency>
-          <cast_shadows>1</cast_shadows>
-        </visual>
-        <collision name='collision'>
-          <laser_retro>0</laser_retro>
-          <max_contacts>10</max_contacts>
-          <pose>0 0 0 0 -0 0</pose>
-          <geometry>
-            <mesh>
-              <uri>/home/jake/triton/src/triton_gazebo/models/triton_thruster/meshes/triton_thruster.dae</uri>
-              <scale>1 1 1</scale>
-            </mesh>
-          </geometry>
-          <surface>
-            <friction>
+      <visual name='visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>/home/jake/triton/src/triton_gazebo/models/triton_thruster/meshes/triton_thruster.dae</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+        <material>
+          <lighting>1</lighting>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Black</name>
+          </script>
+          <shader type='pixel'/>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
+      </visual>
+      <collision name='collision'>
+        <laser_retro>0</laser_retro>
+        <max_contacts>10</max_contacts>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>/home/jake/triton/src/triton_gazebo/models/triton_thruster/meshes/triton_thruster.dae</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>1</mu>
+              <mu2>1</mu2>
+              <fdir1>0 0 0</fdir1>
+              <slip1>0</slip1>
+              <slip2>0</slip2>
+            </ode>
+            <torsional>
+              <coefficient>1</coefficient>
+              <patch_radius>0</patch_radius>
+              <surface_radius>0</surface_radius>
+              <use_patch_radius>1</use_patch_radius>
               <ode>
-                <mu>1</mu>
-                <mu2>1</mu2>
-                <fdir1>0 0 0</fdir1>
-                <slip1>0</slip1>
-                <slip2>0</slip2>
+                <slip>0</slip>
               </ode>
-              <torsional>
-                <coefficient>1</coefficient>
-                <patch_radius>0</patch_radius>
-                <surface_radius>0</surface_radius>
-                <use_patch_radius>1</use_patch_radius>
-                <ode>
-                  <slip>0</slip>
-                </ode>
-              </torsional>
-            </friction>
-            <bounce>
-              <restitution_coefficient>0</restitution_coefficient>
-              <threshold>1e+06</threshold>
-            </bounce>
-            <contact>
-              <collide_without_contact>0</collide_without_contact>
-              <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
-              <collide_bitmask>1</collide_bitmask>
-              <ode>
-                <soft_cfm>0</soft_cfm>
-                <soft_erp>0.2</soft_erp>
-                <kp>1e+13</kp>
-                <kd>1</kd>
-                <max_vel>0.01</max_vel>
-                <min_depth>0</min_depth>
-              </ode>
-              <bullet>
-                <split_impulse>1</split_impulse>
-                <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
-                <soft_cfm>0</soft_cfm>
-                <soft_erp>0.2</soft_erp>
-                <kp>1e+13</kp>
-                <kd>1</kd>
-              </bullet>
-            </contact>
-          </surface>
-        </collision>
-      </link>
-      <plugin name="gazebo_force_controller" filename="libgazebo_ros_force.so">
-          <ros>
-              <namespace>/triton/gazebo_drivers</namespace>
-              <remapping>gazebo_ros_force:=force_t2</remapping>
-          </ros>
-          <link_name>thruster</link_name>
-          <force_frame>world</force_frame>
-      </plugin>
-      <static>0</static>
-      <allow_auto_disable>1</allow_auto_disable>
+            </torsional>
+          </friction>
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e+06</threshold>
+          </bounce>
+          <contact>
+            <collide_without_contact>0</collide_without_contact>
+            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
+            <collide_bitmask>1</collide_bitmask>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+            <bullet>
+              <split_impulse>1</split_impulse>
+              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+            </bullet>
+          </contact>
+        </surface>
+      </collision>
+    </link>
+    <link name='thruster2'>
+      <inertial>
+        <mass>0.38044</mass>
+        <inertia>
+          <ixx>0.00030988</ixx>
+          <ixy>5.5564e-08</ixy>
+          <ixz>3.9324e-07</ixz>
+          <iyy>0.0003498</iyy>
+          <iyz>1.7659e-06</iyz>
+          <izz>0.00030001</izz>
+        </inertia>
+      </inertial>
       <pose>0.2035 0.18 0 0 1.5707 2.35619</pose>
-    </model>
-    <model name='triton_thruster3'>
-      <link name='thruster'>
-        <inertial>
-          <mass>0.38044</mass>
-          <inertia>
-            <ixx>0.00030988</ixx>
-            <ixy>5.5564e-08</ixy>
-            <ixz>3.9324e-07</ixz>
-            <iyy>0.0003498</iyy>
-            <iyz>1.7659e-06</iyz>
-            <izz>0.00030001</izz>
-          </inertia>
-        </inertial>
-        <pose>-0 0 0 0 -0 0</pose>
-        <visual name='visual'>
-          <pose>0 0 0 0 -0 0</pose>
-          <geometry>
-            <mesh>
-              <uri>/home/jake/triton/src/triton_gazebo/models/triton_thruster/meshes/triton_thruster.dae</uri>
-              <scale>1 1 1</scale>
-            </mesh>
-          </geometry>
-          <material>
-            <lighting>1</lighting>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/Black</name>
-            </script>
-            <shader type='pixel'/>
-          </material>
-          <transparency>0</transparency>
-          <cast_shadows>1</cast_shadows>
-        </visual>
-        <collision name='collision'>
-          <laser_retro>0</laser_retro>
-          <max_contacts>10</max_contacts>
-          <pose>0 0 0 0 -0 0</pose>
-          <geometry>
-            <mesh>
-              <uri>/home/jake/triton/src/triton_gazebo/models/triton_thruster/meshes/triton_thruster.dae</uri>
-              <scale>1 1 1</scale>
-            </mesh>
-          </geometry>
-          <surface>
-            <friction>
+      <visual name='visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>/home/jake/triton/src/triton_gazebo/models/triton_thruster/meshes/triton_thruster.dae</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+        <material>
+          <lighting>1</lighting>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Black</name>
+          </script>
+          <shader type='pixel'/>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
+      </visual>
+      <collision name='collision'>
+        <laser_retro>0</laser_retro>
+        <max_contacts>10</max_contacts>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>/home/jake/triton/src/triton_gazebo/models/triton_thruster/meshes/triton_thruster.dae</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>1</mu>
+              <mu2>1</mu2>
+              <fdir1>0 0 0</fdir1>
+              <slip1>0</slip1>
+              <slip2>0</slip2>
+            </ode>
+            <torsional>
+              <coefficient>1</coefficient>
+              <patch_radius>0</patch_radius>
+              <surface_radius>0</surface_radius>
+              <use_patch_radius>1</use_patch_radius>
               <ode>
-                <mu>1</mu>
-                <mu2>1</mu2>
-                <fdir1>0 0 0</fdir1>
-                <slip1>0</slip1>
-                <slip2>0</slip2>
+                <slip>0</slip>
               </ode>
-              <torsional>
-                <coefficient>1</coefficient>
-                <patch_radius>0</patch_radius>
-                <surface_radius>0</surface_radius>
-                <use_patch_radius>1</use_patch_radius>
-                <ode>
-                  <slip>0</slip>
-                </ode>
-              </torsional>
-            </friction>
-            <bounce>
-              <restitution_coefficient>0</restitution_coefficient>
-              <threshold>1e+06</threshold>
-            </bounce>
-            <contact>
-              <collide_without_contact>0</collide_without_contact>
-              <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
-              <collide_bitmask>1</collide_bitmask>
-              <ode>
-                <soft_cfm>0</soft_cfm>
-                <soft_erp>0.2</soft_erp>
-                <kp>1e+13</kp>
-                <kd>1</kd>
-                <max_vel>0.01</max_vel>
-                <min_depth>0</min_depth>
-              </ode>
-              <bullet>
-                <split_impulse>1</split_impulse>
-                <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
-                <soft_cfm>0</soft_cfm>
-                <soft_erp>0.2</soft_erp>
-                <kp>1e+13</kp>
-                <kd>1</kd>
-              </bullet>
-            </contact>
-          </surface>
-        </collision>
-      </link>
-      <plugin name="gazebo_force_controller" filename="libgazebo_ros_force.so">
-          <ros>
-              <namespace>/triton/gazebo_drivers</namespace>
-              <remapping>gazebo_ros_force:=force_t3</remapping>
-          </ros>
-          <link_name>thruster</link_name>
-          <force_frame>world</force_frame>
-      </plugin>
-      <static>0</static>
-      <allow_auto_disable>1</allow_auto_disable>
+            </torsional>
+          </friction>
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e+06</threshold>
+          </bounce>
+          <contact>
+            <collide_without_contact>0</collide_without_contact>
+            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
+            <collide_bitmask>1</collide_bitmask>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+            <bullet>
+              <split_impulse>1</split_impulse>
+              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+            </bullet>
+          </contact>
+        </surface>
+      </collision>
+    </link>
+    <link name='thruster3'>
+      <inertial>
+        <mass>0.38044</mass>
+        <inertia>
+          <ixx>0.00030988</ixx>
+          <ixy>5.5564e-08</ixy>
+          <ixz>3.9324e-07</ixz>
+          <iyy>0.0003498</iyy>
+          <iyz>1.7659e-06</iyz>
+          <izz>0.00030001</izz>
+        </inertia>
+      </inertial>
       <pose>-0.235 -0.189 0 0 1.5707 -0.785398</pose>
-    </model>
-    <model name='triton_thruster4'>
-      <link name='thruster'>
-        <inertial>
-          <mass>0.38044</mass>
-          <inertia>
-            <ixx>0.00030988</ixx>
-            <ixy>5.5564e-08</ixy>
-            <ixz>3.9324e-07</ixz>
-            <iyy>0.0003498</iyy>
-            <iyz>1.7659e-06</iyz>
-            <izz>0.00030001</izz>
-          </inertia>
-        </inertial>
-        <pose>-0 0 0 0 -0 0</pose>
-        <visual name='visual'>
-          <pose>0 0 0 0 -0 0</pose>
-          <geometry>
-            <mesh>
-              <uri>/home/jake/triton/src/triton_gazebo/models/triton_thruster/meshes/triton_thruster.dae</uri>
-              <scale>1 1 1</scale>
-            </mesh>
-          </geometry>
-          <material>
-            <lighting>1</lighting>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/Black</name>
-            </script>
-            <shader type='pixel'/>
-          </material>
-          <transparency>0</transparency>
-          <cast_shadows>1</cast_shadows>
-        </visual>
-        <collision name='collision'>
-          <laser_retro>0</laser_retro>
-          <max_contacts>10</max_contacts>
-          <pose>0 0 0 0 -0 0</pose>
-          <geometry>
-            <mesh>
-              <uri>/home/jake/triton/src/triton_gazebo/models/triton_thruster/meshes/triton_thruster.dae</uri>
-              <scale>1 1 1</scale>
-            </mesh>
-          </geometry>
-          <surface>
-            <friction>
+      <visual name='visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>/home/jake/triton/src/triton_gazebo/models/triton_thruster/meshes/triton_thruster.dae</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+        <material>
+          <lighting>1</lighting>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Black</name>
+          </script>
+          <shader type='pixel'/>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
+      </visual>
+      <collision name='collision'>
+        <laser_retro>0</laser_retro>
+        <max_contacts>10</max_contacts>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>/home/jake/triton/src/triton_gazebo/models/triton_thruster/meshes/triton_thruster.dae</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>1</mu>
+              <mu2>1</mu2>
+              <fdir1>0 0 0</fdir1>
+              <slip1>0</slip1>
+              <slip2>0</slip2>
+            </ode>
+            <torsional>
+              <coefficient>1</coefficient>
+              <patch_radius>0</patch_radius>
+              <surface_radius>0</surface_radius>
+              <use_patch_radius>1</use_patch_radius>
               <ode>
-                <mu>1</mu>
-                <mu2>1</mu2>
-                <fdir1>0 0 0</fdir1>
-                <slip1>0</slip1>
-                <slip2>0</slip2>
+                <slip>0</slip>
               </ode>
-              <torsional>
-                <coefficient>1</coefficient>
-                <patch_radius>0</patch_radius>
-                <surface_radius>0</surface_radius>
-                <use_patch_radius>1</use_patch_radius>
-                <ode>
-                  <slip>0</slip>
-                </ode>
-              </torsional>
-            </friction>
-            <bounce>
-              <restitution_coefficient>0</restitution_coefficient>
-              <threshold>1e+06</threshold>
-            </bounce>
-            <contact>
-              <collide_without_contact>0</collide_without_contact>
-              <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
-              <collide_bitmask>1</collide_bitmask>
-              <ode>
-                <soft_cfm>0</soft_cfm>
-                <soft_erp>0.2</soft_erp>
-                <kp>1e+13</kp>
-                <kd>1</kd>
-                <max_vel>0.01</max_vel>
-                <min_depth>0</min_depth>
-              </ode>
-              <bullet>
-                <split_impulse>1</split_impulse>
-                <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
-                <soft_cfm>0</soft_cfm>
-                <soft_erp>0.2</soft_erp>
-                <kp>1e+13</kp>
-                <kd>1</kd>
-              </bullet>
-            </contact>
-          </surface>
-        </collision>
-      </link>
-      <plugin name="gazebo_force_controller" filename="libgazebo_ros_force.so">
-          <ros>
-              <namespace>/triton/gazebo_drivers</namespace>
-              <remapping>gazebo_ros_force:=force_t4</remapping>
-          </ros>
-          <link_name>thruster</link_name>
-          <force_frame>world</force_frame>
-      </plugin>
-      <static>0</static>
-      <allow_auto_disable>1</allow_auto_disable>
+            </torsional>
+          </friction>
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e+06</threshold>
+          </bounce>
+          <contact>
+            <collide_without_contact>0</collide_without_contact>
+            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
+            <collide_bitmask>1</collide_bitmask>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+            <bullet>
+              <split_impulse>1</split_impulse>
+              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+            </bullet>
+          </contact>
+        </surface>
+      </collision>
+    </link>
+    <link name='thruster4'>
+      <inertial>
+        <mass>0.38044</mass>
+        <inertia>
+          <ixx>0.00030988</ixx>
+          <ixy>5.5564e-08</ixy>
+          <ixz>3.9324e-07</ixz>
+          <iyy>0.0003498</iyy>
+          <iyz>1.7659e-06</iyz>
+          <izz>0.00030001</izz>
+        </inertia>
+      </inertial>
       <pose>-0.235 0.189 0 0 -1.5707 -2.35619</pose>
-    </model>
-    <model name='triton_thruster5'>
-      <link name='thruster'>
-        <inertial>
-          <mass>0.38044</mass>
-          <inertia>
-            <ixx>0.00030988</ixx>
-            <ixy>5.5564e-08</ixy>
-            <ixz>3.9324e-07</ixz>
-            <iyy>0.0003498</iyy>
-            <iyz>1.7659e-06</iyz>
-            <izz>0.00030001</izz>
-          </inertia>
-        </inertial>
-        <pose>-0 0 0 0 -0 0</pose>
-        <visual name='visual'>
-          <pose>0 0 0 0 -0 0</pose>
-          <geometry>
-            <mesh>
-              <uri>/home/jake/triton/src/triton_gazebo/models/triton_thruster/meshes/triton_thruster.dae</uri>
-              <scale>1 1 1</scale>
-            </mesh>
-          </geometry>
-          <material>
-            <lighting>1</lighting>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/Black</name>
-            </script>
-            <shader type='pixel'/>
-          </material>
-          <transparency>0</transparency>
-          <cast_shadows>1</cast_shadows>
-        </visual>
-        <collision name='collision'>
-          <laser_retro>0</laser_retro>
-          <max_contacts>10</max_contacts>
-          <pose>0 0 0 0 -0 0</pose>
-          <geometry>
-            <mesh>
-              <uri>/home/jake/triton/src/triton_gazebo/models/triton_thruster/meshes/triton_thruster.dae</uri>
-              <scale>1 1 1</scale>
-            </mesh>
-          </geometry>
-          <surface>
-            <friction>
+      <visual name='visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>/home/jake/triton/src/triton_gazebo/models/triton_thruster/meshes/triton_thruster.dae</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+        <material>
+          <lighting>1</lighting>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Black</name>
+          </script>
+          <shader type='pixel'/>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
+      </visual>
+      <collision name='collision'>
+        <laser_retro>0</laser_retro>
+        <max_contacts>10</max_contacts>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>/home/jake/triton/src/triton_gazebo/models/triton_thruster/meshes/triton_thruster.dae</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>1</mu>
+              <mu2>1</mu2>
+              <fdir1>0 0 0</fdir1>
+              <slip1>0</slip1>
+              <slip2>0</slip2>
+            </ode>
+            <torsional>
+              <coefficient>1</coefficient>
+              <patch_radius>0</patch_radius>
+              <surface_radius>0</surface_radius>
+              <use_patch_radius>1</use_patch_radius>
               <ode>
-                <mu>1</mu>
-                <mu2>1</mu2>
-                <fdir1>0 0 0</fdir1>
-                <slip1>0</slip1>
-                <slip2>0</slip2>
+                <slip>0</slip>
               </ode>
-              <torsional>
-                <coefficient>1</coefficient>
-                <patch_radius>0</patch_radius>
-                <surface_radius>0</surface_radius>
-                <use_patch_radius>1</use_patch_radius>
-                <ode>
-                  <slip>0</slip>
-                </ode>
-              </torsional>
-            </friction>
-            <bounce>
-              <restitution_coefficient>0</restitution_coefficient>
-              <threshold>1e+06</threshold>
-            </bounce>
-            <contact>
-              <collide_without_contact>0</collide_without_contact>
-              <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
-              <collide_bitmask>1</collide_bitmask>
-              <ode>
-                <soft_cfm>0</soft_cfm>
-                <soft_erp>0.2</soft_erp>
-                <kp>1e+13</kp>
-                <kd>1</kd>
-                <max_vel>0.01</max_vel>
-                <min_depth>0</min_depth>
-              </ode>
-              <bullet>
-                <split_impulse>1</split_impulse>
-                <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
-                <soft_cfm>0</soft_cfm>
-                <soft_erp>0.2</soft_erp>
-                <kp>1e+13</kp>
-                <kd>1</kd>
-              </bullet>
-            </contact>
-          </surface>
-        </collision>
-      </link>
-      <plugin name="gazebo_force_controller" filename="libgazebo_ros_force.so">
-          <ros>
-              <namespace>/triton/gazebo_drivers</namespace>
-              <remapping>gazebo_ros_force:=force_t5</remapping>
-          </ros>
-          <link_name>thruster</link_name>
-          <force_frame>world</force_frame>
-      </plugin>
-      <static>0</static>
-      <allow_auto_disable>1</allow_auto_disable>
+            </torsional>
+          </friction>
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e+06</threshold>
+          </bounce>
+          <contact>
+            <collide_without_contact>0</collide_without_contact>
+            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
+            <collide_bitmask>1</collide_bitmask>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+            <bullet>
+              <split_impulse>1</split_impulse>
+              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+            </bullet>
+          </contact>
+        </surface>
+      </collision>
+    </link>
+    <link name='thruster5'>
+      <inertial>
+        <mass>0.38044</mass>
+        <inertia>
+          <ixx>0.00030988</ixx>
+          <ixy>5.5564e-08</ixy>
+          <ixz>3.9324e-07</ixz>
+          <iyy>0.0003498</iyy>
+          <iyz>1.7659e-06</iyz>
+          <izz>0.00030001</izz>
+        </inertia>
+      </inertial>
       <pose>0 -0.22 0.13 3.1415 0 0</pose>
-    </model>
-    <model name='triton_thruster6'>
-      <link name='thruster'>
-        <inertial>
-          <mass>0.38044</mass>
-          <inertia>
-            <ixx>0.00030988</ixx>
-            <ixy>5.5564e-08</ixy>
-            <ixz>3.9324e-07</ixz>
-            <iyy>0.0003498</iyy>
-            <iyz>1.7659e-06</iyz>
-            <izz>0.00030001</izz>
-          </inertia>
-        </inertial>
-        <pose>-0 0 0 0 -0 0</pose>
-        <visual name='visual'>
-          <pose>0 0 0 0 -0 0</pose>
-          <geometry>
-            <mesh>
-              <uri>/home/jake/triton/src/triton_gazebo/models/triton_thruster/meshes/triton_thruster.dae</uri>
-              <scale>1 1 1</scale>
-            </mesh>
-          </geometry>
-          <material>
-            <lighting>1</lighting>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/Black</name>
-            </script>
-            <shader type='pixel'/>
-          </material>
-          <transparency>0</transparency>
-          <cast_shadows>1</cast_shadows>
-        </visual>
-        <collision name='collision'>
-          <laser_retro>0</laser_retro>
-          <max_contacts>10</max_contacts>
-          <pose>0 0 0 0 -0 0</pose>
-          <geometry>
-            <mesh>
-              <uri>/home/jake/triton/src/triton_gazebo/models/triton_thruster/meshes/triton_thruster.dae</uri>
-              <scale>1 1 1</scale>
-            </mesh>
-          </geometry>
-          <surface>
-            <friction>
+      <visual name='visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>/home/jake/triton/src/triton_gazebo/models/triton_thruster/meshes/triton_thruster.dae</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+        <material>
+          <lighting>1</lighting>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Black</name>
+          </script>
+          <shader type='pixel'/>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
+      </visual>
+      <collision name='collision'>
+        <laser_retro>0</laser_retro>
+        <max_contacts>10</max_contacts>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>/home/jake/triton/src/triton_gazebo/models/triton_thruster/meshes/triton_thruster.dae</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>1</mu>
+              <mu2>1</mu2>
+              <fdir1>0 0 0</fdir1>
+              <slip1>0</slip1>
+              <slip2>0</slip2>
+            </ode>
+            <torsional>
+              <coefficient>1</coefficient>
+              <patch_radius>0</patch_radius>
+              <surface_radius>0</surface_radius>
+              <use_patch_radius>1</use_patch_radius>
               <ode>
-                <mu>1</mu>
-                <mu2>1</mu2>
-                <fdir1>0 0 0</fdir1>
-                <slip1>0</slip1>
-                <slip2>0</slip2>
+                <slip>0</slip>
               </ode>
-              <torsional>
-                <coefficient>1</coefficient>
-                <patch_radius>0</patch_radius>
-                <surface_radius>0</surface_radius>
-                <use_patch_radius>1</use_patch_radius>
-                <ode>
-                  <slip>0</slip>
-                </ode>
-              </torsional>
-            </friction>
-            <bounce>
-              <restitution_coefficient>0</restitution_coefficient>
-              <threshold>1e+06</threshold>
-            </bounce>
-            <contact>
-              <collide_without_contact>0</collide_without_contact>
-              <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
-              <collide_bitmask>1</collide_bitmask>
-              <ode>
-                <soft_cfm>0</soft_cfm>
-                <soft_erp>0.2</soft_erp>
-                <kp>1e+13</kp>
-                <kd>1</kd>
-                <max_vel>0.01</max_vel>
-                <min_depth>0</min_depth>
-              </ode>
-              <bullet>
-                <split_impulse>1</split_impulse>
-                <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
-                <soft_cfm>0</soft_cfm>
-                <soft_erp>0.2</soft_erp>
-                <kp>1e+13</kp>
-                <kd>1</kd>
-              </bullet>
-            </contact>
-          </surface>
-        </collision>
-      </link>
-      <plugin name="gazebo_force_controller" filename="libgazebo_ros_force.so">
-          <ros>
-              <namespace>/triton/gazebo_drivers</namespace>
-              <remapping>gazebo_ros_force:=force_t6</remapping>
-          </ros>
-          <link_name>thruster</link_name>
-          <force_frame>world</force_frame>
-      </plugin>
-      <static>0</static>
-      <allow_auto_disable>1</allow_auto_disable>
+            </torsional>
+          </friction>
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e+06</threshold>
+          </bounce>
+          <contact>
+            <collide_without_contact>0</collide_without_contact>
+            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
+            <collide_bitmask>1</collide_bitmask>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+            <bullet>
+              <split_impulse>1</split_impulse>
+              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+            </bullet>
+          </contact>
+        </surface>
+      </collision>
+    </link>
+    <link name='thruster6'>
+      <inertial>
+        <mass>0.38044</mass>
+        <inertia>
+          <ixx>0.00030988</ixx>
+          <ixy>5.5564e-08</ixy>
+          <ixz>3.9324e-07</ixz>
+          <iyy>0.0003498</iyy>
+          <iyz>1.7659e-06</iyz>
+          <izz>0.00030001</izz>
+        </inertia>
+      </inertial>
       <pose>0 0.22 0.13 3.1415 0 3.1415</pose>
-    </model>
+      <visual name='visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>/home/jake/triton/src/triton_gazebo/models/triton_thruster/meshes/triton_thruster.dae</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+        <material>
+          <lighting>1</lighting>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Black</name>
+          </script>
+          <shader type='pixel'/>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
+      </visual>
+      <collision name='collision'>
+        <laser_retro>0</laser_retro>
+        <max_contacts>10</max_contacts>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>/home/jake/triton/src/triton_gazebo/models/triton_thruster/meshes/triton_thruster.dae</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>1</mu>
+              <mu2>1</mu2>
+              <fdir1>0 0 0</fdir1>
+              <slip1>0</slip1>
+              <slip2>0</slip2>
+            </ode>
+            <torsional>
+              <coefficient>1</coefficient>
+              <patch_radius>0</patch_radius>
+              <surface_radius>0</surface_radius>
+              <use_patch_radius>1</use_patch_radius>
+              <ode>
+                <slip>0</slip>
+              </ode>
+            </torsional>
+          </friction>
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e+06</threshold>
+          </bounce>
+          <contact>
+            <collide_without_contact>0</collide_without_contact>
+            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
+            <collide_bitmask>1</collide_bitmask>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+            <bullet>
+              <split_impulse>1</split_impulse>
+              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+            </bullet>
+          </contact>
+        </surface>
+      </collision>
+    </link>
+    <plugin name="gazebo_force_controller" filename="libgazebo_ros_force.so">
+        <ros>
+            <namespace>/triton/gazebo_drivers</namespace>
+            <remapping>gazebo_ros_force:=force_t1</remapping>
+        </ros>
+        <link_name>thruster1</link_name>
+        <force_frame>world</force_frame>
+    </plugin>
+    <plugin name="gazebo_force_controller" filename="libgazebo_ros_force.so">
+        <ros>
+            <namespace>/triton/gazebo_drivers</namespace>
+            <remapping>gazebo_ros_force:=force_t2</remapping>
+        </ros>
+        <link_name>thruster2</link_name>
+        <force_frame>world</force_frame>
+    </plugin>
+    <plugin name="gazebo_force_controller" filename="libgazebo_ros_force.so">
+        <ros>
+            <namespace>/triton/gazebo_drivers</namespace>
+            <remapping>gazebo_ros_force:=force_t3</remapping>
+        </ros>
+        <link_name>thruster3</link_name>
+        <force_frame>world</force_frame>
+    </plugin>
+    <plugin name="gazebo_force_controller" filename="libgazebo_ros_force.so">
+        <ros>
+            <namespace>/triton/gazebo_drivers</namespace>
+            <remapping>gazebo_ros_force:=force_t4</remapping>
+        </ros>
+        <link_name>thruster4</link_name>
+        <force_frame>world</force_frame>
+    </plugin>
+    <plugin name="gazebo_force_controller" filename="libgazebo_ros_force.so">
+        <ros>
+            <namespace>/triton/gazebo_drivers</namespace>
+            <remapping>gazebo_ros_force:=force_t5</remapping>
+        </ros>
+        <link_name>thruster5</link_name>
+        <force_frame>world</force_frame>
+    </plugin>
+    <plugin name="gazebo_force_controller" filename="libgazebo_ros_force.so">
+        <ros>
+            <namespace>/triton/gazebo_drivers</namespace>
+            <remapping>gazebo_ros_force:=force_t6</remapping>
+        </ros>
+        <link_name>thruster6</link_name>
+        <force_frame>world</force_frame>
+    </plugin>
     <joint name='frame_thruster1' type='fixed'>
-      <parent>triton_frame::frame</parent>
-      <child>triton_thruster1::thruster</child>
+      <parent>frame</parent>
+      <child>thruster1</child>
       <pose>0 0 0 0 -0 0</pose>
       <physics>
         <ode>
@@ -726,8 +690,8 @@
       </physics>
     </joint>
     <joint name='frame_thruster2' type='fixed'>
-      <parent>triton_frame::frame</parent>
-      <child>triton_thruster2::thruster</child>
+      <parent>frame</parent>
+      <child>thruster2</child>
       <pose>0 0 0 0 -0 0</pose>
       <physics>
         <ode>
@@ -743,8 +707,8 @@
       </physics>
     </joint>
     <joint name='frame_thruster3' type='fixed'>
-      <parent>triton_frame::frame</parent>
-      <child>triton_thruster3::thruster</child>
+      <parent>frame</parent>
+      <child>thruster3</child>
       <pose>0 0 0 0 -0 0</pose>
       <physics>
         <ode>
@@ -760,8 +724,8 @@
       </physics>
     </joint>
     <joint name='frame_thruster4' type='fixed'>
-      <parent>triton_frame::frame</parent>
-      <child>triton_thruster4::thruster</child>
+      <parent>frame</parent>
+      <child>thruster4</child>
       <pose>0 0 0 0 -0 0</pose>
       <physics>
         <ode>
@@ -777,8 +741,8 @@
       </physics>
     </joint>
     <joint name='frame_thruster5' type='fixed'>
-      <parent>triton_frame::frame</parent>
-      <child>triton_thruster5::thruster</child>
+      <parent>frame</parent>
+      <child>thruster5</child>
       <pose>0 0 0 0 -0 0</pose>
       <physics>
         <ode>
@@ -794,8 +758,8 @@
       </physics>
     </joint>
     <joint name='frame_thruster6' type='fixed'>
-      <parent>triton_frame::frame</parent>
-      <child>triton_thruster6::thruster</child>
+      <parent>frame</parent>
+      <child>thruster6</child>
       <pose>0 0 0 0 -0 0</pose>
       <physics>
         <ode>
