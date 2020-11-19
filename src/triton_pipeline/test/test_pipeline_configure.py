@@ -42,7 +42,7 @@ def generate_test_description():
     }
 
 
-class TestPipeline(unittest.TestCase):
+class TestPipelineConfigure(unittest.TestCase):
 
 
     @classmethod

@@ -40,6 +40,6 @@ class TestPipelineInitSuccess(unittest.TestCase):
 
     def test_succesful_init(self, pipeline_manager, proc_info, proc_output):
         proc_output.assertWaitFor(
-            expected_output='Pipeline manager succesfully started!',
-            process=pipeline_manager
+            expected_output='Pipeline manager successfully started!',
+            # process=pipeline_manager
         )
