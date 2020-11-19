@@ -22,7 +22,7 @@ def generate_launch_description():
 
     underwater_camera = Node(
         name='underwater_camera',
-        namespace='/triton/drivers/front_camera',
+        namespace='/triton/gazebo_drivers',
         package='triton_gazebo',
         executable='underwater_camera',
         output='screen',

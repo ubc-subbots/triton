@@ -18,24 +18,24 @@ namespace triton_gazebo
         rmw_qos_profile_t publisher_qos_profile = rmw_qos_profile_default;
 
         underwater_image_pub_ = image_transport::create_publisher(this, 
-            "image_raw", 
+            "front_camera/underwater/image_raw", 
             publisher_qos_profile);
 
         image_pub_ = image_transport::create_publisher(this, 
-            "gazebo/image_raw", 
+            "repub/image_raw", 
             publisher_qos_profile);
 
         depth_pub_ = image_transport::create_publisher(this, 
-            "gazebo/depth/image_raw", 
+            "repub/depth/image_raw", 
             publisher_qos_profile);
 
         image_sub_.subscribe(this,
-            "/triton/gazebo_drivers/front_camera/image_raw", 
+            "front_camera/image_raw", 
             "raw",
             subscriber_qos_profile);
 
         depth_sub_.subscribe(this,
-             "/triton/gazebo_drivers/front_camera/depth/image_raw", 
+             "front_camera/depth/image_raw", 
              "raw",
              subscriber_qos_profile);
 

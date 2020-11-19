@@ -17,7 +17,7 @@ def generate_launch_description():
 
     thrust_allocator = Node(
         name='thrust_allocator',
-        namespace='/triton/controls',
+        namespace='/triton',
         package='triton_controls',
         executable='thrust_allocator',
         output='screen',

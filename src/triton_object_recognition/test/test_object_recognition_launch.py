@@ -57,7 +57,7 @@ class TestObjectRecognitionLaunchInit(unittest.TestCase):
 
 
     def test_object_recognizer_init(self, proc_info, proc_output, objectrecognizer):
-        proc_output.assertWaitFor('ObjectRecognizer successfully started!',timeout=900)
+        proc_output.assertWaitFor('Object Recognizer successfully started!',timeout=900)
         proc_info.assertWaitForShutdown(process=objectrecognizer)
 
 
