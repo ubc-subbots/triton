@@ -2,8 +2,8 @@ pipeline_manager:
   ros__parameters:
     pipeline:
       components:
-        - example::ComponentOne
-        - example::ComponentTwo
+        - triton_example::ComponentOne
+        - triton_example::ComponentTwo
       pkg_names: 
         - triton_example
         - triton_example

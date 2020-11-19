@@ -1,7 +1,7 @@
 #include "triton_example/component_two.hpp"
 using std::placeholders::_1;
 
-namespace example
+namespace triton_example
 {
 
 
@@ -13,14 +13,16 @@ ComponentTwo::ComponentTwo(const rclcpp::NodeOptions & options)
     );
 
     publisher_ = this->create_publisher<std_msgs::msg::String>(
-        "component_two/out", 10
+        "example/component_two/out", 10
     );
 
     subscription_ = this->create_subscription<std_msgs::msg::String>(
-      "component_two/in", 10, std::bind(&ComponentTwo::callback, this, _1)
+      "example/component_two/in", 10, std::bind(&ComponentTwo::callback, this, _1)
       );
 
     counter_ = 0;
+
+    RCLCPP_INFO(this->get_logger(), "Component Two succesfully started!");
 }
 
 
@@ -42,4 +44,4 @@ void ComponentTwo::callback(const std_msgs::msg::String::SharedPtr msg)
 }
 
     
-} // namespace example
+} // namespace triton_example

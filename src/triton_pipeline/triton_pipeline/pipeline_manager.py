@@ -54,28 +54,28 @@ class PipelineManager(Node):
 
         self.feedback_sub = self.create_subscription(
             PipelineFeedback,
-            '/triton/pipeline_feedback',
+            'pipeline_feedback',
             self.feedback_callback,
             10
         )
 
         self.pipeline_loading_client = self.create_client(
                 LoadNode, 
-                '/triton/pipeline/_container/load_node'
+                'pipeline/_container/load_node'
         )
         while not self.pipeline_loading_client.wait_for_service(timeout_sec=1.0):
             self.get_logger().warn('Pipeline loading service not available, waiting again...')
 
         self.pipeline_unloading_client = self.create_client(
                 UnloadNode, 
-                '/triton/pipeline/_container/unload_node'
+                'pipeline/_container/unload_node'
         )
         while not self.pipeline_unloading_client.wait_for_service(timeout_sec=1.0):
             self.get_logger().warn('Pipeline unloading service not available, waiting again...')
 
         self.pipeline_listing_client = self.create_client(
                 ListNodes, 
-                '/triton/pipeline/_container/list_nodes'
+                'pipeline/_container/list_nodes'
         )
         while not self.pipeline_listing_client.wait_for_service(timeout_sec=1.0):
             self.get_logger().warn('Pipeline listing service not available, waiting again...')
@@ -392,7 +392,10 @@ def main(args=None):
     pipeline_manager = PipelineManager()
     executor = MultiThreadedExecutor()
     executor.add_node(pipeline_manager)
-    executor.spin()
+    try:
+        executor.spin()
+    except KeyboardInterrupt:
+        pass # To force exit code 0 
     pipeline_manager.destroy_node()
     executor.shutdown()
     rclpy.shutdown()

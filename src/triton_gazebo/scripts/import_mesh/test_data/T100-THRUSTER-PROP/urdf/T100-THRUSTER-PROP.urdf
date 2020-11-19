@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.5.1-0-g916b5db  Build Version: 1.5.7152.31018
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot
+  name="T100-THRUSTER-PROP">
+  <link
+    name="T100-THRUSTER-PROP">
+    <inertial>
+      <origin
+        xyz="4.0172E-17 -0.0046664 1.93347251544738E-17"
+        rpy="0 0 0" />
+      <mass
+        value="0.025834" />
+      <inertia
+        ixx="3.767E-06"
+        ixy="2.93288806330505E-22"
+        ixz="2.0482E-07"
+        iyy="5.5728E-06"
+        iyz="-4.77762232260691E-21"
+        izz="3.4934E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="4.0172E-17 -0.0046664 1.93347251544738E-17"
+        rpy="1.5707963267949 0 0" />
+      <geometry>
+        <mesh
+          filename="package://T100-THRUSTER-PROP/meshes/T100-THRUSTER-PROP.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.79216 0.81961 0.93333 1" />
+        <texture
+          filename="package://T100-THRUSTER-PROP/textures/" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="4.0172E-17 -0.0046664 1.93347251544738E-17"
+        rpy="1.5707963267949 0 0" />
+      <geometry>
+        <mesh
+          filename="package://T100-THRUSTER-PROP/meshes/T100-THRUSTER-PROP.STL" />
+      </geometry>
+    </collision>
+  </link>
+</robot>
