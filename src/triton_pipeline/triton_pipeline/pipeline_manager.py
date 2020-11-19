@@ -396,7 +396,6 @@ def main(args=None):
         executor.spin()
     except KeyboardInterrupt:
         pass # To force exit code 0 
-    pipeline_manager.destroy_node()
     executor.shutdown()
     rclpy.shutdown()
 
