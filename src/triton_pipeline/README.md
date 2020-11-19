@@ -25,19 +25,19 @@ Make sure that the `input` field is one of the accepted types given in `RunPipel
 - `pipeline_manager` : A standalone node used to manage a component container to use it as a pipeline.
 
     ### Subscribed Topics
-    - `/triton/pipeline_feedback` (`triton_interfaces/msg/PipelineFeedback.msg`) : Accepts feedback from nodes in the pipeline.
+    - `pipeline_feedback` (`triton_interfaces/msg/PipelineFeedback.msg`) : Accepts feedback from nodes in the pipeline.
     
     ### Services
-    - `/triton/configure_pipeline` (`triton_interfaces/srv/ConfigurePipeline.srv`) : Service for configuring the pipeline.
+    - `configure_pipeline` (`triton_interfaces/srv/ConfigurePipeline.srv`) : Service for configuring the pipeline.
     
     ### Action Servers
-    - `/triton/run_pipeline` (`triton_interfaces/action/RunPipeline.action`) : Action for running the configured pipeline.
+    - `run_pipeline` (`triton_interfaces/action/RunPipeline.action`) : Action for running the configured pipeline.
 
     ### Parameters
-    - `components` (`String[]`): Declares the components to be launched in the pipeline when it is run.
-    - `pkg_names` (`String[]`): The packages to which the components belong. There should be a one-to-one correspondence with each component.
-    - `namespace` (`String`): The namespace in which the components will be launched.
-    - `remap_rules` (`String[]`): Declares the topic remapping rules for the pipeline components.
+    - `components` (`string[]`): Declares the components to be launched in the pipeline when it is run.
+    - `pkg_names` (`string[]`): The packages to which the components belong. There should be a one-to-one correspondence with each component.
+    - `namespace` (`string`): The namespace in which the components will be launched.
+    - `remap_rules` (`string[]`): Declares the topic remapping rules for the pipeline components.
 
 ## Contributors
 
