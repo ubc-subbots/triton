@@ -30,6 +30,7 @@ jobs:
           source /opt/ros/foxy/setup.bash
           source /usr/share/gazebo/setup.sh
           colcon build
+          launch_test src/triton_pipeline/test/test_pipeline_run_comp_not_exist.py 
           colcon test
           colcon test-result --verbose
 
