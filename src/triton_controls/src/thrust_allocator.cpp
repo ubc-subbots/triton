@@ -120,9 +120,11 @@ namespace triton_controls
 
 int main(int argc, char * argv[])
 {
-  rclcpp::init(argc, argv);
-  auto options = rclcpp::NodeOptions();
-  rclcpp::spin(std::make_shared<triton_controls::ThrustAllocator>(options));
-  rclcpp::shutdown();
+  try {
+    rclcpp::init(argc, argv);
+    auto options = rclcpp::NodeOptions();
+    rclcpp::spin(std::make_shared<triton_controls::ThrustAllocator>(options));
+    rclcpp::shutdown();
+  } catch (rclcpp::exceptions::RCLError const&){} // during testing sometimes throws error
   return 0;
 }
