@@ -31,7 +31,6 @@ jobs:
           source /usr/share/gazebo/setup.sh
           colcon build
           source ./install/setup.bash
-          launch_test src/triton_pipeline/test/test_pipeline_run_comp_not_exist.py 
           colcon test
           colcon test-result --verbose
 
