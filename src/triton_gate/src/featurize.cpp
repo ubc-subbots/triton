@@ -150,15 +150,12 @@ public:
      */
     Mat featurize_for_classification(vector<vector<Point>> hulls)
     {
-        int numOfHulls = hulls.size();
-        int numOfFeatures = 10;
-        Mat X_hat;// = Mat::zeros(numOfHulls, numOfFeatures, CV_32F);
-        //int i = 0;
+        Mat X_hat;
         for (vector<Point> hull : hulls)
         {
-            //cout << "for classifisfasfj" << endl;
             X_hat.push_back(Mat(form_feature_vector(hull)).reshape(0,1)); // so each feature vector is a row
         }
+        X_hat.convertTo(X_hat, CV_32F); // to make sure the type is correct
         return X_hat;
     }
 

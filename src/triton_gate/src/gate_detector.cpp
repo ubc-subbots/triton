@@ -130,19 +130,37 @@ public:
         svm->setType(SVM::Types::C_SVC);
         svm->setKernel(SVM::KernelTypes::LINEAR);
         svm->load("/home/jared/subbot/triton/accuracy_opencv_model.xml");
-        //vector<float> y_hat;
+        vector<float> y_hat;
         Mat X_hat = featurizer.featurize_for_classification(hulls);
-        Mat y_hat = Mat::zeros(1, X_hat.rows, CV_32F);
-        cout << "ready to predict" << endl;
+        //Mat y_hat = Mat::zeros(1, X_hat.rows, CV_32F);
         cout << "X num of rows " << X_hat.rows << endl;
         cout << "X num of cols " << X_hat.cols << endl;
-        cout << "y num of rows " << y_hat.rows << endl;
-        cout << "y num of cols " << y_hat.cols << endl;
+        //cout << "y num of rows " << y_hat.rows << endl;
+        //cout << "y num of cols " << y_hat.cols << endl;
+        vector<float> oneFeatVec = X_hat.row(0);
+        cout << "one feat vec: " << endl;
+        for (float f : oneFeatVec){
+            cout << f << " ";
+        }
+        cout << endl;
+        cout << "whole mat: " << endl;
+        for (int i = 0; i < X_hat.rows; i++){
+            vector<float> row = X_hat.row(i);
+            for (int j = 0; j < X_hat.cols; j++){
+                cout << row.at(j) << "      ";
+            }
+            cout << endl;
+        }
+        cout << "type of X_hat " << X_hat.type() << endl;
+        cout << "type of CV_32F " << CV_32F << endl;
+        //cout << svm->predict(Mat(oneFeatVec).reshape(0,1)) << endl;
+        cout << svm->predict(oneFeatVec) << endl;
         svm->predict(X_hat, y_hat);
         for (int i = 0; i < hulls.size(); i++)
         {
             //if (svm->predict(X_hat.at(i)) == 1)
-            if (y_hat.at<float>(0,i) == 1)
+            //if (y_hat.at<float>(0,i) == 1)
+            if (y_hat.at(i) == 1)
             {
                 pole_hulls.push_back(hulls.at(i));
             }
