@@ -16,9 +16,21 @@ namespace triton_object_recognition
     : Node("object_recognizer", options) 
     {
         //Create publisher, subscriber, and service
-        publisher_ = this->create_publisher<triton_interfaces::msg::DetectionBoxArray>("object_recognizer/out", 10);
-        subscription_ = image_transport::create_subscription(this,"object_recognizer/in",bind(&ObjectRecognizer::subscriberCallback, this, _1),"raw");
-        service_ = create_service<triton_interfaces::srv::ObjectDetection>("object_recognizer/recognize",bind(&ObjectRecognizer::serviceCallback, this, _1,_2));
+        publisher_ = this->create_publisher<triton_interfaces::msg::DetectionBoxArray>(
+            "object_recognizer/out", 
+            10
+        );
+
+        subscription_ = image_transport::create_subscription(this,
+            "object_recognizer/in",
+            bind(&ObjectRecognizer::subscriberCallback, this, _1),
+            "raw"
+        );
+
+        service_ = create_service<triton_interfaces::srv::ObjectDetection>(
+            "object_recognizer/recognize",
+            bind(&ObjectRecognizer::serviceCallback, this, _1,_2)
+        );
 
         #if DEBUG_VISUALIZE
             debug_publisher_ = image_transport::create_publisher(this, "object_recognizer/debug");
@@ -92,7 +104,7 @@ namespace triton_object_recognition
         }
         net_->setPreferableBackend(backend_);
         net_->setPreferableTarget(target_);
-        RCLCPP_INFO(get_logger(),"ObjectRecognizer successfully started!");
+        RCLCPP_INFO(get_logger(),"Object Recognizer successfully started!");
     }
 
     void ObjectRecognizer::subscriberCallback(const sensor_msgs::msg::Image::ConstSharedPtr & msg) const

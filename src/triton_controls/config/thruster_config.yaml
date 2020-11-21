@@ -1,4 +1,4 @@
-/triton/controls/thrust_allocator:
+/triton/thrust_allocator:
   ros__parameters:
     num_thrusters: 6
     t1:

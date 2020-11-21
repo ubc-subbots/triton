@@ -10,20 +10,24 @@ namespace triton_controls
     y_lens_ (MAX_THRUSTERS, 0),
     z_lens_ (MAX_THRUSTERS, 0),
     contribs_ (3, std::vector<double>(MAX_THRUSTERS))
-  {
+  {   
       this->declare_parameter<int>("num_thrusters", num_thrusters_);
+
       this->get_parameter("num_thrusters", num_thrusters_);
+      if (num_thrusters_ > MAX_THRUSTERS){
+        RCLCPP_ERROR(this->get_logger(), "Attempted to configure too many thrusters, results will not be desirable");
+      }
 
       std::string names[MAX_THRUSTERS] = {"t1", "t2", "t3", "t4", "t5", "t6"};
     
       for (int i = 0; i < MAX_THRUSTERS; i++)
       {
-        this->declare_parameter(names[i]+".contrib.x", contribs_[0][i]);
-        this->declare_parameter(names[i]+".contrib.y", contribs_[1][i]);
-        this->declare_parameter(names[i]+".contrib.z", contribs_[2][i]);
-        this->declare_parameter(names[i]+".lx", x_lens_[i]);
-        this->declare_parameter(names[i]+".ly", y_lens_[i]);
-        this->declare_parameter(names[i]+".lz", z_lens_[i]);
+        this->declare_parameter<float>(names[i]+".contrib.x", contribs_[0][i]);
+        this->declare_parameter<float>(names[i]+".contrib.y", contribs_[1][i]);
+        this->declare_parameter<float>(names[i]+".contrib.z", contribs_[2][i]);
+        this->declare_parameter<float>(names[i]+".lx", x_lens_[i]);
+        this->declare_parameter<float>(names[i]+".ly", y_lens_[i]);
+        this->declare_parameter<float>(names[i]+".lz", z_lens_[i]);
 
         this->get_parameter(names[i]+".contrib.x", contribs_[0][i]);
         this->get_parameter(names[i]+".contrib.y", contribs_[1][i]);
@@ -55,13 +59,13 @@ namespace triton_controls
       cv::invert(alloc_mat, pinv_alloc_, cv::DECOMP_SVD);
 
       forces_pub_ = this->create_publisher<std_msgs::msg::Float64MultiArray>(
-        "output_forces", 10);
+        "controls/output_forces", 10);
 
       signals_pub_ = this->create_publisher<std_msgs::msg::Float64MultiArray>(
-        "signals", 10);
+        "controls/signals", 10);
 
       forces_sub_ = this->create_subscription<geometry_msgs::msg::Wrench>(
-        "/triton/controls/input_forces", 10, std::bind(&ThrustAllocator::wrenchCallback, this, _1));
+        "controls/input_forces", 10, std::bind(&ThrustAllocator::wrenchCallback, this, _1));
 
       RCLCPP_INFO(this->get_logger(), "Thrust Allocator succesfully started!");
   }
@@ -116,9 +120,11 @@ namespace triton_controls
 
 int main(int argc, char * argv[])
 {
-  rclcpp::init(argc, argv);
-  auto options = rclcpp::NodeOptions();
-  rclcpp::spin(std::make_shared<triton_controls::ThrustAllocator>(options));
-  rclcpp::shutdown();
+  try {
+    rclcpp::init(argc, argv);
+    auto options = rclcpp::NodeOptions();
+    rclcpp::spin(std::make_shared<triton_controls::ThrustAllocator>(options));
+    rclcpp::shutdown();
+  } catch (rclcpp::exceptions::RCLError const&){} // during testing sometimes throws error
   return 0;
 }
