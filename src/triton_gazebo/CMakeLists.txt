@@ -15,7 +15,7 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-set(CMAKE_CXX_FLAGS "-O3 -DNDEBUG")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS} -O3 -DNDEBUG")
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
@@ -30,9 +30,13 @@ find_package(rclcpp REQUIRED)
 find_package(rclcpp_components REQUIRED)
 find_package(OpenCV 4.2 REQUIRED)
 find_package(cv_bridge REQUIRED)
+find_package(triton_interfaces REQUIRED)
 
 include_directories(include)
 include_directories(${OpenCV_INCLUDE_DIRS})
+include_directories(${GAZEBO_INCLUDE_DIRS})
+
+link_directories(${GAZEBO_LIBRARY_DIRS})
 
 add_executable(underwater_camera 
   src/underwater_camera.cpp
@@ -59,6 +63,18 @@ add_library(triton_gazebo SHARED
   src/underwater_camera.cpp
 )
 
+add_library(bounding_box_plugin SHARED src/bounding_box_plugin.cpp)
+target_include_directories(bounding_box_plugin PUBLIC
+  include
+)
+target_link_libraries(bounding_box_plugin ${GAZEBO_LIBRARIES})
+ament_target_dependencies(bounding_box_plugin
+  "triton_interfaces"
+)
+ament_export_libraries(bounding_box_plugin)
+target_link_libraries(bounding_box_plugin ${GAZEBO_LIBRARIES})
+
+
 rclcpp_components_register_nodes(triton_gazebo "triton_gazebo::UnderwaterCamera")
 
 target_compile_definitions(triton_gazebo
@@ -79,9 +95,6 @@ install(TARGETS
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
 )
-
-
-
 
 install(DIRECTORY
   config
