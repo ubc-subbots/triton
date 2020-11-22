@@ -186,7 +186,7 @@
     -->
 
     <!-- Thrust Vectors -->
-    <plugin name="gazebo_force_controller" filename="libgazebo_ros_force.so">
+    <plugin name="force_controller_t1" filename="libgazebo_ros_force.so">
         <ros>
             <namespace>/triton/gazebo_drivers</namespace>
             <remapping>gazebo_ros_force:=force_t1</remapping>
@@ -195,7 +195,7 @@
         <force_frame>world</force_frame>
     </plugin>
 
-    <plugin name="gazebo_force_controller" filename="libgazebo_ros_force.so">
+    <plugin name="force_controller_t2" filename="libgazebo_ros_force.so">
         <ros>
             <namespace>/triton/gazebo_drivers</namespace>
             <remapping>gazebo_ros_force:=force_t2</remapping>
@@ -204,7 +204,7 @@
         <force_frame>world</force_frame>
     </plugin>
 
-    <plugin name="gazebo_force_controller" filename="libgazebo_ros_force.so">
+    <plugin name="force_controller_t3" filename="libgazebo_ros_force.so">
         <ros>
             <namespace>/triton/gazebo_drivers</namespace>
             <remapping>gazebo_ros_force:=force_t3</remapping>
@@ -213,7 +213,7 @@
         <force_frame>world</force_frame>
     </plugin>
 
-    <plugin name="gazebo_force_controller" filename="libgazebo_ros_force.so">
+    <plugin name="force_controller_t4" filename="libgazebo_ros_force.so">
         <ros>
             <namespace>/triton/gazebo_drivers</namespace>
             <remapping>gazebo_ros_force:=force_t4</remapping>
@@ -222,7 +222,7 @@
         <force_frame>world</force_frame>
     </plugin>
 
-    <plugin name="gazebo_force_controller" filename="libgazebo_ros_force.so">
+    <plugin name="force_controller_t5" filename="libgazebo_ros_force.so">
         <ros>
             <namespace>/triton/gazebo_drivers</namespace>
             <remapping>gazebo_ros_force:=force_t5</remapping>
@@ -231,19 +231,13 @@
         <force_frame>world</force_frame>
     </plugin>
 
-    <plugin name="gazebo_force_controller" filename="libgazebo_ros_force.so">
+    <plugin name="force_controller_t6" filename="libgazebo_ros_force.so">
         <ros>
             <namespace>/triton/gazebo_drivers</namespace>
             <remapping>gazebo_ros_force:=force_t6</remapping>
         </ros>
         <link_name>thruster6::thruster</link_name>
         <force_frame>world</force_frame>
-    </plugin>
-  
-    <!-- Buoyancy Plugin -->
-    <plugin name="buoyancy" filename="libBuoyancyPlugin.so">
-      <!-- fluid density determines sub buoyancy, lower density equals more positivly buoyant-->
-      <fluid_density>275.000</fluid_density>
     </plugin>
 
     <static>0</static>

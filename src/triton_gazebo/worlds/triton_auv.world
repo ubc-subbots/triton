@@ -2,7 +2,7 @@
 <sdf version="1.7">
   <world name="default">
     <include>
-      <uri>model://triton_full</uri>
+      <uri>model://triton_auv</uri>
     </include>
     <grid>0</grid>
   </world>
