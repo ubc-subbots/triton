@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cmath>
 #include <unistd.h>
 //#include <filesystem> //for filepath, can be used in C++17
 #include <opencv2/opencv.hpp>
@@ -126,49 +127,16 @@ public:
 
         // Featurize hulls, predict using model and get classified pole hulls
         vector<vector<Point>> pole_hulls;
-        Ptr<SVM> svm = SVM::create();
-        svm->setType(SVM::Types::C_SVC);
-        svm->setKernel(SVM::KernelTypes::LINEAR);
-        svm->load("/home/jared/subbot/triton/accuracy_opencv_model.xml");
+        Ptr<SVM> svm = SVM::load("/home/jared/subbot/triton/accuracy_opencv_model.xml");
         vector<float> y_hat;
         Mat X_hat = featurizer.featurize_for_classification(hulls);
-        //Mat y_hat = Mat::zeros(1, X_hat.rows, CV_32F);
-        cout << "X num of rows " << X_hat.rows << endl;
-        cout << "X num of cols " << X_hat.cols << endl;
-        //cout << "y num of rows " << y_hat.rows << endl;
-        //cout << "y num of cols " << y_hat.cols << endl;
-        vector<float> oneFeatVec = X_hat.row(0);
-        cout << "one feat vec: " << endl;
-        for (float f : oneFeatVec){
-            cout << f << " ";
-        }
-        cout << endl;
-        cout << "whole mat: " << endl;
-        for (int i = 0; i < X_hat.rows; i++){
-            vector<float> row = X_hat.row(i);
-            for (int j = 0; j < X_hat.cols; j++){
-                cout << row.at(j) << "      ";
-            }
-            cout << endl;
-        }
-        cout << "type of X_hat " << X_hat.type() << endl;
-        cout << "type of CV_32F " << CV_32F << endl;
-        //cout << svm->predict(Mat(oneFeatVec).reshape(0,1)) << endl;
-        cout << svm->predict(oneFeatVec) << endl;
         svm->predict(X_hat, y_hat);
         for (int i = 0; i < hulls.size(); i++)
         {
-            //if (svm->predict(X_hat.at(i)) == 1)
-            //if (y_hat.at<float>(0,i) == 1)
             if (y_hat.at(i) == 1)
             {
                 pole_hulls.push_back(hulls.at(i));
             }
-            else 
-            {
-                cout << "Not a hull!\n";
-            }
-          
       }
 
       // Get 2D array of all the points of the pole hulls (to determine extrema)
@@ -237,28 +205,28 @@ public:
      */
     vector<Point> create_gate_contour(vector<Point> hull_points, Mat src)
     {
-        //int width = src.cols;
+        int width = src.cols;
 
         // Get extrema points of hulls (i.e the points closest/furthest from the top left (0,0) and top right (width, 0) of the image)
         Point top_left = *min_element(hull_points.begin(), hull_points.end(),
             [] (Point a, Point b)
             {
-                return (a.x < b.x || a.y < b.y);
+                return (sqrt(pow(a.x,2)+pow(a.y,2))<sqrt(pow(b.x,2)+pow(b.y,2)));
             });
         Point top_right = *min_element(hull_points.begin(), hull_points.end(),
-            [] (Point a, Point b)
+            [width] (Point a, Point b)
             {
-                return (a.x > b.x || a.y < b.y);
+                return (sqrt(pow(a.x-width,2)+pow(a.y,2))<sqrt(pow(b.x-width,2)+pow(b.y,2)));
             });
-        Point bot_left = *min_element(hull_points.begin(), hull_points.end(),
-            [] (Point a, Point b)
+        Point bot_left = *max_element(hull_points.begin(), hull_points.end(),
+            [width] (Point a, Point b)
             {
-                return (a.x < b.x || a.y > b.y);
+                return (sqrt(pow(a.x-width,2)+pow(a.y,2))<sqrt(pow(b.x-width,2)+pow(b.y,2)));
             });
-        Point bot_right = *min_element(hull_points.begin(), hull_points.end(),
+        Point bot_right = *max_element(hull_points.begin(), hull_points.end(),
             [] (Point a, Point b)
             {
-                return (a.x > b.x || a.y > b.y);
+                return (sqrt(pow(a.x,2)+pow(a.y,2))<sqrt(pow(b.x,2)+pow(b.y,2)));
             });
 
         if (debug)
@@ -270,8 +238,8 @@ public:
         }
         gate_cntr.push_back(top_left);
         gate_cntr.push_back(top_right);
-        gate_cntr.push_back(bot_left);
         gate_cntr.push_back(bot_right);
+        gate_cntr.push_back(bot_left);
         return gate_cntr;
     }
 

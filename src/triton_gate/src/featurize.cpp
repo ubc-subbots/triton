@@ -150,12 +150,22 @@ public:
      */
     Mat featurize_for_classification(vector<vector<Point>> hulls)
     {
-        Mat X_hat;
+        int vecNum = 0;
+        int cols = 10;
+        int rows = hulls.size();
+        float x_array[rows][10];
         for (vector<Point> hull : hulls)
         {
-            X_hat.push_back(Mat(form_feature_vector(hull)).reshape(0,1)); // so each feature vector is a row
+            //X_hat.push_back(Mat(form_feature_vector(hull)).reshape(0,1)); // so each feature vector is a row
+            vector<float> feat = form_feature_vector(hull);
+            for (int feature = 0; feature < 10; feature++)
+            {
+                x_array[vecNum][feature] = feat.at(feature);
+            }
+            vecNum++;
         }
-        X_hat.convertTo(X_hat, CV_32F); // to make sure the type is correct
+        Mat X_hat = Mat(rows, 10, CV_32F, &x_array);
+        //cout << X_hat << endl;
         return X_hat;
     }
 
