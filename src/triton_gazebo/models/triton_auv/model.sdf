@@ -185,7 +185,7 @@
 
     -->
 
-    <!-- Thrust Vectors 
+    <!-- Thrust Vectors -->
     <plugin name="force_controller_t1" filename="libgazebo_ros_force.so">
         <ros>
             <namespace>/triton/gazebo_drivers</namespace>
@@ -239,7 +239,7 @@
         <link_name>thruster6::thruster</link_name>
         <force_frame>link</force_frame>
     </plugin>
-    -->
+
     <static>0</static>
     <allow_auto_disable>1</allow_auto_disable>
 
