@@ -5,7 +5,7 @@ This package serves as an example package displaying how to write component node
 
 ## Usage
 
-Follow the usage of the `triton_pipeline` package with `<PIPELINE_TYPE> = example` and `<PIPELINE_INPUT> = 0`. You can then use the following command to send data to the example pipeline and see output from each node in the same terminal where the `triton_pipeline.launch.py` launch file was launched.
+Follow the usage of the `triton_pipeline` package with `<PIPELINE_TYPE> = example` and `<PIPELINE_INPUT> = 0`. You can then use the following command to send data to the example pipeline and see output from each node in the same terminal where the `pipeline_launch.py` launch file was launched.
 
     ros2 topic pub /triton/example/component_one/in std_msgs/String '{data: "Hello World"}'
 
@@ -17,21 +17,21 @@ You should see the string `"Hello World from ComponentOne and ComponentTwo"` bei
 
 ## Nodes
 
-- `component_one` : A component node (`example::ComponentOne`) which adds `"from ComponentOne"` to any string it recieves.
+- `component_one` : A component node (`triton_example::ComponentOne`) which adds `"from ComponentOne"` to any string it recieves.
 
     ### Subscribed Topics
-    - `component_one/in` (`std_msgs/msg/String.msg`) : Input string.
+    - `example/component_one/in` (`std_msgs/msg/String.msg`) : Input string.
     
     ### Published Topics
-    - `component_one/out` (`std_msgs/msg/String.msg`) : Output string.
+    - `example/component_one/out` (`std_msgs/msg/String.msg`) : Output string.
     
-- `component_two` : A component node (`example::ComponentTwo`) which adds `"and ComponentTwo"` to any string it recieves. Also notifies pipeline of success once it recieves 25 string messages.
+- `component_two` : A component node (`triton_example::ComponentTwo`) which adds `"and ComponentTwo"` to any string it recieves. Also notifies pipeline of success once it recieves 25 string messages.
 
     ### Subscribed Topics
-    - `component_two/in` (`std_msgs/msg/String.msg`) : Input string.
+    - `example/component_two/in` (`std_msgs/msg/String.msg`) : Input string.
     
     ### Published Topics
-    - `component_two/out` (`std_msgs/msg/String.msg`) : Output string.
+    - `example/component_two/out` (`std_msgs/msg/String.msg`) : Output string.
     - `/triton/pipeline_feedback` (`triton_interfaces/msg/PipelineFeedback.msg`) : Pipeline feedback.
 
 ## Contributors

@@ -1,6 +1,4 @@
-build/
-install/
-log/
-.vscode/
-*.jpg
-*.pkl
+build
+install
+log
+

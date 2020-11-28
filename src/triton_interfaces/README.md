@@ -11,8 +11,11 @@ This package provides no executables. See ROS2 tutorials (such as [this](https:/
 ### Messages
 - `Pipelineeedback` Message used for nodes within the pipline to communicate with the manager
 - `PipelineType` Message used for enumeration of pipeline types
+- `DetectionBox` Message used for a detection box in an object recognition system
+- `DetectionBoxArray` Message used to represent an array of detection boxes
 ### Services
 - `ConfigurePipeline` Service used to configure the pipeline with a certain pipeline type
+- `ObjectDetection` Service used to detect objects in a given image
 
 ## Contributors
 
