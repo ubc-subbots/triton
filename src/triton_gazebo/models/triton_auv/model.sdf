@@ -8,7 +8,7 @@
       Thrusters will follow the following naming convention: 
 
                              Thruster 6
-         Thruster 4 / /________|__|________\ \ Thruster 2
+         Thruster 2 / /________|__|________\ \ Thruster 3
                    / /|                    |\ \
                       |        +y          |
                       |       |            |_
@@ -16,7 +16,7 @@
                       |     +z             |
                       |   (pointing up)    |
                    \ \|____________________|/ /
-         Thruster 3 \ \        |  |        / / Thruster 1
+         Thruster 1 \ \        |  |        / / Thruster 4
                              Thruster 5
 
     -->
@@ -31,37 +31,37 @@
     <!-- Thrusters -->
     <include>
       <uri>model://triton_thruster</uri>
-      <pose>0.2035 -0.18 0 0 -1.5707 0.785398</pose>
+      <pose>-0.235 -0.189 0 0 1.5707 2.35619</pose>
       <name>thruster1</name>
     </include>
 
     <include>
       <uri>model://triton_thruster</uri>
-      <pose>0.2035 0.18 0 0 1.5707 2.35619</pose>
+      <pose>-0.235 0.189 0 0 -1.5707 0.785398</pose>
       <name>thruster2</name>
     </include>
 
     <include>
       <uri>model://triton_thruster</uri>
-      <pose>-0.235 -0.189 0 0 1.5707 -0.785398</pose>
+      <pose>0.2035 0.189 0 0 1.5707 -0.785398</pose>
       <name>thruster3</name>
     </include>
 
     <include>
       <uri>model://triton_thruster</uri>
-      <pose>-0.235 0.189 0 0 -1.5707 -2.35619</pose>
+      <pose>0.2035 -0.189 0 0 -1.5707 -2.35619</pose>
       <name>thruster4</name>
     </include>
 
     <include>
       <uri>model://triton_thruster</uri>
-      <pose>0 -0.22 0.13 3.1415 0 0</pose>
+      <pose>0 -0.22 0.13 3.1415 3.1415 0</pose>
       <name>thruster5</name>
     </include>
 
     <include>
       <uri>model://triton_thruster</uri>
-      <pose>0 0.22 0.13 3.1415 0 3.1415</pose>
+      <pose>0 0.22 0.13 3.1415 3.1415 3.1415</pose>
       <name>thruster6</name>
     </include>
 
@@ -185,14 +185,14 @@
 
     -->
 
-    <!-- Thrust Vectors -->
+    <!-- Thrust Vectors 
     <plugin name="force_controller_t1" filename="libgazebo_ros_force.so">
         <ros>
             <namespace>/triton/gazebo_drivers</namespace>
             <remapping>gazebo_ros_force:=force_t1</remapping>
         </ros>
         <link_name>thruster1::thruster</link_name>
-        <force_frame>world</force_frame>
+        <force_frame>link</force_frame>
     </plugin>
 
     <plugin name="force_controller_t2" filename="libgazebo_ros_force.so">
@@ -201,7 +201,7 @@
             <remapping>gazebo_ros_force:=force_t2</remapping>
         </ros>
         <link_name>thruster2::thruster</link_name>
-        <force_frame>world</force_frame>
+        <force_frame>link</force_frame>
     </plugin>
 
     <plugin name="force_controller_t3" filename="libgazebo_ros_force.so">
@@ -210,7 +210,7 @@
             <remapping>gazebo_ros_force:=force_t3</remapping>
         </ros>
         <link_name>thruster3::thruster</link_name>
-        <force_frame>world</force_frame>
+        <force_frame>link</force_frame>
     </plugin>
 
     <plugin name="force_controller_t4" filename="libgazebo_ros_force.so">
@@ -219,7 +219,7 @@
             <remapping>gazebo_ros_force:=force_t4</remapping>
         </ros>
         <link_name>thruster4::thruster</link_name>
-        <force_frame>world</force_frame>
+        <force_frame>link</force_frame>
     </plugin>
 
     <plugin name="force_controller_t5" filename="libgazebo_ros_force.so">
@@ -228,7 +228,7 @@
             <remapping>gazebo_ros_force:=force_t5</remapping>
         </ros>
         <link_name>thruster5::thruster</link_name>
-        <force_frame>world</force_frame>
+        <force_frame>link</force_frame>
     </plugin>
 
     <plugin name="force_controller_t6" filename="libgazebo_ros_force.so">
@@ -237,9 +237,9 @@
             <remapping>gazebo_ros_force:=force_t6</remapping>
         </ros>
         <link_name>thruster6::thruster</link_name>
-        <force_frame>world</force_frame>
+        <force_frame>link</force_frame>
     </plugin>
-
+    -->
     <static>0</static>
     <allow_auto_disable>1</allow_auto_disable>
 
