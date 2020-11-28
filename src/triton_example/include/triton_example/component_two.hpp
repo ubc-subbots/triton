@@ -5,7 +5,7 @@
 #include "std_msgs/msg/string.hpp"
 #include "triton_interfaces/msg/pipeline_feedback.hpp"
 
-namespace example
+namespace triton_example
 {      
 
     class ComponentTwo : public rclcpp::Node
@@ -66,9 +66,9 @@ namespace example
 
     };
     
-} // namespace example
+} // namespace triton_example
 
 #include "rclcpp_components/register_node_macro.hpp"
-RCLCPP_COMPONENTS_REGISTER_NODE(example::ComponentTwo)
+RCLCPP_COMPONENTS_REGISTER_NODE(triton_example::ComponentTwo)
 
 #endif  //TRITON_EXAMPLE__COMPONENT_TWO

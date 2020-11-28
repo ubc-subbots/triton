@@ -1,0 +1,11 @@
+pipeline_manager:
+  ros__parameters:
+    pipeline:
+      components:
+        - example::ComponentOne
+      pkg_names:
+        - triton_does_not_exist
+      namespace: /triton/example
+      remap_rules:
+        - /triton/example/component_two/in:=/triton/example/component_one/out
+    use_sim_time: false

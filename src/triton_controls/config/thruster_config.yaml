@@ -1,0 +1,35 @@
+/triton/thrust_allocator:
+  ros__parameters:
+    num_thrusters: 6
+    t1:
+      contrib: 
+        x: -0.7071
+        y: 0.7071
+      lx: 6.5640
+      ly: 6.5640
+    t2:
+      contrib: 
+        x: -0.7071
+        y: -0.7071
+      lx: 6.5640
+      ly: 6.5640
+    t3:
+      contrib:
+        x: 0.7071
+        y: -0.7071
+      lx: 7.5630
+      ly: 7.5630
+    t4:
+      contrib: 
+        x: 0.7071
+        y: 0.7071
+      lx: 7.5630
+      ly: 7.5630
+    t5:
+      contrib:
+        z: -1.0
+      ly: 8.744
+    t6:
+      contrib:
+        z: -1.0
+      ly: 8.239
