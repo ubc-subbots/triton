@@ -9,7 +9,6 @@
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <depend>OpenCV</depend>
   <depend>cv_bridge</depend>
   <depend>triton_vision_utils</depend>
 
