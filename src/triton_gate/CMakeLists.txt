@@ -17,16 +17,46 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(rclcpp_components REQUIRED)
 find_package(cv_bridge REQUIRED)
 find_package(OpenCV 4 REQUIRED)
 find_package(triton_vision_utils REQUIRED)
 
-include_directories(
-  include
+include_directories(include)
+
+add_library(triton_gate SHARED
+  src/gate_detector.cpp
+)
+
+rclcpp_components_register_nodes(triton_gate "triton_gate::GateDetector")
+
+target_compile_definitions(triton_gate
+  PRIVATE "triton_gate_CPP_BUILDING_DLL"
+)
+
+ament_target_dependencies(triton_gate
+  "rclcpp"
+  "rclcpp_components"
+  "cv_bridge"
+  "OpenCV"
+  "triton_vision_utils"
+)
+
+install(TARGETS
+  triton_gate
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+)
+
+install(DIRECTORY
+  launch
+  DESTINATION share/${PROJECT_NAME}/
 )
 
 add_executable(gate_detector
-  src/gate_detector.cpp
+  src/gate_detector1.cpp
 )
 
 target_include_directories(gate_detector PUBLIC
