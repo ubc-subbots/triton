@@ -48,7 +48,7 @@
                         <ros>
                             <namespace>triton/gazebo_drivers</namespace>
                         </ros>
-                        <camera_name>bounding_box</camera_name>
+                        <camera_name>front_camera</camera_name>
                         <size_x>2.0</size_x>
                         <size_y>2.0</size_y>
                         <size_z>2.0</size_z>

@@ -6,6 +6,8 @@
 #include <gazebo/gazebo.hh>
 #include <gazebo/rendering/Camera.hh>
 #include <gazebo/sensors/CameraSensor.hh>
+#include "rclcpp/rclcpp.hpp"
+#include "triton_interfaces/msg/detection_box.hpp"
 
 namespace triton_gazebo
 {
@@ -24,6 +26,10 @@ namespace triton_gazebo
     gazebo::sensors::CameraSensorPtr parentSensor;
     gazebo::event::ConnectionPtr updateConnection;
     std::vector<ignition::math::Vector3d> corners_;
+
+    //ROS
+    rclcpp::Node * node_;
+    rclcpp::Publisher<triton_interfaces::msg::DetectionBox>::SharedPtr publisher_; 
 
   };
 }

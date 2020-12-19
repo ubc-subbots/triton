@@ -1,14 +1,18 @@
 #include "triton_gazebo/bounding_box_plugin.hpp"
-#include "triton_interfaces/msg/detection_box.hpp"
 using namespace gazebo;
 
 namespace triton_gazebo
 {
     BoundingBoxPlugin::BoundingBoxPlugin() : SensorPlugin()
     {
+        //Create publisher
+        node_ = new rclcpp::Node(this->handleName+"bounding_box");
     };
 
-    BoundingBoxPlugin::~BoundingBoxPlugin (){}
+    BoundingBoxPlugin::~BoundingBoxPlugin ()
+    {
+        delete node_;
+    }
 
 
     void BoundingBoxPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf)
@@ -60,8 +64,8 @@ namespace triton_gazebo
         else
             gzwarn << "[bounding_box] origin_z in z not set. Default: 0.0." << std::endl;
 
-        corners_.clear();
         //Set up corners of bounding box
+        corners_.clear();
         double coords[3][2] = {  {origin_x-size_x/2, origin_x+size_x/2},
                                 {origin_y-size_y/2, origin_y+size_y/2},
                                 {origin_z-size_z/2, origin_z+size_z/2}};
@@ -73,6 +77,23 @@ namespace triton_gazebo
             }
         }
 
+        // Create ROS publisher
+        std::string ros_namespace;
+        if (_sdf->HasElement("ros") && _sdf->GetElement("ros")->HasElement("namespace"))
+            ros_namespace = _sdf->GetElement("ros")->GetElement("namespace")->Get<std::string>();
+        else
+            gzwarn << "[bounding_box] ros/namespace not set." << std::endl;
+
+        std::string camera_name;
+        if (_sdf->HasElement("camera_name"))
+            camera_name = _sdf->GetElement("camera_name")->Get<std::string>();
+        else
+            gzwarn << "[bounding_box] camera_name in z not set." << std::endl;
+
+        publisher_ = node_->create_publisher<triton_interfaces::msg::DetectionBox>(
+            ros_namespace+"/"+camera_name+"/bounding_box", 
+            10
+        );
         // Connect to the sensor update event.
         this->updateConnection = this->parentSensor->ConnectUpdated(
             std::bind(&BoundingBoxPlugin::OnUpdate, this));
@@ -123,7 +144,7 @@ namespace triton_gazebo
         bbox.width = x_max-x_min;
         bbox.height = y_max-y_min;
 
-        //TODO: Publish message
+        publisher_->publish(bbox);
     }
     
 } // namespace triton_gazebo
