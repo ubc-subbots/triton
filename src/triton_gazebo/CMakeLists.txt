@@ -96,6 +96,13 @@ install(TARGETS
   RUNTIME DESTINATION bin
 )
 
+install(TARGETS
+  bounding_box_plugin
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+)
+
 install(DIRECTORY
   config
   launch
