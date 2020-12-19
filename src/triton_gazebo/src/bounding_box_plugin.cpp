@@ -6,11 +6,6 @@ namespace triton_gazebo
 {
     BoundingBoxPlugin::BoundingBoxPlugin() : SensorPlugin()
     {
-        //TODO: Parametrize this
-        corners_.push_back(ignition::math::Vector3d(0,-1,-1));
-        corners_.push_back(ignition::math::Vector3d(0,-1,1));
-        corners_.push_back(ignition::math::Vector3d(0,1,1));
-        corners_.push_back(ignition::math::Vector3d(0,1,-1));
     };
 
     BoundingBoxPlugin::~BoundingBoxPlugin (){}
@@ -28,13 +23,63 @@ namespace triton_gazebo
             return;
         }
 
+        // Load parameters for size/location of 3D box
+        float size_x = 2;//Object's width
+        if (_sdf->HasElement("size_x"))
+            size_x = _sdf->GetElement("size_x")->Get<float>();
+        else
+            gzwarn << "[bounding_box] size_x not set. Default: 2.0." << std::endl;
+
+        float size_y = 2;//Object's depth
+        if (_sdf->HasElement("size_y"))
+            size_y = _sdf->GetElement("size_y")->Get<float>();
+        else
+            gzwarn << "[bounding_box] size_y not set. Default: 2.0." << std::endl;
+
+        float size_z = 2;//Object's height
+        if (_sdf->HasElement("size_z"))
+            size_z = _sdf->GetElement("size_z")->Get<float>();
+        else
+            gzwarn << "[bounding_box] size_z not set. Default: 2.0." << std::endl;
+        
+        float origin_x = 0;
+        if (_sdf->HasElement("origin_x"))
+            origin_x = _sdf->GetElement("origin_x")->Get<float>();
+        else
+            gzwarn << "[bounding_box] origin_x not set. Default: 0.0." << std::endl;
+
+        float origin_y = 0;
+        if (_sdf->HasElement("origin_y"))
+            origin_y = _sdf->GetElement("origin_y")->Get<float>();
+        else
+            gzwarn << "[bounding_box] origin_y in y not set. Default: 0.0." << std::endl;
+
+        float origin_z = 0;
+        if (_sdf->HasElement("origin_z"))
+            origin_z = _sdf->GetElement("origin_z")->Get<float>();
+        else
+            gzwarn << "[bounding_box] origin_z in z not set. Default: 0.0." << std::endl;
+
+        corners_.clear();
+        //Set up corners of bounding box
+        double coords[3][2] = {  {origin_x-size_x/2, origin_x+size_x/2},
+                                {origin_y-size_y/2, origin_y+size_y/2},
+                                {origin_z-size_z/2, origin_z+size_z/2}};
+        for (int i = 0; i<2; i++){
+            for (int j = 0; j<2; j++){
+                for (int k = 0; k<2; k++){
+                    corners_.push_back(ignition::math::Vector3d(coords[0][i],coords[1][j],coords[2][k]));
+                }
+            }
+        }
+
         // Connect to the sensor update event.
         this->updateConnection = this->parentSensor->ConnectUpdated(
             std::bind(&BoundingBoxPlugin::OnUpdate, this));
 
         // Make sure the parent sensor is active.
         this->parentSensor->SetActive(true);
-    };
+    }
 
     void BoundingBoxPlugin::OnUpdate()
     {
@@ -79,6 +124,6 @@ namespace triton_gazebo
         bbox.height = y_max-y_min;
 
         //TODO: Publish message
-    };
+    }
     
 } // namespace triton_gazebo
