@@ -53,13 +53,15 @@ namespace triton_state_maintainer
          * @note something of particular note about this function
          * 
          */
-        void callback(const geometry_msgs::msg::Pose::SharedPtr msg) const;
+        void callback(const geometry_msgs::msg::Pose::SharedPtr msg);
 
         rclcpp::Publisher<geometry_msgs::msg::Pose>::SharedPtr publisher_;
         rclcpp::Subscription<geometry_msgs::msg::Pose>::SharedPtr subscription_;
         
-        mutable bool has_pose_;
-        mutable geometry_msgs::msg::Pose pose_;
+        bool has_pose_;
+        geometry_msgs::msg::Pose pose_;
+        std::vector<double> pose_offset_value_ = std::vector<double>();
+        geometry_msgs::msg::Pose pose_offset_;
 
     };
 
