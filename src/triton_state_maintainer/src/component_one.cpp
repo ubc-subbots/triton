@@ -22,6 +22,7 @@ namespace triton_state_maintainer
 
     RCLCPP_INFO(this->get_logger(), "Started component!");
     RCLCPP_INFO(this->get_logger(), "pose_ x:%f, y:%f, z:%f,  x:%f, y:%f, z:%f, w:%f", pose_.position.x, pose_.position.y, pose_.position.z, pose_.orientation.x, pose_.orientation.y, pose_.orientation.z, pose_.orientation.w);
+    RCLCPP_INFO(this->get_logger(), "pose_offset_value_ x:%f, y:%f, z:%f,  x:%f, y:%f, z:%f, w:%f", pose_offset_value_[0], pose_offset_value_[1], pose_offset_value_[2], pose_offset_value_[3], pose_offset_value_[4], pose_offset_value_[5], pose_offset_value_[6]);
   }
 
 
@@ -34,9 +35,9 @@ namespace triton_state_maintainer
     }
     auto reply_msg = geometry_msgs::msg::Pose();
     reply_msg = pose_;
-    reply_msg.position.x += pose_offset_.position.x;
-    reply_msg.position.y += pose_offset_.position.y;
-    reply_msg.position.z += pose_offset_.position.z;
+    reply_msg.position.x += pose_offset_value_[0]; //pose_offset_.position.x;
+    reply_msg.position.y += pose_offset_value_[1]; //pose_offset_.position.y;
+    reply_msg.position.z += pose_offset_value_[2]; //pose_offset_.position.z;
     publisher_->publish(reply_msg);
     RCLCPP_INFO(this->get_logger(), "get %f, %f, %f", msg->position.x, msg->position.y, msg->position.z);
     RCLCPP_INFO(this->get_logger(), "reply %f, %f, %f", reply_msg.position.x, reply_msg.position.y, reply_msg.position.z);
