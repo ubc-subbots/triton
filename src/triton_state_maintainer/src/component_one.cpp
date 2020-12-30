@@ -12,6 +12,8 @@ namespace triton_state_maintainer
     //  this->declare_parameter<geometry_msgs::msg::Pose>("pose_offset"+i, pose_offset_value_[i]);
     //  this->get_parameter("pose_offset"+i, pose_offset_value_[i]);
     //}
+    this->declare_parameter<std::vector<double>>("pose_offset", pose_offset_value_);
+    this->get_parameter("pose_offset", pose_offset_value_);
 
     publisher_ = this->create_publisher<geometry_msgs::msg::Pose>("/triton/controls/input_pose", 10);
 
@@ -30,13 +32,14 @@ namespace triton_state_maintainer
       has_pose_ = true;
       pose_ = *msg;
     }
-    auto message = geometry_msgs::msg::Pose();
-    message = pose_;
-    message.position.x += pose_offset_.position.x;
-    message.position.y += pose_offset_.position.y;
-    message.position.z += pose_offset_.position.z;
-    publisher_->publish(message);
-    RCLCPP_INFO(this->get_logger(), "thanks!! %f, %f, %f", message.position.x, message.position.y, message.position.z);
+    auto reply_msg = geometry_msgs::msg::Pose();
+    reply_msg = pose_;
+    reply_msg.position.x += pose_offset_.position.x;
+    reply_msg.position.y += pose_offset_.position.y;
+    reply_msg.position.z += pose_offset_.position.z;
+    publisher_->publish(reply_msg);
+    RCLCPP_INFO(this->get_logger(), "get %f, %f, %f", msg->position.x, msg->position.y, msg->position.z);
+    RCLCPP_INFO(this->get_logger(), "reply %f, %f, %f", reply_msg.position.x, reply_msg.position.y, reply_msg.position.z);
   }
 
 
