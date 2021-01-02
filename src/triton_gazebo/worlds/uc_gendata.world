@@ -8,14 +8,19 @@
                 <uri>model://cube</uri>
             </include>
             <plugin name="initial_velocity" filename="libInitialVelocityPlugin.so">
-                <linear>-0.1 0 0</linear>
+                <linear>0 0 0</linear>
                 <angular>0 0 0</angular>
             </plugin>
         </model>
         <model name="camera_model">
-            <pose>2 0 0 0 0 3.14</pose>
-            <static>true</static>
+            <pose>2 0 0 0 0 3.14159</pose>
+            <static>false</static>
+            <plugin name="initial_velocity" filename="libInitialVelocityPlugin.so">
+                <linear>0.1 0 0</linear>
+                <angular>0 0 0</angular>
+            </plugin>
             <link name="camera_link">
+                <gravity>0</gravity>
                 <sensor type="depth" name="camera1">
                     <update_rate>50</update_rate>
                     <visualize>true</visualize>
