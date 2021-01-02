@@ -3,9 +3,14 @@
     <world name="default">
         <model name="cube1">
             <pose>0 0 0 0 0 0</pose>
+            <static>false</static>
             <include>
                 <uri>model://cube</uri>
             </include>
+            <plugin name="initial_velocity" filename="libInitialVelocityPlugin.so">
+                <linear>-0.1 0 0</linear>
+                <angular>0 0 0</angular>
+            </plugin>
         </model>
         <model name="camera_model">
             <pose>2 0 0 0 0 3.14</pose>
@@ -49,12 +54,7 @@
                             <namespace>triton/gazebo_drivers</namespace>
                         </ros>
                         <camera_name>front_camera</camera_name>
-                        <size_x>2.0</size_x>
-                        <size_y>2.0</size_y>
-                        <size_z>2.0</size_z>
-                        <origin_x>0.0</origin_x>
-                        <origin_y>0.0</origin_y>
-                        <origin_z>0.0</origin_z>
+                        <model_name>cube1</model_name>
                     </plugin>
                 </sensor>
             </link>
