@@ -19,6 +19,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS} -O3 -DNDEBUG")
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
+find_package(ament_cmake_python REQUIRED)
 find_package(gazebo_ros_pkgs REQUIRED)
 find_package(gazebo REQUIRED)
 find_package(gazebo_dev REQUIRED)
@@ -28,6 +29,7 @@ find_package(sensor_msgs REQUIRED)
 find_package(message_filters REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_components REQUIRED)
+find_package(rclpy REQUIRED)
 find_package(OpenCV 4.2 REQUIRED)
 find_package(cv_bridge REQUIRED)
 find_package(triton_interfaces REQUIRED)
@@ -117,6 +119,15 @@ install(DIRECTORY
 install(DIRECTORY
   models
   DESTINATION share/${PROJECT_NAME}/gazebo
+)
+
+# Install Python modules
+ament_python_install_package(${PROJECT_NAME})
+
+# Install Python executables
+install(PROGRAMS
+  BBoxSubscriber.py
+  DESTINATION lib/${PROJECT_NAME}
 )
 
 if(BUILD_TESTING)
