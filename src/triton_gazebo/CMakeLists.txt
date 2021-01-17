@@ -30,9 +30,15 @@ find_package(rclcpp REQUIRED)
 find_package(rclcpp_components REQUIRED)
 find_package(OpenCV 4.2 REQUIRED)
 find_package(cv_bridge REQUIRED)
+find_package(std_msgs REQUIRED)
 
-include_directories(include)
-include_directories(${OpenCV_INCLUDE_DIRS})
+include_directories(
+  include
+  ${OpenCV_INCLUDE_DIRS}
+  ${GAZEBO_LIBRARIES}
+)
+
+link_directories(${gazebo_dev_LIBRARY_DIRS})
 
 add_executable(underwater_camera 
   src/underwater_camera.cpp
@@ -50,8 +56,28 @@ ament_target_dependencies(underwater_camera
   "cv_bridge"
 )
 
+# Build and link revolute_driver plugin
+add_library(thruster_driver_plugin SHARED 
+  src/thruster_driver_plugin.cpp
+)
+target_include_directories(thruster_driver_plugin PUBLIC
+  include
+)
+ament_target_dependencies(thruster_driver_plugin
+  std_msgs
+  rclcpp
+  "gazebo_dev"
+  "gazebo_ros"
+)
+ament_export_libraries(thruster_driver_plugin)
+target_link_libraries(
+  thruster_driver_plugin 
+  ${GAZEBO_LIBRARIES}
+)
+
 install(TARGETS 
   underwater_camera
+  thruster_driver_plugin
   DESTINATION lib/${PROJECT_NAME}
 )
 
@@ -79,9 +105,6 @@ install(TARGETS
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
 )
-
-
-
 
 install(DIRECTORY
   config
