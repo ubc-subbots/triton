@@ -10,10 +10,10 @@ from cv2 import cv2
 import numpy as np
 import random
 
-class BBoxSubscriber(Node):
+class SynchronizedImageSaver(Node):
 
     def __init__(self):
-        super().__init__('bounding_box_subscriber')
+        super().__init__('synchronized_image_saver')
         self.subscribe_image = self.create_subscription(Image, "/triton/gazebo_drivers/front_camera/underwater/image_raw", self.save_image, 10)
         self.subscriber_bbox = self.create_subscription(DetectionBox, "/triton/gazebo_drivers/front_camera/bounding_box", self.save_bbox, 10)
 
@@ -45,9 +45,7 @@ class BBoxSubscriber(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-
-    subscriber = BBoxSubscriber()
-
+    subscriber = SynchronizedImageSaver()
     rclpy.spin(subscriber)
 
     # Destroy the node explicitly

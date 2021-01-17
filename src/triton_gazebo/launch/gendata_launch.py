@@ -70,12 +70,12 @@ def generate_launch_description():
     ld.add_action(gazebo_server)
     ld.add_action(gazebo_client)
 
-    save_data_subscriber = Node(
+    synchronized_image_saver = Node(
         package="triton_gazebo",
-        executable='BBoxSubscriber.py',
-        name='save_data_subscriber'
+        executable='synchronized_image_saver.py',
+        name='synchronized_image_saver'
     )
 
-    ld.add_action(save_data_subscriber)
+    ld.add_action(synchronized_image_saver)
 
     return ld
