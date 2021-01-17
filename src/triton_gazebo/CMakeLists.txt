@@ -54,6 +54,7 @@ ament_target_dependencies(underwater_camera
   "rclcpp"
   "OpenCV"
   "cv_bridge"
+  "triton_interfaces"
 )
 
 install(TARGETS 
