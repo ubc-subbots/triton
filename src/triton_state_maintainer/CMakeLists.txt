@@ -25,6 +25,25 @@ find_package(geometry_msgs REQUIRED)
 
 include_directories(include ${catkin_INCLUDE_DIRS})
 
+add_executable(component_one
+  src/component_one.cpp
+)
+target_include_directories(component_one PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+)
+ament_target_dependencies(
+  component_one
+  "rclcpp"
+  "rclcpp_components"
+  "std_msgs"
+  "triton_interfaces"
+  "geometry_msgs"
+)
+install(TARGETS component_one
+  DESTINATION lib/${PROJECT_NAME}
+)
+
 add_library(triton_state_maintainer SHARED
   src/component_one.cpp
 )

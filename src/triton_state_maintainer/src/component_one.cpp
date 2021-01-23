@@ -6,6 +6,7 @@ namespace triton_state_maintainer
 
   ComponentOne::ComponentOne(const rclcpp::NodeOptions & options)
   : Node("component_one", options),
+    pose_offset_value_ (7, 0),
     has_pose_ (false)
   {
     //this->declare_parameter<std::vector<double>>("pose_offset", pose_offset_value_);
@@ -35,7 +36,7 @@ namespace triton_state_maintainer
     RCLCPP_INFO(this->get_logger(), "Started component!");
     RCLCPP_INFO(this->get_logger(), "pose_ x:%f, y:%f, z:%f,  x:%f, y:%f, z:%f, w:%f", pose_.position.x, pose_.position.y, pose_.position.z, pose_.orientation.x, pose_.orientation.y, pose_.orientation.z, pose_.orientation.w);
     RCLCPP_INFO(this->get_logger(), "pose_offset_value_ size = %d", pose_offset_value_.size());
-    //RCLCPP_INFO(this->get_logger(), "pose_offset_value_ x:%f, y:%f, z:%f,  x:%f, y:%f, z:%f, w:%f", pose_offset_value_[0], pose_offset_value_[1], pose_offset_value_[2], pose_offset_value_[3], pose_offset_value_[4], pose_offset_value_[5], pose_offset_value_[6]);
+    RCLCPP_INFO(this->get_logger(), "pose_offset_value_ x:%f, y:%f, z:%f,  x:%f, y:%f, z:%f, w:%f", pose_offset_value_[0], pose_offset_value_[1], pose_offset_value_[2], pose_offset_value_[3], pose_offset_value_[4], pose_offset_value_[5], pose_offset_value_[6]);
   }
 
 
