@@ -1,0 +1,13 @@
+component_one:
+  ros__parameters:
+    pose_offset:
+      pos:
+        x: 10.0
+        y: 0.0
+        z: 0.0
+      orient:
+        w: 0.0
+        x: 0.0
+        y: 0.0
+        z: 0.0
+    use_sim_time: false
