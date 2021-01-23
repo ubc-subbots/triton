@@ -22,8 +22,14 @@ find_package(rclcpp_components REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(triton_interfaces REQUIRED)
 find_package(geometry_msgs REQUIRED)
+find_package(tf2 REQUIRED)
+find_package(tf2_ros REQUIRED)
 
-include_directories(include ${catkin_INCLUDE_DIRS})
+include_directories(include
+  ${catkin_INCLUDE_DIRS}
+  ${tf2_INCLUDE_DIRS}
+  ${tf2_ros_INCLUDE_DIRS}
+)
 
 add_executable(component_one
   src/component_one.cpp
@@ -39,6 +45,8 @@ ament_target_dependencies(
   "std_msgs"
   "triton_interfaces"
   "geometry_msgs"
+  "tf2"
+  "tf2_ros"
 )
 install(TARGETS component_one
   DESTINATION lib/${PROJECT_NAME}
@@ -60,6 +68,8 @@ ament_target_dependencies(triton_state_maintainer
   "std_msgs"
   "triton_interfaces"
   "geometry_msgs"
+  "tf2"
+  "tf2_ros"
 )
 
 install(TARGETS

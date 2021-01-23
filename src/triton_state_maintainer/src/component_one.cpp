@@ -37,6 +37,19 @@ namespace triton_state_maintainer
     RCLCPP_INFO(this->get_logger(), "pose_ x:%f, y:%f, z:%f,  x:%f, y:%f, z:%f, w:%f", pose_.position.x, pose_.position.y, pose_.position.z, pose_.orientation.x, pose_.orientation.y, pose_.orientation.z, pose_.orientation.w);
     RCLCPP_INFO(this->get_logger(), "pose_offset_value_ size = %d", pose_offset_value_.size());
     RCLCPP_INFO(this->get_logger(), "pose_offset_value_ x:%f, y:%f, z:%f,  x:%f, y:%f, z:%f, w:%f", pose_offset_value_[0], pose_offset_value_[1], pose_offset_value_[2], pose_offset_value_[3], pose_offset_value_[4], pose_offset_value_[5], pose_offset_value_[6]);
+
+    tf2::Quaternion q(
+        pose_offset_value_[3],
+        pose_offset_value_[4],
+        pose_offset_value_[5],
+        pose_offset_value_[6]);
+    tf2::Matrix3x3 m(q);
+    double roll, pitch, yaw;
+    m.getRPY(roll, pitch, yaw);
+    RCLCPP_INFO(this->get_logger(), "rpy %f, %f, %f", roll, pitch, yaw);
+    tf2::Quaternion nq;
+    nq.setRPY(roll, pitch, yaw);
+    RCLCPP_INFO(this->get_logger(), "xyzw %f, %f, %f, %f", nq.x(), nq.y(), nq.z(), nq.w());
   }
 
 
