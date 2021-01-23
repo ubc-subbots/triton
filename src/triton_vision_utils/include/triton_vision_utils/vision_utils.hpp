@@ -77,6 +77,24 @@ namespace vision_utils
 		 * @param lower_area: Lower threshold of area filter
 		 */
 		vector<vector<Point>> convex_hulls(Mat src, float upper_area = 1.0 / 2, float lower_area = 1.0 / 1000);
+		
+		/**
+		 * Finds circles in an image using Hough Circle Transform.
+		 * @param src: 		 A grayscale image
+		 * @param method: 	 Detection method. Currently the only implemented method is HOUGH_GRADIENT
+		 * @param dp: 		 Inverse ratio of the accumulator resolution to the image resolution. Default is 1, 
+		 * 			    	 the accumulator has the same resolution as the input image.
+		 * @param minDist: 	 Minimum distance between centers of the detected circles. If = 0, minDist = src.rows/10
+		 * @param cannyThreshold: 	 First method-spicific parameter. In case of HOUGH_GRADIENT, it is the first 
+		 * 				  	 		 threshold for the hysteresis procedure used in the Canny algorithm
+		 * @param accumulatorThreshold: 	 Second method-spicific parameter. In case of HOUGH_GRADIENT, it is the second 
+		 * 				  	 				 threshold for the hysteresis procedure used in the Canny algorithm
+		 * @param minRadius: Minimum circle radius
+		 * @param maxRadius: Maximum circle radius. If <= 0, uses the maximum image dimension. If <0, 
+		 * 					 returns center without finding radius.
+		 * @return: 	 	 A vector of circles in the form of (x, y, radius), it would be modified
+		 */
+		vector<Vec3f> find_circles(Mat src, double minDist=0, int method = HOUGH_GRADIENT, double dp = 1, double cannyThreshold = 25, double accumulatorThreshold = 43, int minRadius = 0, int maxRadius = 0);
 	};
 
 } // namespace vision_utils

@@ -269,52 +269,37 @@ int main()
     ObjectDetector objdtr = ObjectDetector(1, true, 400);
     GateDetector gatedtr = GateDetector(1, true, 400);
 
-    src = cv::imread("/home/jared/subbot/triton/19.jpg");
-    /*
-    cv::imwrite("Src.jpg", src);
-    //cv::waitKey(0);
+    //src = cv::imread("/home/jared/Downloads/underwater_ball.jpeg");
+    //src = cv::imread("/home/jared/Downloads/underwater_ball2.jpeg");
+    //src = cv::imread("/home/jared/Downloads/orange_circles.png");
+    src = cv::imread("/home/jared/Downloads/noisy_circle.png");
+    //src = cv::imread("/home/jared/Downloads/orange_outlines.png");
 
-    cv::Mat enh = objdtr.enhance(src, 1,1,1,1);
-    cv::imwrite("Enh.jpg", enh);
-    //cv::waitKey(0);
+    Mat pre = objdtr.preprocess(src);
+    Mat enh = objdtr.enhance(pre, 0, 0, 0, 1);
+    Mat seg = objdtr.morphological(gatedtr.segment(enh), Size(1,1), Size(1,1));
+    //medianBlur(seg, seg, 5);
+    imwrite("/home/jared/Downloads/seged_circles.jpg", seg);
 
-    cv::Mat gradiented = objdtr.gradient(src);
-    cv::imwrite("Grad.jpg", gradiented);
-    //cv::waitKey(0);
+    //vector<Vec3f> circles = objdtr.find_circles(seg, (int)seg.rows/10, 3, 1, 25, 43, 0, 0); // good for underwater ball.jpeg
+    vector<Vec3f> circles = objdtr.find_circles(seg, (int)seg.rows/10, 3, 1, 95, 50, 0, 0); // good for underwater ball2.jpeg
 
-    cv::Mat morphed = objdtr.morphological(src, Size(50, 50));
-    cv::imwrite("Mor.jpg", morphed);
-
-    */
-    cv::Mat segmented = gatedtr.segment(src);
-    cv::imwrite("Seg.jpg", segmented);
-
-/*
-    cv::imshow("Src", src);
-    cv::imshow("Enh", enh);
-    cv::imshow("Grad", gradiented);
-    cv::imshow("Mor", morphed);
-    cv::imshow("Seg", segmented);
-    cv::waitKey(0);
-    */
-    vector<vector<Point>> hulls;
-    hulls = objdtr.convex_hulls(segmented);
-    /*
-    Mat drawing = Mat::zeros( segmented.size(), CV_8UC3 );
-    for( size_t i = 0; i<hulls.size(); i++ )
+    cvtColor(seg, seg, COLOR_GRAY2BGR);
+    cout << circles.size() << endl;
+// draw circles
+    for( size_t i = 0; i < circles.size(); i++ )
     {
-        Scalar color = Scalar(255,255,255);
-        drawContours( drawing, hulls, (int)i, color );
+         Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
+         int radius = cvRound(circles[i][2]);
+         // draw the circle center
+         circle( seg, center, 3, Scalar(0,255,0), -1, 8, 0 );
+         // draw the circle outline
+         circle( seg, center, radius, Scalar(0,0,255), 3, 8, 0 );
     }
-        imshow("drawing", drawing);
-        imwrite("draw.jpg", drawing);
-        imshow("seg", segmented);
-        cv::waitKey(0);
-        */
-    gatedtr.bound_gate_using_poles(hulls,src);
-    imshow("bounded using poles", src);
-    imwrite("bounded_using_poles.jpg", src);
+    namedWindow( "circles", 1 );
+    imshow( "circles", seg );
     waitKey(0);
+    imwrite("/home/jared/Downloads/circles.jpg", seg);
 
 
     return 0;

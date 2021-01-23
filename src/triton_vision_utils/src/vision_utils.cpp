@@ -168,3 +168,20 @@ vector<vector<Point>> ObjectDetector::convex_hulls(Mat src, float upper_area, fl
     }
     return right_size_vector_of_hulls;
 }
+
+vector<Vec3f> ObjectDetector::find_circles(Mat src, double minDist, int method, double dp, double cannyThreshold, double accumulatorThreshold, int minRadius, int maxRadius)
+{
+    vector<Vec3f> circles;
+    GaussianBlur(src, src, Size(9,9), 2, 2);
+    //medianBlur(src_gray, src_gray, 5);
+    double mD;
+    if (minDist == 0)
+    {
+        mD = src.rows/10;
+    }
+    else {
+        mD = minDist;
+    }
+    HoughCircles(src, circles, method, dp, mD, cannyThreshold, accumulatorThreshold, minRadius, maxRadius);
+    return circles;
+}
