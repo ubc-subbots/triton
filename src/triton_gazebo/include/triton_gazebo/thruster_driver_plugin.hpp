@@ -16,26 +16,29 @@
 namespace triton_gazebo
 {
 
-using std::placeholders::_1;
+    using std::placeholders::_1;
 
-class ThrusterDriver : public gazebo::ModelPlugin
-{
-private:
-    rclcpp::Node::SharedPtr node;
-    rclcpp::Subscription<std_msgs::msg::Float64MultiArray>::SharedPtr torque_command;
-    gazebo::physics::ModelPtr model;
+    class ThrusterDriver : public gazebo::ModelPlugin
+    {
+    private:
+        rclcpp::Node::SharedPtr node;
+        rclcpp::Subscription<std_msgs::msg::Float64MultiArray>::SharedPtr force_cmd;
+        gazebo::physics::ModelPtr model;
 
-    std::vector<gazebo::physics::LinkPtr> thruster;
-    std::thread spinThread;
-    std::string topic_name;
+        std::vector<gazebo::physics::LinkPtr> thruster;
+        std::thread spinThread;
+        std::string topic_name;
 
-    void CallbackThread(void);
-    void TorqueCallback(const std_msgs::msg::Float64MultiArray::SharedPtr) const;
-public: 
-    ThrusterDriver(void);
-    ~ThrusterDriver(void);
-    virtual void Load(gazebo::physics::ModelPtr, sdf::ElementPtr);
-};
+        void SpinNode(void);
+        void TorqueCallback(const std_msgs::msg::Float64MultiArray::SharedPtr) const;
+    public: 
+        ThrusterDriver(void);
+        ~ThrusterDriver(void);
+        virtual void Load(gazebo::physics::ModelPtr, sdf::ElementPtr);
+    };
+
+    // Tell Gazebo about this plugin, so that Gazebo can call Load on this plugin.
+    GZ_REGISTER_MODEL_PLUGIN(ThrusterDriver)
 
 }
 #endif // _THRUSTER_DRIVER_PLUGIN_HH_

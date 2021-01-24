@@ -100,6 +100,8 @@
         </surface>
       </collision>
     </link>
+    <plugin name="thruster_driver" filename="libthruster_driver_plugin.so">
+    </plugin>
     <static>0</static>
     <allow_auto_disable>1</allow_auto_disable>
   </model>
