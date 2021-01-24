@@ -5,9 +5,8 @@
         x: 20.0
         y: 0.0
         z: 0.0
-      orient:
-        x: 0.0
+      ang:
+        r: 0.0
+        p: 0.0
         y: 0.0
-        z: 0.0
-        w: 1.0
     use_sim_time: false

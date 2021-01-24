@@ -62,7 +62,7 @@ namespace triton_state_maintainer
         
         bool has_pose_;
         geometry_msgs::msg::Pose pose_;
-        std::vector<double> pose_offset_value_; // = std::vector<double>(7, 100.0);
+        std::vector<double> pose_offset_value_;
         geometry_msgs::msg::Pose pose_offset_;
 
     };
