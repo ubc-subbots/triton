@@ -2,35 +2,32 @@
 #define _THRUSTER_DRIVER_PLUGIN_HH_
 
 #include <vector> 
-
-// Gazebo libraries
 #include <gazebo/gazebo.hh>
 #include <gazebo/physics/physics.hh>
-
-// ROS2 libraries
+#include <ignition/math/Vector3.hh>
 #include "rclcpp/rclcpp.hpp"
-
-// Msgs
 #include "std_msgs/msg/float64_multi_array.hpp"
 
 namespace triton_gazebo
 {
-
     using std::placeholders::_1;
 
     class ThrusterDriver : public gazebo::ModelPlugin
     {
     private:
+        int array_size;
         rclcpp::Node::SharedPtr node;
         rclcpp::Subscription<std_msgs::msg::Float64MultiArray>::SharedPtr force_cmd;
-        gazebo::physics::ModelPtr model;
-
         std::vector<gazebo::physics::LinkPtr> thruster;
+        std::vector<double> thrust_values;
+        gazebo::event::ConnectionPtr updateConnection_;
+
         std::thread spinThread;
         std::string topic_name;
 
         void SpinNode(void);
-        void TorqueCallback(const std_msgs::msg::Float64MultiArray::SharedPtr) const;
+        void GetForceCmd(const std_msgs::msg::Float64MultiArray::SharedPtr);
+        void ApplyForce(void);
     public: 
         ThrusterDriver(void);
         ~ThrusterDriver(void);

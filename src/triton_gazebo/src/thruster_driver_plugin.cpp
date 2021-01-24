@@ -4,17 +4,7 @@ namespace triton_gazebo
 {
 
     // Constructor
-    ThrusterDriver::ThrusterDriver()
-    {
-        if (!rclcpp::ok())
-        {
-            int argc = 0; 
-            char **argv = NULL;
-            rclcpp::init(argc, argv);
-        }
-
-        node = rclcpp::Node::make_shared("thruster_driver");
-    }
+    ThrusterDriver::ThrusterDriver() : node{rclcpp::Node::make_shared("thruster_driver")} {}
 
     // Destructor 
     ThrusterDriver::~ThrusterDriver() {}
@@ -23,9 +13,27 @@ namespace triton_gazebo
      * This function will be called continuously and recieve a vector from the thrust allocation node,
      * we need to read that value and pass the each force value to the correct thruster
      */
-    void ThrusterDriver::TorqueCallback(const std_msgs::msg::Float64MultiArray::SharedPtr joint_cmd) const
+    void ThrusterDriver::GetForceCmd(const std_msgs::msg::Float64MultiArray::SharedPtr joint_cmd)
     {
+        int array_size = joint_cmd->data.size();
+        RCLCPP_INFO(node->get_logger(), "recieved vector of size: %f\n", array_size);
 
+        for (int i = 0; i < array_size; i++)
+        {
+            RCLCPP_INFO(node->get_logger(), "%f ", joint_cmd->data[i]);
+            thrust_values[i] = joint_cmd->data[i];
+        }
+    }
+
+    /** 
+     * This function will update in sequence with gazebo's main world update function
+     */
+    void ThrusterDriver::ApplyForce()
+    {
+        for (int i = 0; i < 2; i++)
+        {
+            thruster[i]->SetForce(ignition::math::Vector3d(0, 0, thrust_values[i]));
+        }
     }
 
     /** 
@@ -47,7 +55,6 @@ namespace triton_gazebo
      */
     void ThrusterDriver::Load(gazebo::physics::ModelPtr _model, sdf::ElementPtr _sdf)
     {
-
         if (_sdf->HasElement("topic_name"))
         {
             topic_name = _sdf->Get<std::string>("topic_name");
@@ -56,13 +63,21 @@ namespace triton_gazebo
         {
             topic_name = "triton_gazebo/thruster_vector";
         }
-        
-        force_cmd = node->create_subscription<std_msgs::msg::Flsoat64MultiArray>(
+        thrust_values = std::vector<double>(6, 0);
+        force_cmd = node->create_subscription<std_msgs::msg::Float64MultiArray>(
                         topic_name, 
                         10, 
-                        std::bind(&ThrusterDriver::TorqueCallback, this, _1));
+                        std::bind(&ThrusterDriver::GetForceCmd, this, _1));
 
         RCLCPP_INFO(node->get_logger(), "Subscriber node created.\n");
+
+        thruster.push_back(_model->GetLink("triton_auv::thruster5::thruster"));
+        thruster.push_back(_model->GetLink("triton_auv::thruster6::thruster"));
+
+        RCLCPP_INFO(node->get_logger(), thruster[0]->GetName());
+
+        updateConnection_ = gazebo::event::Events::ConnectWorldUpdateBegin(
+                                std::bind(&ThrusterDriver::ApplyForce, this));
 
         /// @todo feels like there should be a way to pass rclcpp::spin directly to thread, this works the way it is though 
         spinThread = std::thread(std::bind(&ThrusterDriver::SpinNode, this));
