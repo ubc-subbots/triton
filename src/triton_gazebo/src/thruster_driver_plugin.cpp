@@ -1,5 +1,5 @@
 #include "triton_gazebo/thruster_driver_plugin.hpp"
-
+#include <string.h>
 namespace triton_gazebo
 {
 
@@ -16,11 +16,11 @@ namespace triton_gazebo
     void ThrusterDriver::GetForceCmd(const std_msgs::msg::Float64MultiArray::SharedPtr joint_cmd)
     {
         int array_size = joint_cmd->data.size();
-        RCLCPP_INFO(node->get_logger(), "recieved vector of size: %f\n", array_size);
+        RCLCPP_INFO(node->get_logger(), "received vector of size: %d\n", array_size);
 
         for (int i = 0; i < array_size; i++)
         {
-            RCLCPP_INFO(node->get_logger(), "%f ", joint_cmd->data[i]);
+            RCLCPP_INFO(node->get_logger(), "%f Newtons", joint_cmd->data[i]);
             thrust_values[i] = joint_cmd->data[i];
         }
     }
@@ -71,6 +71,10 @@ namespace triton_gazebo
 
         RCLCPP_INFO(node->get_logger(), "Subscriber node created.\n");
 
+        thruster.push_back(_model->GetLink("triton_auv::thruster1::thruster"));
+        thruster.push_back(_model->GetLink("triton_auv::thruster2::thruster"));
+        thruster.push_back(_model->GetLink("triton_auv::thruster3::thruster"));
+        thruster.push_back(_model->GetLink("triton_auv::thruster4::thruster"));
         thruster.push_back(_model->GetLink("triton_auv::thruster5::thruster"));
         thruster.push_back(_model->GetLink("triton_auv::thruster6::thruster"));
 
