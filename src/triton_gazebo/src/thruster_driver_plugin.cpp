@@ -16,7 +16,7 @@ namespace triton_gazebo
     void ThrusterDriver::GetForceCmd(const std_msgs::msg::Float64MultiArray::SharedPtr joint_cmd)
     {
         int array_size = joint_cmd->data.size();
-        RCLCPP_INFO(node->get_logger(), "received vector of size: %d\n", array_size);
+        RCLCPP_INFO(node->get_logger(), "received vector of size: %d\n", array_size);   
 
         for (int i = 0; i < array_size; i++)
         {
@@ -30,9 +30,11 @@ namespace triton_gazebo
      */
     void ThrusterDriver::ApplyForce()
     {
-        for (int i = 0; i < 2; i++)
+        for (int i = 0; i < 6; i++)
         {
-            thruster[i]->SetForce(ignition::math::Vector3d(0, 0, thrust_values[i]));
+            // thruster[i]->SetForce(ignition::math::Vector3d(0, 0, thrust_values[i]));
+            thruster[i]->AddLinkForce(ignition::math::Vector3d(0, 0, thrust_values[i]), ignition::math::Vector3d(0, 0, 0));
+               
         }
     }
 
@@ -78,8 +80,9 @@ namespace triton_gazebo
         thruster.push_back(_model->GetLink("triton_auv::thruster5::thruster"));
         thruster.push_back(_model->GetLink("triton_auv::thruster6::thruster"));
 
-        RCLCPP_INFO(node->get_logger(), thruster[0]->GetName());
-
+        for(int i=0;i<sizeof(thruster)/sizeof(thruster[0]);i++)
+            RCLCPP_INFO(node->get_logger(), thruster[i]->GetName());
+    
         updateConnection_ = gazebo::event::Events::ConnectWorldUpdateBegin(
                                 std::bind(&ThrusterDriver::ApplyForce, this));
 
