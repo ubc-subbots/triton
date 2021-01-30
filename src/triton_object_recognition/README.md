@@ -5,24 +5,24 @@ This package contains a ROS2 node that can use a YOLOv3 network to detect and cl
 
 ## Usage
 
-You can use the following command to run the node using the yolov3 tiny model:
+You can use the following command to run the `object_recognizer` node using the yolov3 tiny model:
 
-    ros2 launch triton_object_recognition tiny_yolov3.launch.py
+    ros2 launch triton_object_recognition tiny_yolov3_launch.py
 
-You should see `ObjectRecognizer successfully started!` if successful.
+You should see `Object Recognizer successfully started!` if successful.
 
 ## Nodes
 
-- `object_recognizer` : A component node (`object_recognition::ObjectRecognizer`) which recognizes objects in a received image.
+- `object_recognizer` : A component node (`triton_object_recognition::ObjectRecognizer`) which recognizes objects in a received image.
 
     ### Subscribed Topics
-    - `object_recognizer/in` (`sensor_msgs::msg::Image`) : Input image.
+    - `object_recognizer/in` (`sensor_msgs/msg/Image.msg`) : Input image.
     
     ### Published Topics
-    - `object_recognizer/out` (`triton_interfaces::msg::DetectionBoxArray`) : Output detection boxes.
+    - `object_recognizer/out` (`triton_interfaces/msg/DetectionBoxArray.msg`) : Output detection boxes.
     
     ### Services
-    - `object_recognizer/recognize` (`triton_interfaces::srv::ObjectDetection`): Takes in an image message and produces the detection boxes from that image.
+    - `object_recognizer/recognize` (`triton_interfaces/srv/ObjectDetection.srv`): Takes in an image message and produces the detection boxes from that image.
 
 ## Contributors
 

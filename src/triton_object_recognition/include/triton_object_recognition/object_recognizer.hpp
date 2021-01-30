@@ -14,7 +14,7 @@
     #define DEBUG_VISUALIZE 1
 #endif
 
-namespace object_recognition
+namespace triton_object_recognition
 {      
 
     class ObjectRecognizer : public rclcpp::Node
@@ -85,9 +85,9 @@ namespace object_recognition
                 cv::Mat & frame, const std::vector<cv::Mat>& outs) const;
     };
     
-} // namespace object_recognition
+} // namespace triton_object_recognition
 
 #include "rclcpp_components/register_node_macro.hpp"
-RCLCPP_COMPONENTS_REGISTER_NODE(object_recognition::ObjectRecognizer)
+RCLCPP_COMPONENTS_REGISTER_NODE(triton_object_recognition::ObjectRecognizer)
 
 #endif  //TRITON_OBJECT_RECOGNITION__OBJECT_RECOGNIZER

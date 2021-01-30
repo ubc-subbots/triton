@@ -4,7 +4,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
 
-namespace example
+namespace triton_example
 {      
 
     class ComponentOne : public rclcpp::Node
@@ -59,9 +59,9 @@ namespace example
 
     };
     
-} // namespace example
+} // namespace triton_example
 
 #include "rclcpp_components/register_node_macro.hpp"
-RCLCPP_COMPONENTS_REGISTER_NODE(example::ComponentOne)
+RCLCPP_COMPONENTS_REGISTER_NODE(triton_example::ComponentOne)
 
 #endif  //TRITON_EXAMPLE__COMPONENT_ONE

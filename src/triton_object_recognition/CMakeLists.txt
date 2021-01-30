@@ -36,7 +36,9 @@ add_library(triton_object_recognition SHARED
 
 target_link_libraries(triton_object_recognition ${OpenCV_LIBRARIES} ${Boost_LIBRARIES})
 
-rclcpp_components_register_nodes(triton_object_recognition "object_recognition::ObjectRecognizer")
+rclcpp_components_register_nodes(triton_object_recognition 
+  "triton_object_recognition::ObjectRecognizer"
+)
 
 target_compile_definitions(triton_object_recognition
   PRIVATE "triton_object_recognition_CPP_BUILDING_DLL"

@@ -16,7 +16,7 @@ def generate_test_description():
     ld = LaunchDescription()
 
     pkg_name = 'triton_object_recognition'
-    component = 'object_recognition::ObjectRecognizer'
+    component = 'triton_object_recognition::ObjectRecognizer'
 
     config = os.path.join(
         get_package_share_directory('triton_object_recognition'),
@@ -24,22 +24,11 @@ def generate_test_description():
         'tiny_yolov3.yaml'
     )
 
-    object_recognizer = ComposableNode(
-        name='object_recognizer',
-        namespace='/triton/object_recognition',
-        package='triton_object_recognition',
-        parameters=[config],
-        plugin='object_recognition::ObjectRecognizer'
-    )
-
     object_recognizer_container = ComposableNodeContainer(
         name='object_recognizer_container',
         namespace='/',
         package='rclcpp_components',
         executable='component_container',
-        composable_node_descriptions=[
-            object_recognizer
-        ],
         output='screen'
     )
 
@@ -68,7 +57,7 @@ class TestObjectRecognitionLaunchInit(unittest.TestCase):
 
 
     def test_object_recognizer_init(self, proc_info, proc_output, objectrecognizer):
-        proc_output.assertWaitFor('ObjectRecognizer successfully started!',timeout=900)
+        proc_output.assertWaitFor('Object Recognizer successfully started!',timeout=900)
         proc_info.assertWaitForShutdown(process=objectrecognizer)
 
 

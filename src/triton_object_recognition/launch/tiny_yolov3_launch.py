@@ -16,15 +16,15 @@ def generate_launch_description():
 
     object_recognizer = ComposableNode(
         name='object_recognizer',
-        namespace='/triton/object_recognition',
+        namespace='/triton',
         package='triton_object_recognition',
         parameters=[config], 
-        plugin='object_recognition::ObjectRecognizer'
+        plugin='triton_object_recognition::ObjectRecognizer'
     )
 
     object_recognizer_container = ComposableNodeContainer(
         name='object_recognizer_container',
-        namespace='/triton/object_recognition',
+        namespace='/tritonimage_underwater',
         package='rclcpp_components',
         executable='component_container',
         composable_node_descriptions=[
