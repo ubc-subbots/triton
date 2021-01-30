@@ -169,9 +169,63 @@ vector<vector<Point>> ObjectDetector::convex_hulls(Mat src, float upper_area, fl
     return right_size_vector_of_hulls;
 }
 
+Mat ObjectDetector::util_segment(Mat src, int hue) {
+    
+    // Boundaries
+    int low_H = hue - 10, low_S = 0, low_V = 0;
+    int high_H = hue + 10, high_S = 255, high_V = 255;
+
+    // Since the range of hue in OpenCV is 0 - 180
+    if (low_H < 0) low_H += 180;
+    if (high_H > 180) high_H -= 180;
+    /*
+    if (low_H > high_H) {
+        int h = low_H;
+        low_H - high_H;
+        high_H = h;
+    }
+    */
+
+    //cout << "low and high h: " << low_H << " " << high_H << endl;
+
+    Mat segment;
+    // Convert to HSV colorspace
+    cvtColor(src, segment, COLOR_BGR2HSV);
+
+    inRange(segment, Scalar(low_H, low_S, low_V), Scalar(high_H, high_S, high_V), segment);
+
+    // Convert to HSV color space
+    Mat hsv;
+    cvtColor(src, hsv, COLOR_BGR2HSV);
+
+    // Compute gradient threshold on saturation channel of HSV image
+    // (seems to have best response)
+    ObjectDetector objdtr = ObjectDetector(0.5, true, 400);
+    Mat hsvChannels[3];
+    split(hsv, hsvChannels);
+    Mat grad = objdtr.gradient(hsvChannels[1]);
+    Scalar grad_mean, grad_std;
+    meanStdDev(grad, grad_mean, grad_std);
+    Mat grad_thres;
+    // Since grad should be single-channel, grad_mean[0] and grad_std[0] should contain the values we need
+    threshold(grad, grad_thres, (double)(grad_mean[0])+3*grad_std[0], 255, THRESH_BINARY);
+
+    // Combine the two binary image, note that the gradient threshold has the best response from farther away
+    // and the color mask works best at close distances, so by combining them, we have an image that produces
+    // a great response to the poles at all distances to them
+    Mat segmented;
+    bitwise_or(grad_thres, segment, segmented);
+    return segmented;
+}
+
 vector<Vec3f> ObjectDetector::find_circles(Mat src, double minDist, int method, double dp, double cannyThreshold, double accumulatorThreshold, int minRadius, int maxRadius)
 {
     vector<Vec3f> circles;
+    /*
+    Mat close_k = getStructuringElement(MORPH_RECT, Size(10,10));
+    morphologyEx(src, src, MORPH_CLOSE, close_k);
+    //dilate(src, src, close_k);
+    */
     GaussianBlur(src, src, Size(9,9), 2, 2);
     //medianBlur(src_gray, src_gray, 5);
     double mD;
@@ -183,5 +237,17 @@ vector<Vec3f> ObjectDetector::find_circles(Mat src, double minDist, int method, 
         mD = minDist;
     }
     HoughCircles(src, circles, method, dp, mD, cannyThreshold, accumulatorThreshold, minRadius, maxRadius);
+    return circles;
+}
+
+vector<Vec3f> ObjectDetector::auto_find_circles(Mat src)
+{
+    ObjectDetector objdtr = ObjectDetector();
+    Mat pre = objdtr.preprocess(src);
+    Mat enh = objdtr.enhance(pre, 0, 0, 0, 1);
+    Mat seg = objdtr.util_segment(enh, 10);
+    // works best when openkernel is smaller and closekernel is really big
+    Mat mor = objdtr.morphological(seg, Size(3,3), Size(18,18));
+    vector<Vec3f> circles = objdtr.find_circles(mor, (int)mor.rows/10, 3, 1, 100, 33, 0, 0); // even better for both
     return circles;
 }

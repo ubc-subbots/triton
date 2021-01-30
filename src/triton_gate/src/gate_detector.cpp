@@ -267,39 +267,64 @@ int main()
 {
     cv::Mat src;
     ObjectDetector objdtr = ObjectDetector(1, true, 400);
-    GateDetector gatedtr = GateDetector(1, true, 400);
+    //GateDetector gatedtr = GateDetector(1, true, 400);
 
     //src = cv::imread("/home/jared/Downloads/underwater_ball.jpeg");
     //src = cv::imread("/home/jared/Downloads/underwater_ball2.jpeg");
-    //src = cv::imread("/home/jared/Downloads/orange_circles.png");
-    src = cv::imread("/home/jared/Downloads/noisy_circle.png");
+    //src = cv::imread("/home/jared/Downloads/underwater_ball3.jpeg");
+    //src = cv::imread("/home/jared/Downloads/19.jpg");
+    src = cv::imread("/home/jared/Downloads/orange_circles.png");
+    //src = cv::imread("/home/jared/Downloads/noisy_circle.png");
     //src = cv::imread("/home/jared/Downloads/orange_outlines.png");
 
     Mat pre = objdtr.preprocess(src);
     Mat enh = objdtr.enhance(pre, 0, 0, 0, 1);
-    Mat seg = objdtr.morphological(gatedtr.segment(enh), Size(1,1), Size(1,1));
-    //medianBlur(seg, seg, 5);
+    Mat seg = objdtr.util_segment(enh, 10);
+    // works best when openkernel is smaller and closekernel is really big
+    Mat mor = objdtr.morphological(seg, Size(3,3), Size(18,18));
+    //mor = src;
+    //cvtColor(mor, mor, COLOR_BGR2GRAY);
+
+  //medianBlur(seg, seg, 5);
     imwrite("/home/jared/Downloads/seged_circles.jpg", seg);
+    imshow( "seg", seg );
+    waitKey(0);
+    imshow( "mor", mor );
+    waitKey(0);
 
     //vector<Vec3f> circles = objdtr.find_circles(seg, (int)seg.rows/10, 3, 1, 25, 43, 0, 0); // good for underwater ball.jpeg
-    vector<Vec3f> circles = objdtr.find_circles(seg, (int)seg.rows/10, 3, 1, 95, 50, 0, 0); // good for underwater ball2.jpeg
+    //vector<Vec3f> circles = objdtr.find_circles(seg, (int)seg.rows/10, 3, 1, 95, 50, 0, 0); // good for underwater ball2.jpeg
+    //vector<Vec3f> circles = objdtr.find_circles(mor, (int)mor.rows/10, 3, 1, 255, 40, 0, 0); // kind of good for both
+    vector<Vec3f> circles = objdtr.find_circles(mor, (int)mor.rows/10, 3, 1, 100, 33, 0, 0); // even better for both
+    //vector<Vec3f> circles2 = objdtr.find_circles(seg, (int)mor.rows/10, 3, 1, 100, 33, 0, 0); // even better for both
 
-    cvtColor(seg, seg, COLOR_GRAY2BGR);
+    cvtColor(mor, mor, COLOR_GRAY2BGR);
     cout << circles.size() << endl;
 // draw circles
+/*
+    for( size_t i = 0; i < circles2.size(); i++ )
+    {
+         Point center(cvRound(circles2[i][0]), cvRound(circles2[i][1]));
+         int radius = cvRound(circles2[i][2]);
+         // draw the circle center
+         circle( mor, center, 3, Scalar(0,255,0), -1, 8, 0 );
+         // draw the circle outline
+         circle( mor, center, radius, Scalar(0,0,255), 3, 8, 0 );
+    }
+    */
     for( size_t i = 0; i < circles.size(); i++ )
     {
          Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
          int radius = cvRound(circles[i][2]);
          // draw the circle center
-         circle( seg, center, 3, Scalar(0,255,0), -1, 8, 0 );
+         circle( mor, center, 3, Scalar(0,255,0), -1, 8, 0 );
          // draw the circle outline
-         circle( seg, center, radius, Scalar(0,0,255), 3, 8, 0 );
+         circle( mor, center, radius, Scalar(0,0,255), 3, 8, 0 );
     }
     namedWindow( "circles", 1 );
-    imshow( "circles", seg );
+    imshow( "circles", mor );
     waitKey(0);
-    imwrite("/home/jared/Downloads/circles.jpg", seg);
+    imwrite("/home/jared/Downloads/circles.jpg", mor);
 
 
     return 0;

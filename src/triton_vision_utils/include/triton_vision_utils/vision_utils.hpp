@@ -79,6 +79,13 @@ namespace vision_utils
 		vector<vector<Point>> convex_hulls(Mat src, float upper_area = 1.0 / 2, float lower_area = 1.0 / 1000);
 		
 		/**
+		 * Segment image using specified hue.
+		 * @param src: An image
+		 * @param hue: Desired hue
+		 * @return: A segmented grayscale image
+		 */
+		Mat util_segment(Mat src, int hue);
+		/**
 		 * Finds circles in an image using Hough Circle Transform.
 		 * @param src: 		 A grayscale image
 		 * @param method: 	 Detection method. Currently the only implemented method is HOUGH_GRADIENT
@@ -94,7 +101,8 @@ namespace vision_utils
 		 * 					 returns center without finding radius.
 		 * @return: 	 	 A vector of circles in the form of (x, y, radius), it would be modified
 		 */
-		vector<Vec3f> find_circles(Mat src, double minDist=0, int method = HOUGH_GRADIENT, double dp = 1, double cannyThreshold = 25, double accumulatorThreshold = 43, int minRadius = 0, int maxRadius = 0);
+		vector<Vec3f> find_circles(Mat src, double minDist=0, int method = HOUGH_GRADIENT, double dp = 1, double cannyThreshold = 100, double accumulatorThreshold = 33, int minRadius = 0, int maxRadius = 0);
+		vector<Vec3f> auto_find_circles(Mat src);
 	};
 
 } // namespace vision_utils
