@@ -169,6 +169,24 @@ vector<vector<Point>> ObjectDetector::convex_hulls(Mat src, float upper_area, fl
     return right_size_vector_of_hulls;
 }
 
+Mat ObjectDetector::filter_small_contours(Mat src, double area) {
+
+    Mat filtered = src.clone();
+    vector<vector<Point>> contours;
+    vector<vector<Point>> smallContours;
+    findContours(src, contours, RETR_LIST, CHAIN_APPROX_NONE);
+
+    for (vector<Point> contour : contours) {
+        double contour_area = contourArea(contour);
+        if (contour_area <= area) {
+            smallContours.push_back(contour);
+        }
+    }
+    fillPoly(filtered, smallContours, Scalar(0));
+
+    return filtered;
+}
+
 Mat ObjectDetector::util_segment(Mat src, int hue) {
     
     // Boundaries
@@ -243,11 +261,14 @@ vector<Vec3f> ObjectDetector::find_circles(Mat src, double minDist, int method, 
 vector<Vec3f> ObjectDetector::auto_find_circles(Mat src)
 {
     ObjectDetector objdtr = ObjectDetector();
+    double minDist = (double)src.rows/10;
+    double minCircleArea = minDist * minDist / 4 * 3.14159 * 0.9;
     Mat pre = objdtr.preprocess(src);
     Mat enh = objdtr.enhance(pre, 0, 0, 0, 1);
     Mat seg = objdtr.util_segment(enh, 10);
+    Mat mor = objdtr.filter_small_contours(seg, minCircleArea);
     // works best when openkernel is smaller and closekernel is really big
-    Mat mor = objdtr.morphological(seg, Size(3,3), Size(18,18));
-    vector<Vec3f> circles = objdtr.find_circles(mor, (int)mor.rows/10, 3, 1, 100, 33, 0, 0); // even better for both
+    mor = objdtr.morphological(mor, Size(3,3), Size(25,25));
+    vector<Vec3f> circles = objdtr.find_circles(mor, (int)mor.rows/10, 3, 1, 100, 30, 0, 0); // even better for both
     return circles;
 }

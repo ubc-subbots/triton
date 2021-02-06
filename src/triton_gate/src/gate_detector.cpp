@@ -272,18 +272,20 @@ int main()
     //src = cv::imread("/home/jared/Downloads/underwater_ball.jpeg");
     //src = cv::imread("/home/jared/Downloads/underwater_ball2.jpeg");
     //src = cv::imread("/home/jared/Downloads/underwater_ball3.jpeg");
-    //src = cv::imread("/home/jared/Downloads/19.jpg");
-    src = cv::imread("/home/jared/Downloads/orange_circles.png");
+    src = cv::imread("/home/jared/Downloads/19.jpg");
+    //src = cv::imread("/home/jared/Downloads/orange_circles.png");
     //src = cv::imread("/home/jared/Downloads/noisy_circle.png");
     //src = cv::imread("/home/jared/Downloads/orange_outlines.png");
 
+    double minDist = (double)src.rows/10;
+    double minCircleArea = minDist * minDist / 4 * 3.14159 * 0.9;
     Mat pre = objdtr.preprocess(src);
     Mat enh = objdtr.enhance(pre, 0, 0, 0, 1);
     Mat seg = objdtr.util_segment(enh, 10);
     // works best when openkernel is smaller and closekernel is really big
-    Mat mor = objdtr.morphological(seg, Size(3,3), Size(18,18));
-    //mor = src;
-    //cvtColor(mor, mor, COLOR_BGR2GRAY);
+    Mat mor = objdtr.filter_small_contours(seg, minCircleArea);
+    //Mat mor = objdtr.morphological(seg, Size(3,3), Size(18,18));
+    mor = objdtr.morphological(mor, Size(3,3), Size(25,25));
 
   //medianBlur(seg, seg, 5);
     imwrite("/home/jared/Downloads/seged_circles.jpg", seg);
@@ -295,7 +297,7 @@ int main()
     //vector<Vec3f> circles = objdtr.find_circles(seg, (int)seg.rows/10, 3, 1, 25, 43, 0, 0); // good for underwater ball.jpeg
     //vector<Vec3f> circles = objdtr.find_circles(seg, (int)seg.rows/10, 3, 1, 95, 50, 0, 0); // good for underwater ball2.jpeg
     //vector<Vec3f> circles = objdtr.find_circles(mor, (int)mor.rows/10, 3, 1, 255, 40, 0, 0); // kind of good for both
-    vector<Vec3f> circles = objdtr.find_circles(mor, (int)mor.rows/10, 3, 1, 100, 33, 0, 0); // even better for both
+    vector<Vec3f> circles = objdtr.find_circles(mor, (int)mor.rows/10, 3, 1, 100, 30, 0, 0); // even better for both
     //vector<Vec3f> circles2 = objdtr.find_circles(seg, (int)mor.rows/10, 3, 1, 100, 33, 0, 0); // even better for both
 
     cvtColor(mor, mor, COLOR_GRAY2BGR);

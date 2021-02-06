@@ -79,6 +79,13 @@ namespace vision_utils
 		vector<vector<Point>> convex_hulls(Mat src, float upper_area = 1.0 / 2, float lower_area = 1.0 / 1000);
 		
 		/**
+		 * Removes contours with small areas from source image. Helps remove noise.
+		 * @param src: A binary segmented grayscale image
+		 * @param area: Upper threshold of area 
+		 * @return: A filtered image
+		 */
+		Mat filter_small_contours(Mat src, double area);
+		/**
 		 * Segment image using specified hue.
 		 * @param src: An image
 		 * @param hue: Desired hue
