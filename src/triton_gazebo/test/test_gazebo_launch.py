@@ -29,7 +29,7 @@ def generate_test_description():
     return ld 
 
 
-class TestExampleLaunchInit(unittest.TestCase):
+class TestGazeboLaunchInit(unittest.TestCase):
 
 
     @classmethod

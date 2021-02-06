@@ -32,7 +32,7 @@ class TestPipelineLaunchInit(unittest.TestCase):
 
 
     def test_pipeline_init(self, proc_info, proc_output):
-        proc_output.assertWaitFor('Pipeline manager succesfully started!')
+        proc_output.assertWaitFor('Pipeline manager successfully started')
 
 
 @launch_testing.post_shutdown_test()
