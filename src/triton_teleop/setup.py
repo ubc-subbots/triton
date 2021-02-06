@@ -23,7 +23,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'keyboard_teleop = triton_teleop.keyboard_teleop:main'
+            'keyboard_teleop = triton_teleop.keyboard_teleop:main',
+            'sim_thrust_mapper = triton_teleop.sim_thrust_mapper:main'
         ],
     },
 )
