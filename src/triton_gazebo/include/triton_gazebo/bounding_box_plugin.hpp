@@ -28,6 +28,15 @@ namespace triton_gazebo
     rclcpp::Node * node_;
     rclcpp::Publisher<triton_interfaces::msg::DetectionBox>::SharedPtr publisher_; 
 
+    static int powint(int x, int p)//https://stackoverflow.com/a/1505791
+    {
+        if (p == 0) return 1;
+        if (p == 1) return x;
+        int tmp = powint(x, p/2);
+        if (p%2 == 0) return tmp * tmp;
+        else return x * tmp * tmp;
+    }
+
   };
 }
 GZ_REGISTER_SENSOR_PLUGIN(triton_gazebo::BoundingBoxPlugin)

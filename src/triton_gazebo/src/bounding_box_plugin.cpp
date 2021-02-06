@@ -62,35 +62,38 @@ namespace triton_gazebo
 
     void BoundingBoxPlugin::OnUpdate()
     {
-        std::vector<ignition::math::Vector3d> corners;
-
         rendering::ScenePtr scene = rendering::get_scene();
         
         rendering::VisualPtr visual = scene->GetVisual(model_name_);
         ignition::math::AxisAlignedBox visual_box = visual->BoundingBox();
 
-        auto min_corner = visual_box.Min() + visual->Position();
-        auto max_corner = visual_box.Max() + visual->Position();
+        //This is just a fancy way of adding all 8 corners to a vector given the bounds (handy if you need arbitrary dimensions)
+        auto cornersFromBounds = [](ignition::math::Vector3d min, ignition::math::Vector3d max){
+            std::vector<ignition::math::Vector3d> corners;
+            for(int i = 0; i < powint(2,3); i++) {
+                ignition::math::Vector3d corner;
+                for (int j = 0; j < 3; j++){
+                    if (i & powint(2,j))
+                        corner[j] = min[j];
+                    else 
+                        corner[j] = max[j];
+                }
+                corners.push_back(corner);
+            }
+            return corners;
+        };
 
+        ignition::math::Quaterniond rotation = visual->Rotation();
+
+        std::vector<ignition::math::Vector3d> corners;
         if (!model_name_.empty()){
-            corners.push_back(ignition::math::Vector3d(min_corner.X(),min_corner.Y(),min_corner.Z()));
-            corners.push_back(ignition::math::Vector3d(min_corner.X(),min_corner.Y(),max_corner.Z()));
-            corners.push_back(ignition::math::Vector3d(min_corner.X(),max_corner.Y(),min_corner.Z()));
-            corners.push_back(ignition::math::Vector3d(min_corner.X(),max_corner.Y(),max_corner.Z()));
-            corners.push_back(ignition::math::Vector3d(max_corner.X(),min_corner.Y(),min_corner.Z()));
-            corners.push_back(ignition::math::Vector3d(max_corner.X(),min_corner.Y(),max_corner.Z()));
-            corners.push_back(ignition::math::Vector3d(max_corner.X(),max_corner.Y(),min_corner.Z()));
-            corners.push_back(ignition::math::Vector3d(max_corner.X(),max_corner.Y(),max_corner.Z()));
+            corners = cornersFromBounds(visual_box.Min(),visual_box.Max());
+            for (auto & corner : corners){
+                corner = rotation.RotateVector(corner * visual->Scale()) + visual->Position();
+            }
         } else {
             //default to finding the bounds of a unit box centred at the origin
-            corners.push_back(ignition::math::Vector3d(-0.5,-0.5,-0.5));
-            corners.push_back(ignition::math::Vector3d(-0.5,-0.5,0.5));
-            corners.push_back(ignition::math::Vector3d(-0.5,0.5,-0.5));
-            corners.push_back(ignition::math::Vector3d(-0.5,0.5,0.5));
-            corners.push_back(ignition::math::Vector3d(0.5,-0.5,-0.5));
-            corners.push_back(ignition::math::Vector3d(0.5,-0.5,0.5));
-            corners.push_back(ignition::math::Vector3d(0.5,0.5,-0.5));
-            corners.push_back(ignition::math::Vector3d(0.5,0.5,0.5));
+            corners = cornersFromBounds(ignition::math::Vector3d(-0.5,-0.5,-0.5),ignition::math::Vector3d(0.5,0.5,0.5));
         }
         
         //get max xy

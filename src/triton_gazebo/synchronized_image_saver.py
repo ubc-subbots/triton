@@ -24,8 +24,13 @@ class SynchronizedImageSaver(Node):
         self.current_image = im
 
     def save_bbox(self, msg: DetectionBox):
+        if (msg.width <= 0 or msg.height <= 0):
+            self.get_logger().info("Bounding box has zero size.")
+            return
+
         try:
             rows,cols,channels = self.current_image.shape
+           
             centre_x = (msg.x + msg.width/2)/cols
             centre_y = (msg.y + msg.height/2)/rows
             width = msg.width/cols
@@ -38,6 +43,10 @@ class SynchronizedImageSaver(Node):
             f.write(txt_string)
             f.close()
             cv2.imwrite(os.getcwd()+"/src/triton_gazebo/data/" + name + ".png", self.current_image)
+
+            image_with_box = self.current_image.copy()
+            image_with_box = cv2.rectangle(image_with_box,(int(msg.x),int(msg.y)),(int(msg.x+msg.width),int(msg.y+msg.height)),(0,0,255),1)
+            cv2.imwrite(os.getcwd()+"/src/triton_gazebo/data/" + name + "_box" + ".png", image_with_box)
         except AttributeError as e:
             self.get_logger().info("No image yet.")
             pass
