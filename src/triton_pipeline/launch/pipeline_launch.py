@@ -1,12 +1,11 @@
-import launch
-
+from launch import LaunchDescription
 from launch_ros.actions import ComposableNodeContainer
 from launch_ros.actions import Node
 
 
 def generate_launch_description():
 
-    ld = launch.LaunchDescription()
+    ld = LaunchDescription()
 
     pipeline_manager = Node(
         name='pipeline_manager',

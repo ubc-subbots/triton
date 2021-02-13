@@ -3,8 +3,9 @@ import os
 from ament_index_python.packages import get_package_share_directory
 
 from launch import LaunchDescription
-from launch.actions import ExecuteProcess, DeclareLaunchArgument, SetEnvironmentVariable
+from launch.actions import ExecuteProcess, DeclareLaunchArgument, SetEnvironmentVariable, IncludeLaunchDescription
 from launch.substitutions import LaunchConfiguration, EnvironmentVariable
+from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.conditions import UnlessCondition
 
 
@@ -45,13 +46,23 @@ def generate_launch_description():
         ]
     )
 
-    gazebo_server = ExecuteProcess(
-        cmd=['gzserver', '--verbose', ['worlds/', LaunchConfiguration('world')]]
+    gazebo_server = IncludeLaunchDescription(
+        launch_description_source=PythonLaunchDescriptionSource(
+            os.path.join(get_package_share_directory('gazebo_ros'), 
+            'launch', 'gzserver.launch.py')
+        ),
+        launch_arguments={
+            'world': ['worlds/', LaunchConfiguration('world')],
+            'verbose': 'true'
+            }.items()
     )
 
-    gazebo_client = ExecuteProcess(
-        cmd=['gzclient', '--verbose'],
-        condition=UnlessCondition(LaunchConfiguration('headless'))
+    gazebo_client = IncludeLaunchDescription(
+        launch_description_source=PythonLaunchDescriptionSource(
+            os.path.join(get_package_share_directory('gazebo_ros'), 
+            'launch', 'gzclient.launch.py')
+        ),
+        condition=UnlessCondition(LaunchConfiguration('headless')),
     )
 
     ld.add_action(world_arg)

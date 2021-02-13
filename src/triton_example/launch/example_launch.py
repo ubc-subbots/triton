@@ -1,29 +1,29 @@
-import launch
+from launch import LaunchDescription
 from launch_ros.actions import ComposableNodeContainer
 from launch_ros.descriptions import ComposableNode
 
 
 def generate_launch_description():
 
-    ld = launch.LaunchDescription()
+    ld = LaunchDescription()
 
     component_one = ComposableNode(
         name='component_one',
-        namespace='/triton/example',
+        namespace='/triton',
         package='triton_example',
-        plugin='example::ComponentOne'
+        plugin='triton_example::ComponentOne'
     )
 
     component_two = ComposableNode(
         name='component_two',
-        namespace='/triton/example',
+        namespace='/triton',
         package='triton_example',
-        plugin='example::ComponentTwo'
+        plugin='triton_example::ComponentTwo'
     )
 
     example_container = ComposableNodeContainer(
         name='example_container',
-        namespace='/triton/example',
+        namespace='/triton',
         package='rclcpp_components',
         executable='component_container',
         composable_node_descriptions=[
