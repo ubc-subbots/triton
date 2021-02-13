@@ -11,7 +11,7 @@ def main():
     time.sleep(0.7)
     move_ccw(1)
     time.sleep(1)
-    move_up(3)
+    move_up(0.4)
     stop()
 
 
@@ -28,7 +28,7 @@ def thruster_force(one, two, three, four, five, six):
 
 
 def move_up(time_sec):
-    thruster_force(0.001, 0.002, 0.003, 0.004, 95.05, 95.1)
+    thruster_force(0.001, 0.002, 0.003, 0.004, 120.05, 120.1)
     time.sleep(time_sec)
     stay_afloat()
 
