@@ -126,7 +126,7 @@ ament_python_install_package(${PROJECT_NAME})
 
 # Install Python executables
 install(PROGRAMS
-  synchronized_image_saver.py
+  bounding_box_image_saver.py
   DESTINATION lib/${PROJECT_NAME}
 )
 

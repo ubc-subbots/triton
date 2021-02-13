@@ -9,11 +9,12 @@ import cv_bridge
 from cv2 import cv2
 import numpy as np
 import random
+from ament_index_python.packages import get_package_share_directory
 
-class SynchronizedImageSaver(Node):
+class BoundingBoxImageSaver(Node):
 
     def __init__(self):
-        super().__init__('synchronized_image_saver')
+        super().__init__('bounding_box_image_saver')
         self.subscribe_image = self.create_subscription(Image, "/triton/gazebo_drivers/front_camera/underwater/image_raw", self.save_image, 10)
         self.subscriber_bbox = self.create_subscription(DetectionBox, "/triton/gazebo_drivers/front_camera/bounding_box", self.save_bbox, 10)
 
@@ -39,14 +40,19 @@ class SynchronizedImageSaver(Node):
             name = "image"+str(random.randint(0,2**16-1))
             self.get_logger().info("Saving..."+name)
             txt_string = f"{msg.class_id} {centre_x} {centre_y} {width} {height}"
-            f = open(os.getcwd()+"/src/triton_gazebo/data/" + name + ".txt", "w")
+
+            data_dir = os.path.join(get_package_share_directory("triton_gazebo"),"data")
+            if not os.path.exists(data_dir):
+                os.makedirs(data_dir)
+
+            f = open(os.path.join(data_dir, name + ".txt"), "w")
             f.write(txt_string)
             f.close()
-            cv2.imwrite(os.getcwd()+"/src/triton_gazebo/data/" + name + ".png", self.current_image)
+            cv2.imwrite(os.path.join(data_dir, name + ".png"), self.current_image)
 
             image_with_box = self.current_image.copy()
             image_with_box = cv2.rectangle(image_with_box,(int(msg.x),int(msg.y)),(int(msg.x+msg.width),int(msg.y+msg.height)),(0,0,255),1)
-            cv2.imwrite(os.getcwd()+"/src/triton_gazebo/data/" + name + "_box" + ".png", image_with_box)
+            cv2.imwrite(os.path.join(data_dir, name + "_box" + ".png"), image_with_box)
         except AttributeError as e:
             self.get_logger().info("No image yet.")
             pass
@@ -54,7 +60,7 @@ class SynchronizedImageSaver(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-    subscriber = SynchronizedImageSaver()
+    subscriber = BoundingBoxImageSaver()
     rclpy.spin(subscriber)
 
     # Destroy the node explicitly

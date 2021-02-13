@@ -11,71 +11,29 @@ def generate_launch_description():
 
     ld = LaunchDescription()
 
-    world_arg = DeclareLaunchArgument(
-            'world',
-            default_value='uc_gendata.world',
-            description='Gazebo world file'
-    )
-
-    headless_arg = DeclareLaunchArgument(
-            'headless',
-            default_value='true',
-            description="Set to 'true' to run gazebo headless"
-    )
-
-    # We need to add the models and worlds directories to env so gazebo can find them
-    triton_gazebo_dir = get_package_share_directory('triton_gazebo')
-
-    gmp = 'GAZEBO_MODEL_PATH'
-    add_model_path = SetEnvironmentVariable(
-        name=gmp, 
-        value=[
-            EnvironmentVariable(gmp), 
-            os.pathsep + os.path.join(triton_gazebo_dir, 'gazebo', 'models')
-        ]
-    )
-
-    grp = 'GAZEBO_RESOURCE_PATH'
-    add_resource_path = SetEnvironmentVariable(
-        name=grp, 
-        value=[
-            EnvironmentVariable(grp), 
-            os.pathsep + os.path.join(triton_gazebo_dir, 'gazebo')
-        ]
-    )
-
-    gazebo_server = IncludeLaunchDescription(
-        launch_description_source=PythonLaunchDescriptionSource(
-            os.path.join(get_package_share_directory('gazebo_ros'), 
-            'launch', 'gzserver.launch.py')
+    gazebo = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            get_package_share_directory('triton_gazebo') + '/launch/gazebo_launch.py'
         ),
-        launch_arguments={
-            'world': ['worlds/', LaunchConfiguration('world')],
-            'verbose': 'true'
-            }.items()
+        launch_arguments={'world': 'uc_gendata.world', 'headless': 'true'}.items()
     )
 
-    gazebo_client = IncludeLaunchDescription(
-        launch_description_source=PythonLaunchDescriptionSource(
-            os.path.join(get_package_share_directory('gazebo_ros'), 
-            'launch', 'gzclient.launch.py')
-        ),
-        condition=UnlessCondition(LaunchConfiguration('headless')),
+    ld.add_action(gazebo)
+
+    underwater_camera = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            get_package_share_directory('triton_gazebo') + '/launch/underwater_camera_launch.py'
+        )
     )
 
-    ld.add_action(world_arg)
-    ld.add_action(headless_arg)
-    ld.add_action(add_model_path)
-    ld.add_action(add_resource_path)
-    ld.add_action(gazebo_server)
-    ld.add_action(gazebo_client)
+    ld.add_action(underwater_camera)
 
-    synchronized_image_saver = Node(
+    bounding_box_image_saver = Node(
         package="triton_gazebo",
-        executable='synchronized_image_saver.py',
-        name='synchronized_image_saver'
+        executable='bounding_box_image_saver.py',
+        name='bounding_box_image_saver'
     )
 
-    ld.add_action(synchronized_image_saver)
+    ld.add_action(bounding_box_image_saver)
 
     return ld

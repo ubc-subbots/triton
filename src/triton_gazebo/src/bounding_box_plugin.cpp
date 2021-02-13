@@ -114,7 +114,7 @@ namespace triton_gazebo
                     x_min = corner_pixel.X();
             }
             if (corner_pixel.X()> x_max){
-                if (corner_pixel.X() > this->parentSensor->Camera()->ViewportWidth() - 1)
+                if (corner_pixel.X() > int(this->parentSensor->Camera()->ViewportWidth()) - 1)
                     x_max = this->parentSensor->Camera()->ViewportWidth() - 1;
                 else
                     x_max = corner_pixel.X();
@@ -126,7 +126,7 @@ namespace triton_gazebo
                     y_min = corner_pixel.Y();
             }
             if (corner_pixel.Y() > y_max){
-                if (corner_pixel.Y() > this->parentSensor->Camera()->ViewportHeight() - 1)
+                if (corner_pixel.Y() > int(this->parentSensor->Camera()->ViewportHeight()) - 1)
                     y_max = this->parentSensor->Camera()->ViewportHeight() - 1;
                 else
                     y_max = corner_pixel.Y();
