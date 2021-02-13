@@ -27,7 +27,6 @@ def generate_launch_description():
         namespace='/triton/teleop',
         package='triton_teleop',
         executable='keyboard_teleop',
-        remappings=[('/triton/teleop/force', '/triton/controls/input_forces')],
         output='screen',
     )
 

@@ -17,7 +17,7 @@ class KeyboardTeleop(Node):
 
         self.force_pub = self.create_publisher(
             Wrench,
-            '/triton/teleop/force',
+            '/triton/controls/input_forces',
             10
         )
 
