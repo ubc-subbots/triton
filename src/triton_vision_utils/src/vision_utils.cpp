@@ -258,7 +258,7 @@ vector<Vec3f> ObjectDetector::find_circles(Mat src, double minDist, int method, 
     return circles;
 }
 
-vector<Vec3f> ObjectDetector::auto_find_circles(Mat src)
+vector<Vec3f> ObjectDetector::auto_find_circles(Mat src, int expected)
 {
     ObjectDetector objdtr = ObjectDetector();
     double minDist = (double)src.rows/10;
@@ -269,6 +269,22 @@ vector<Vec3f> ObjectDetector::auto_find_circles(Mat src)
     Mat mor = objdtr.filter_small_contours(seg, minCircleArea);
     // works best when openkernel is smaller and closekernel is really big
     mor = objdtr.morphological(mor, Size(3,3), Size(25,25));
-    vector<Vec3f> circles = objdtr.find_circles(mor, (int)mor.rows/10, 3, 1, 100, 30, 0, 0); // even better for both
+    int accum_thres = 30;
+    vector<Vec3f> circles = objdtr.find_circles(mor, (int)mor.rows/10, 3, 1, 100, accum_thres, 0, 0); // even better for both
+    while (circles.size() < expected && accum_thres >= 0) {
+        circles = objdtr.find_circles(mor, (int)mor.rows/10, 3, 1, 100, accum_thres, 0, 0);
+        accum_thres--;
+    }
     return circles;
+}
+
+double ObjectDetector::eccentricity(vector<Point> contour) {
+    double eccen = 1;
+    if (contour.size() >= 5) {
+        RotatedRect box = fitEllipse(contour);
+        double majorAxis = box.size.height;
+        double minorAxis = box.size.width;
+        eccen = sqrt(1 - pow(minorAxis,2) / pow(majorAxis, 2));
+    }
+    return eccen;
 }

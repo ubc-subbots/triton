@@ -109,7 +109,14 @@ namespace vision_utils
 		 * @return: 	 	 A vector of circles in the form of (x, y, radius), it would be modified
 		 */
 		vector<Vec3f> find_circles(Mat src, double minDist=0, int method = HOUGH_GRADIENT, double dp = 1, double cannyThreshold = 100, double accumulatorThreshold = 33, int minRadius = 0, int maxRadius = 0);
-		vector<Vec3f> auto_find_circles(Mat src);
+		vector<Vec3f> auto_find_circles(Mat src, int expected);
+
+		/**
+		 * Calculate the eccentricity of an ellipse.
+		 * @param contour: contour of source ellipse
+		 * @return: 	   eccentricity between 0 and 1
+		 */
+		double eccentricity(vector<Point> contour);
 	};
 
 } // namespace vision_utils

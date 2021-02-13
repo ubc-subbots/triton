@@ -272,7 +272,12 @@ int main()
     //src = cv::imread("/home/jared/Downloads/underwater_ball.jpeg");
     //src = cv::imread("/home/jared/Downloads/underwater_ball2.jpeg");
     //src = cv::imread("/home/jared/Downloads/underwater_ball3.jpeg");
-    src = cv::imread("/home/jared/Downloads/19.jpg");
+    //src = cv::imread("/home/jared/Downloads/underwater_ball4.jpeg");
+    //src = cv::imread("/home/jared/Downloads/water_buoy.jpeg");
+    //src = cv::imread("/home/jared/Downloads/water_balloons.jpeg");
+    //src = cv::imread("/home/jared/Downloads/water_balloons2.jpeg");
+    src = cv::imread("/home/jared/Downloads/water_balloons3.jpeg");
+    //src = cv::imread("/home/jared/Downloads/19.jpg");
     //src = cv::imread("/home/jared/Downloads/orange_circles.png");
     //src = cv::imread("/home/jared/Downloads/noisy_circle.png");
     //src = cv::imread("/home/jared/Downloads/orange_outlines.png");
@@ -282,10 +287,21 @@ int main()
     Mat pre = objdtr.preprocess(src);
     Mat enh = objdtr.enhance(pre, 0, 0, 0, 1);
     Mat seg = objdtr.util_segment(enh, 10);
-    // works best when openkernel is smaller and closekernel is really big
     Mat mor = objdtr.filter_small_contours(seg, minCircleArea);
     //Mat mor = objdtr.morphological(seg, Size(3,3), Size(18,18));
+    // works best when openkernel is smaller and closekernel is really big
     mor = objdtr.morphological(mor, Size(3,3), Size(25,25));
+
+    vector<vector<Point>> contours;
+    vector<vector<Point>> ellipses;
+    findContours(mor, contours, RETR_TREE, CHAIN_APPROX_SIMPLE);
+    for (int i = 0; i < contours.size(); i++) {
+        double ecc  = objdtr.eccentricity(contours[i]);
+        cout << "eccen of cnt: " << ecc << endl;
+        if (ecc < 0.6) {
+            ellipses.push_back(contours[i]);
+        }
+    }
 
   //medianBlur(seg, seg, 5);
     imwrite("/home/jared/Downloads/seged_circles.jpg", seg);
@@ -297,8 +313,13 @@ int main()
     //vector<Vec3f> circles = objdtr.find_circles(seg, (int)seg.rows/10, 3, 1, 25, 43, 0, 0); // good for underwater ball.jpeg
     //vector<Vec3f> circles = objdtr.find_circles(seg, (int)seg.rows/10, 3, 1, 95, 50, 0, 0); // good for underwater ball2.jpeg
     //vector<Vec3f> circles = objdtr.find_circles(mor, (int)mor.rows/10, 3, 1, 255, 40, 0, 0); // kind of good for both
-    vector<Vec3f> circles = objdtr.find_circles(mor, (int)mor.rows/10, 3, 1, 100, 30, 0, 0); // even better for both
-    //vector<Vec3f> circles2 = objdtr.find_circles(seg, (int)mor.rows/10, 3, 1, 100, 33, 0, 0); // even better for both
+    int accum_thres = 30;
+    vector<Vec3f> circles = objdtr.find_circles(mor, (int)mor.rows/10, 3, 1, 100, accum_thres, 0, 0); // even better for both
+    size_t expected = 2;
+    while (circles.size() < expected && accum_thres >= 0) {
+        circles = objdtr.find_circles(mor, (int)mor.rows/10, 3, 1, 100, accum_thres, 0, 0);
+        accum_thres--;
+    }
 
     cvtColor(mor, mor, COLOR_GRAY2BGR);
     cout << circles.size() << endl;
@@ -314,6 +335,7 @@ int main()
          circle( mor, center, radius, Scalar(0,0,255), 3, 8, 0 );
     }
     */
+    drawContours(mor, ellipses, -1, Scalar(255,0,0), 5);
     for( size_t i = 0; i < circles.size(); i++ )
     {
          Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
