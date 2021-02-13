@@ -43,29 +43,20 @@ namespace triton_controls
          */
         void wrenchCallback(const geometry_msgs::msg::Wrench::SharedPtr msg) const;
 
-        /** Cosine and sine in degrees
+        /** Helper for cross product between 3D distance and force vectors
          * 
-         * @param deg angle in degrees
-         * @return cose/sine of the angle
-         */
-        inline float cosd(float deg) { return cos( deg*M_PI/180.0); }
-        inline float sind(float deg) { return cos( deg*M_PI/180.0); }
+         * @param r distance vector, 3D
+         * @param F force vector, 3D
+         * @return tau, where tau = r X F
+         */ 
+        std::vector<double> cross(std::vector<double> r,std::vector<double> F);
 
-        /** Helper for elementwise multiplication of same size vectors
-         * 
-         * @param u first vector
-         * @param v second vector
-         * @return w, where w is the elementwise multiplication of u and v
-         */
-        std::vector<double> mulVecs(std::vector<double> u,std::vector<double> v);
 
-        /** Helper for elementwise addition of same size vectors
+        /** Helper for constructing the allocation matrix
          * 
-         * @param u first vector
-         * @param v second vector
-         * @return w, where w is the elementwise addition of u and v
+         * @returns a 6 X num_thrusters allocation matrix
          */
-        std::vector<double> addVecs(std::vector<double> u,std::vector<double> v);
+        std::vector<std::vector<double>> createAllocMat();
 
         rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr forces_pub_;  
         rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr signals_pub_;  
@@ -78,7 +69,9 @@ namespace triton_controls
         std::vector<double> x_lens_;
         std::vector<double> y_lens_;
         std::vector<double> z_lens_;
-        std::vector<std::vector<double>> contribs_; 
+        std::vector<double> x_contribs_;
+        std::vector<double> y_contribs_;
+        std::vector<double> z_contribs_;
     };
     
 } // namespace triton_controls
