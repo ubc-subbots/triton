@@ -18,7 +18,6 @@ from composition_interfaces.srv import LoadNode, UnloadNode, ListNodes
 class PipelineManager(Node):
     """
     Pipeline Manager.
-
     Responsible for configuring the running the pipeline
     """
 
@@ -26,7 +25,6 @@ class PipelineManager(Node):
     def __init__(self):
         """
         Pipeline manager constructor
-
         Declares the parameters for the pipeline manager, and sets
         up the neccessary action, service servers, and topic
         publishers and subscribrers.
@@ -90,16 +88,14 @@ class PipelineManager(Node):
             'configure_pipeline',
             self.configure_pipeline
         )
-        self.get_logger().info('Pipeline manager succesfully started!')
+        self.get_logger().info('Pipeline manager successfully started!')
             
 
     def feedback_callback(self, msg):
         """
         Callback function for the pipeline feedback subscriber
-
         Given the pipeline feedback message, sets the manager state related
         to the success/failure of the pipeline
-
         @param msg: A PipelineFeedback message
         """
         self.pipeline_abort = msg.abort
@@ -110,13 +106,11 @@ class PipelineManager(Node):
     def configure_pipeline(self, request, response):
         """
         Callback function for the configure pipeline service
-
         Given the pipeline type in the request, locates and parses the
         associated config file and sets the parameters of the pipeline
         manager to be those given in the config file. Fails if the pipeline
         type is not a valid type, the config file is ill formatted or the 
         parameters in the config file cannot be set.
-
         @param request: A service request
         @param response: A service response
         """
@@ -156,14 +150,12 @@ class PipelineManager(Node):
     def run_pipeline(self, goal_handle):
         """
         Callback function for the run pipeline action
-
         Loads the components needed for the pipeline type which the pipeline
         manager has been configured for into the pipeline, then waits until 
         the pipeline manager recieves feedback indicating that the loaded 
         pipeline has succeded or has had to abort. Succeeds or aborts the 
         goal handle accordingle then returns the output value using the 
         goal handle.
-
         @param goal_handle: An action goal handle
         """
         self.get_logger().info('Running pipeline...')
@@ -196,20 +188,18 @@ class PipelineManager(Node):
     def _load_component(self, component, pkg_name):
         """
         Loads a component into the pipeline
-
         Uses the load node service the component container provides
         to load the node into the pipeline synchronously. Employs 
         busy waiting to recieve the response of whether or not the
         node was successfully loaded.
-
         @param component: A node component string (i.e 'package::NodeName')
         @param pkg_name: A node component string (i.e 'triton_package')
         """
         req = LoadNode.Request()
-        req.package_name = pkg_name
-        req.plugin_name = component
+        req.package_name = self._empty_list(pkg_name)
+        req.plugin_name = self._empty_list(component)
+        req.remap_rules = self._empty_list(self.get_parameter('pipeline.remap_rules').value)
         req.node_namespace = self.get_parameter('pipeline.namespace').value
-        req.remap_rules = self.get_parameter('pipeline.remap_rules').value
         future = self.pipeline_loading_client.call_async(req)
         res = None
         def callback(future):
@@ -219,18 +209,17 @@ class PipelineManager(Node):
         while rclpy.ok() and res is None:
             time.sleep(0.1)
         if not res.success:
-            self.get_logger().warn('The component {} was not loaded succesfully'
+            self.get_logger().warn('The component {} was not loaded successfully'
                                     .format(component))
         else:
             node_name = res.full_node_name
             self.nodes_in_pipeline.append(node_name)
-            self.get_logger().info(node_name + ' loaded succesfully')
+            self.get_logger().info(node_name + ' loaded successfully')
 
 
     def _unload_components(self):
         """
         Unloads all the components from the pipeline
-
         Uses the list nodes service the component container provides
         to determine the names and ids of the nodes currently loaded
         in the pipeline. Employs busy waiting to recieve the response 
@@ -255,15 +244,12 @@ class PipelineManager(Node):
     def _unload_component(self, unique_id, node_name):
         """
         Unloads a single component from the pipeline
-
         Uses the unload node service the component container provides
         to unload the node from the pipeline. Employs busy waiting to
         recieve the response of whether or not the node was unloaded 
         successfully.
-
         @param unique_id: A unique identifer for the node
         @param node_name: The namespaced node name string (i.e '/ns/node_name')
-
         """
         req = UnloadNode.Request()
         req.unique_id = unique_id
@@ -276,19 +262,17 @@ class PipelineManager(Node):
         while rclpy.ok() and res is None:
             time.sleep(0.1)
         if not res.success:
-            self.get_logger().warn('{} was not unloaded succesfully'.format(node_name))
+            self.get_logger().warn('{} was not unloaded successfully'.format(node_name))
         else:
-            self.get_logger().info('{} was unloaded succesfully'.format(node_name))
+            self.get_logger().info('{} was unloaded successfully'.format(node_name))
 
 
     def _load_params_from_yaml(self, config_yaml):
         """
         Sets the parameters for the pipeline manager from the config yaml
-
         Gets the pipeline parameters from the config yaml, turns them into
         parameter objects and sets them for the pipeline manager. Fails if 
         any of the parameters are ill formatted
-
         @param config_yaml: A yaml structure object
         @return: True if the parameters were loaded successfully, else False
         """
@@ -325,7 +309,6 @@ class PipelineManager(Node):
         """
         Traverses the config yaml until it finds the sub yaml
         structure under the key 'pipeline'
-
         @param: config_yaml A yaml structure object
         @return: The pipeline parameter yaml object, or None if it doesn't exist
         """
@@ -340,7 +323,6 @@ class PipelineManager(Node):
     def _create_param_object(self, param_name, param_val):
         """
         Creates a parameter object of the given name with the given value
-
         @param param_name: Name of the parameter
         @param param_value: Value of the parameter
         @return: A rclpy param object with given name, value and inferred type
@@ -355,11 +337,19 @@ class PipelineManager(Node):
         )
         return new_param
 
+ 
+    def _empty_list(self, value):
+        """
+        If the parameter only has an empty string in list, return an empty list.
+        @param value: Value of the list
+        @return: The list, or empty list if it had only empty string
+        """
+        return value if value != [''] else []
+
 
 def main(args=None):
     """
     Executes the pipeline manager node
-
     Uses a multi threaded executor for the pipeline manager and 
     continuously spins until stopped, then destroys the pipeline
     manager and shuts down the infastructure

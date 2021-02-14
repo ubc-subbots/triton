@@ -5,7 +5,7 @@ namespace triton_controls
 {
 
   WaypointMarker::WaypointMarker(const rclcpp::NodeOptions & options)
-  : Node("component_one", options),
+  : Node("waypoint_marker", options),
     pose_offset_value_ (6, 0),
     has_pose_ (false)
   {
@@ -58,14 +58,4 @@ namespace triton_controls
 
 
 } // namespace triton_controls
-
-
-int main(int argc, char * argv[])
-{
-  rclcpp::init(argc, argv);
-  auto options = rclcpp::NodeOptions();
-  rclcpp::spin(std::make_shared<triton_controls::WaypointMarker>(options));
-  rclcpp::shutdown();
-  return 0;
-}
 

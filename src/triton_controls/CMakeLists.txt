@@ -31,14 +31,8 @@ include_directories(include ${catkin_INCLUDE_DIRS})
 add_executable(thrust_allocator 
   src/thrust_allocator.cpp
 )
-add_executable(waypoint_marker
-  src/waypoint_marker.cpp
-)
+
 target_include_directories(thrust_allocator PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>
-)
-target_include_directories(waypoint_marker PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
 )
@@ -52,23 +46,13 @@ ament_target_dependencies(
   "sensor_msgs"
   "OpenCV"
 )
-ament_target_dependencies(
-  waypoint_marker
-  "rclcpp"
-  "rclcpp_components"
-  "triton_interfaces"
-  "geometry_msgs"
-  "tf2"
-)
 install(TARGETS thrust_allocator
-  DESTINATION lib/${PROJECT_NAME}
-)
-install(TARGETS waypoint_marker
   DESTINATION lib/${PROJECT_NAME}
 )
 
 add_library(triton_controls SHARED
   src/thrust_allocator.cpp
+  src/waypoint_marker.cpp
 )
 
 rclcpp_components_register_nodes(triton_controls "triton_controls::ThrustAllocator")
@@ -86,12 +70,6 @@ ament_target_dependencies(triton_controls
   "geometry_msgs"
   "sensor_msgs"
   "OpenCV"
-)
-ament_target_dependencies(waypoint_marker
-  "rclcpp"
-  "rclcpp_components"
-  "triton_interfaces"
-  "geometry_msgs"
   "tf2"
 )
 
