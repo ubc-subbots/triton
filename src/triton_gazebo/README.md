@@ -12,6 +12,11 @@ To run a Gazebo simulation with a world file given in the `worlds` directory, us
 
 Where `<WORLD_FILE_NAME>` is the name of the world file you want to run in Gazebo (e.g `cube.world`) and `<IS_HEADLESS>` is true if you don't want to run the GUI (defaults to false). Remember to build this package (i.e `colcon build --packages-select triton_gazebo`) everytime you change a model or world and want that change to propogate when you relaunch Gazebo.
 
+## Thruster Simulation
+To run a thruster simulation with gazebo model open, use the following in this directory
+
+	python3 src/triton_gazebo/scripts/publisher_commands/run_thruster.py
+
 ### Underwater Camera
 To run the underwater camera node, use the following
 
