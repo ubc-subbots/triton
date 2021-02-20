@@ -80,9 +80,6 @@ install(TARGETS
   RUNTIME DESTINATION bin
 )
 
-
-
-
 link_directories(${gazebo_dev_LIBRARY_DIRS})
 
 add_library(hydrodynamics_plugin SHARED

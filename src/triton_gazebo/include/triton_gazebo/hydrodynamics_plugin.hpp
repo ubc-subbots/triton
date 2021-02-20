@@ -11,8 +11,16 @@
 #include <eigen3/Eigen/Core>
 #include <eigen3/Eigen/Geometry>
 
-const double fluid_density = 1028.00;
-const double gravity = 9.81;
+#define MAX_DIMENSION 6
+
+/**
+ * @brief Shorthand definitions for 6 dimensional matricies and vectors (double precision)
+ */
+namespace Eigen
+{
+    typedef Matrix<double, 6, 6> Matrix6d;
+    typedef Matrix<double, 6, 1> Vector6d;
+} // namespace Eigen
 
 namespace triton_gazebo 
 {
@@ -20,41 +28,64 @@ namespace triton_gazebo
     {
 
     public:
+        /// @brief Constructor
         HydrodynamicsPlugin ();
+        /// @brief Destructor
         ~HydrodynamicsPlugin ();
 
     protected:
         void Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf) override;
+
+        /**
+         * @brief We need to assemble the standard robotics equation of motion for the AUV
+         * on each iteration. This can be done by gathering velocity and acceleration data
+         * and using SDF parameters to approximate the hydrodynamic and hydrostatic forces
+         */ 
         virtual void Update(const gazebo::common::UpdateInfo &_info);
 
     private:
         /**  
-         * Method to bind the Update function to the Gazebo Simulation update
+         * @brief Method to bind the Update function to the Gazebo Simulation update
          */
         void Connect();
-        void GetTimeStep();
-        void GetVelocityVector();
-        void GetAccelerationVector();
 
         /**
-         * Functions borrowed from Plankton.io
+         * @brief Get the current 6-dimensional velocity vector from gazebo. 
+         * 
+         * @return A vector containing linear and angular velocity
          */
-        ComputeAddedCoriolisMatrix(const Eigen::Vector6d&,
-                                   const Eigen::Matrix6d&,
-                                   Eigen::Matrix6d);
-        Eigen::Matrix6d GetAddedMass();
-        void ComputeDampingMatrix(const Eigen::Vector6d,
-                                  Eigen::Matrix6d);
+        Eigen::Vector6d GetVelocityVector();
+
+        /**
+         * @brief Get the current 6-dimensional acceleration vector from gazebo. 
+         * 
+         * @return A vector containing linear and angular acceleration
+         */
+        Eigen::Vector6d GetAccelerationVector();
+
+        /**
+         * @brief Apply a 6-dimensional wrench to a Gazebo model by dividing components
+         * into linear and angular ignition/math vectors and using Gazebo API to send command
+         */
+        void SetWrenchVector(Eigen::Vector6d wrench);
+
+        /**
+         * Computed matrices to satisfy dynamics equations
+         */
+        void ComputeAddedCoriolisMatrix(const Eigen::Vector6d& _vel, const Eigen::Matrix6d& _Ma, Eigen::Matrix6d &_Ca) const;
+        void ComputeDampingMatrix(const Eigen::Vector6d& _vel, Eigen::Matrix6d &_D) const;
+        Eigen::Matrix6d GetAddedMass() const;
 
         gazebo::physics::ModelPtr model;
         gazebo::event::ConnectionPtr updateConnection_;
-        // Should Apply hydrodynamics to all links 
+        // For now, apply to frame but we should Apply hydrodynamics to all links 
         gazebo::physics::LinkPtr frame;
-        //std::vector<gazebo::physics::LinkPtr> links;
 
-        Eigen::VectorXd velocity;
-        Eigen::VectorXd acceleration;
+        double mass;
+        double fluid_density;
+        double gravity;
     };
+
 } //namespace triton_gazebo
 
 GZ_REGISTER_MODEL_PLUGIN(triton_gazebo::HydrodynamicsPlugin)

@@ -2,11 +2,7 @@
 
 namespace triton_gazebo
 {
-    HydrodynamicsPlugin::HydrodynamicsPlugin()
-    {
-        velocity = Eigen::VectorXd(6);
-        acceleration = Eigen::VectorXd(6);
-    }
+    HydrodynamicsPlugin::HydrodynamicsPlugin() {}
 
     HydrodynamicsPlugin::~HydrodynamicsPlugin() {}
 
@@ -15,15 +11,10 @@ namespace triton_gazebo
     {
         model = _model;
         frame = model->GetLink("frame::frame");
-        gzerr << std::endl << frame->GetName() << std::endl;
+        this->mass = frame->GetInertial()->Mass();
 
-        /*
-        links = model->GetLinks();
-        for (int i = 0; i < (int)links.size(); i++)
-        {
-            gzerr << std::endl << links[i]->GetName() << std::endl;
-        }
-        */
+        this->fluid_density = 1028.00;
+        this->gravity = 9.81;
 
         this->Connect();
     }
@@ -36,89 +27,118 @@ namespace triton_gazebo
 
     void HydrodynamicsPlugin::Update(const gazebo::common::UpdateInfo &_info)
     {
-        this->GetVelocityVector();
-        frame->	AddForce(ignition::math::Vector3d(100, 0, 0));
+        Eigen::Vector6d velocity = this->GetVelocityVector();
+        Eigen::Vector6d acceleration = this->GetAccelerationVector();
+
+        SetWrenchVector(-this->mass * acceleration);
     }
 
-    void HydrodynamicsPlugin::GetVelocityVector()
+    Eigen::Vector6d HydrodynamicsPlugin::GetVelocityVector()
     {
         ignition::math::Vector3d linear_vel = this->frame->RelativeLinearVel();
         ignition::math::Vector3d angular_vel = this->frame->RelativeAngularVel();
+        Eigen::Vector6d velocity;
 
         // Convert velocity into Eigen library vector
-        this->velocity << linear_vel.X(),
-                          linear_vel.Y(),
-                          linear_vel.Z(),
-                          angular_vel.X(),
-                          angular_vel.Y(),
-                          angular_vel.Z();
+        velocity << linear_vel.X(),
+                    linear_vel.Y(),
+                    linear_vel.Z(),
+                    angular_vel.X(),
+                    angular_vel.Y(),
+                    angular_vel.Z();
 
-        //std::cout << this->velocity << std::endl;
+        return velocity;
     }
 
-    /// @todo According to Plankton comments, Gazebo may report bad values, 
-    ///       not sure if this is still the case
-    void HydrodynamicsPlugin::GetAccelerationVector()
+    Eigen::Vector6d HydrodynamicsPlugin::GetAccelerationVector()
     {
         ignition::math::Vector3d linear_acc = this->frame->RelativeLinearAccel();
         ignition::math::Vector3d angular_acc = this->frame->RelativeAngularAccel();
+        Eigen::Vector6d acceleration;
 
         // Convert acceleration into Eigen library vector
-        this->acceleration << linear_acc.X(),
-                              linear_acc.Y(),
-                              linear_acc.Z(),
-                              angular_acc.X(),
-                              angular_acc.Y(),
-                              angular_acc.Z();
+        acceleration << linear_acc.X(),
+                        linear_acc.Y(),
+                        linear_acc.Z(),
+                        angular_acc.X(),
+                        angular_acc.Y(),
+                        angular_acc.Z();
 
-        //std::cout << this->acceleration << std::endl;
+        return acceleration;
     }
 
-    /// @brief Adapted from Plankton simulation
-    void ComputeAddedCoriolisMatrix(const Eigen::Vector6d& _vel,
-                                            const Eigen::Matrix6d& _Ma,
-                                            Eigen::Matrix6d &_Ca) const
+    void HydrodynamicsPlugin::SetWrenchVector(Eigen::Vector6d wrench)
     {
-        // This corresponds to eq. 6.43 on p. 120 in
-        // Fossen, Thor, "Handbook of Marine Craft and Hydrodynamics and Motion
-        // Control", 2011
-        Eigen::Vector6d ab = this->GetAddedMass() * _vel;
-        Eigen::Matrix3d Sa = -1 * CrossProductOperator(ab.head<3>());
-        _Ca << Eigen::Matrix3d::Zero(), Sa,
-                Sa, -1 * CrossProductOperator(ab.tail<3>());
-    }
--
-    void ComputeDampingMatrix(const Eigen::Vector6d& _vel,
-                                        Eigen::Matrix6d &_D) const
-    {
-        // From Antonelli 2014: the viscosity of the fluid causes
-        // the presence of dissipative drag and lift forces on the
-        // body. A common simplification is to consider only linear
-        // and quadratic damping terms and group these terms in a
-        // matrix Drb
+        ignition::math::Vector3d force(wrench[0], wrench[1], wrench[2]);
+        ignition::math::Vector3d torque(wrench[3], wrench[4], wrench[5]);
 
-        _D.setZero();
+/*      This sequence should cover hydrodynamic forces
+        Eigen::Vector6d velRel, acc;
+        // Compute the relative velocity
+        velRel = EigenStack(
+        this->ToNED(linVel - flowVel),
+        this->ToNED(angVel));
 
-        _D = -1 *
-            (this->DLin + this->offsetLinearDamping * Eigen::Matrix6d::Identity()) -
-            _vel[0] * (this->DLinForwardSpeed +
-            this->offsetLinForwardSpeedDamping * Eigen::Matrix6d::Identity());
+        // Update added Coriolis matrix
+        this->ComputeAddedCoriolisMatrix(velRel, this->Ma, this->Ca);
 
-        // Nonlinear damping matrix is considered as a diagonal matrix
-        for (int i = 0; i < 6; i++)
+        // Update damping matrix
+        this->ComputeDampingMatrix(velRel, this->D);
+
+        // Filter acceleration (see issue explanation above)
+        this->ComputeAcc(velRel, _time, 0.3);
+
+        // We can now compute the additional forces/torques due to thisdynamic
+        // effects based on Eq. 8.136 on p.222 of Fossen: Handbook of Marine Craft ...
+
+        // Damping forces and torques
+        Eigen::Vector6d damping = -this->D * velRel;
+
+        // Added-mass forces and torques
+        Eigen::Vector6d added = -this->GetAddedMass() * this->filteredAcc;
+
+        // Added Coriolis term
+        Eigen::Vector6d cor = -this->Ca * velRel;
+
+        // All additional (compared to standard rigid body) Fossen terms combined.
+        Eigen::Vector6d tau = damping + added + cor;
+
+        if (!std::isnan(tau.norm()))
         {
-            _D(i, i) += -1 *
-            (this->DNonLin(i, i) + this->offsetNonLinDamping) *
-            std::fabs(_vel[i]);
+            // Convert the forces and moments back to Gazebo's reference frame
+            ignition::math::Vector3d hydForce =
+                this->FromNED(Vec3dToGazebo(tau.head<3>()));
+            ignition::math::Vector3d hydTorque =
+                this->FromNED(Vec3dToGazebo(tau.tail<3>()));
+
+            // Forces and torques are also wrt link frame
+            this->link->AddRelativeForce(hydForce);
+            this->link->AddRelativeTorque(hydTorque);
         }
-        _D *= this->scalingDamping;
+
+        this->ApplyBuoyancyForce();
+*/
+
+
+        frame->AddForce(force);
+        frame->AddTorque(torque);
     }
 
-    /////////////////////////////////////////////////
-    Eigen::Matrix6d GetAddedMass() const
+    void HydrodynamicsPlugin::ComputeAddedCoriolisMatrix(const Eigen::Vector6d& _vel, const Eigen::Matrix6d& _Ma, Eigen::Matrix6d &_Ca) const
     {
-        return this->scalingAddedMass *
-            (this->Ma + this->offsetAddedMass * Eigen::Matrix6d::Identity());
+
+    }
+
+    void HydrodynamicsPlugin::ComputeDampingMatrix(const Eigen::Vector6d& _vel, Eigen::Matrix6d &_D) const
+    {
+
+    }
+
+    Eigen::Matrix6d HydrodynamicsPlugin::GetAddedMass() const
+    {
+        Eigen::Matrix6d M_d;
+        
+        return M_d;
     }
 
 } // namespace triton_gazebo
