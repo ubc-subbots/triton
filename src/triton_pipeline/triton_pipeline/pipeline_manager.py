@@ -14,6 +14,7 @@ from triton_interfaces.srv import ConfigurePipeline
 from triton_interfaces.msg import PipelineType, PipelineFeedback
 from composition_interfaces.srv import LoadNode, UnloadNode, ListNodes
 
+from .load_params import load_parameter_file
 
 class PipelineManager(Node):
     """
@@ -49,6 +50,7 @@ class PipelineManager(Node):
                 ('components', ['']),
                 ('pkg_names', ['']),
                 ('remap_rules', ['']),
+                ('param_files', ['']),
                 ('namespace', '')
         ])
 
@@ -181,8 +183,9 @@ class PipelineManager(Node):
         if self.pipeline_configured:
             pipeline_components = self.get_parameter('pipeline.components').value
             pipeline_pkg_names = self.get_parameter('pipeline.pkg_names').value
-            for component, pkg_name in zip(pipeline_components, pipeline_pkg_names):
-                self._load_component(component, pkg_name)
+            param_files = self.get_parameter('pipeline.param_files').value
+            for component, pkg_name, param_file in zip(pipeline_components, pipeline_pkg_names, param_files):
+                self._load_component(component, pkg_name, param_file)
         else:
             self.get_logger().warn('Pipeline is not configured')
 
@@ -206,7 +209,7 @@ class PipelineManager(Node):
         return res
 
 
-    def _load_component(self, component, pkg_name):
+    def _load_component(self, component, pkg_name, param_file):
         """
         Loads a component into the pipeline
 
@@ -216,7 +219,8 @@ class PipelineManager(Node):
         node was successfully loaded.
 
         @param component: A node component string (i.e 'package::NodeName')
-        @param pkg_name: A node component string (i.e 'triton_package')
+        @param pkg_name: Package in which the component is found(i.e 'triton_package')
+        @param param_file: Param file to load with the node (can be empty string)
         """
         req = LoadNode.Request()
         req.package_name = pkg_name
@@ -239,6 +243,15 @@ class PipelineManager(Node):
             node_name = res.full_node_name
             self.nodes_in_pipeline.append(node_name)
             self.get_logger().info(node_name + ' loaded successfully')
+            if (len(param_file) > 0):
+                package_dir = get_package_share_directory(pkg_name)
+                param_file_path = os.path.join(package_dir, 'config', param_file)
+                success = load_parameter_file(self, node_name, param_file_path)
+                if not success:
+                    self.get_logger().info('Could not load param file ' + param_file )
+                else:
+                    self.get_logger().info(param_file + ' param file loaded successfully')
+
 
 
     def _unload_components(self):

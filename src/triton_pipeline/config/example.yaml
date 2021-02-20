@@ -1,4 +1,4 @@
-pipeline_manager:
+/triton/pipeline_manager:
   ros__parameters:
     pipeline:
       components:
@@ -7,7 +7,11 @@ pipeline_manager:
       pkg_names: 
         - triton_example
         - triton_example
+      param_files:
+        - params_one.yaml
+        - params_two.yaml
       namespace: /triton
       remap_rules:
         - /triton/example/component_two/in:=/triton/example/component_one/out
     use_sim_time: false
+

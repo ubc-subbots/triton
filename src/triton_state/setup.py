@@ -1,4 +1,6 @@
 from setuptools import setup
+from glob import glob
+import os
 
 package_name = 'triton_state'
 
@@ -9,6 +11,8 @@ setup(
     data_files=[
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
+        (os.path.join('share', package_name), glob('config/*.yaml')),
+        (os.path.join('share', package_name), glob('launch/*.py')),
         ('share/' + package_name, ['package.xml']),
     ],
     install_requires=['setuptools'],
