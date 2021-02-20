@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<sdf version="1.7">
+    <world name="default">
+        <model name="cube1">
+            <pose>0 0 0 0 0 1</pose>
+            <include>
+                <uri>model://cube</uri>
+            </include>
+        </model>
+        <model name="cube2">
+            <pose>0 -2 0 0 0 0.785</pose>
+            <include>
+                <uri>model://cube</uri>
+            </include>
+        </model>
+        <model name="cube3">
+            <pose>0 0 2 0 0 0</pose>
+            <include>
+              <uri>model://cube</uri>
+            </include>
+          </model>
+        <model name="camera_model">
+            <pose>2 0 0 0 0 3.14</pose>
+            <static>true</static>
+            <link name="camera_link">
+                <sensor type="depth" name="camera1">
+                    <update_rate>50</update_rate>
+                    <visualize>true</visualize>
+                    <camera>
+                        <horizontal_fov>1.92</horizontal_fov>
+                        <image>
+                            <width>640</width>
+                            <height>480</height>
+                            <format>B8G8R8</format>
+                        </image>
+                        <depth_camera></depth_camera>
+                        <clip>
+                            <near>0.02</near>
+                            <far>300</far>
+                        </clip>
+                        <noise>
+                            <type>gaussian</type>
+                            <!-- Noise is sampled independently per pixel on each frame.
+                   That pixel's noise value is added to each of its color
+                   channels, which at that point lie in the range [0,1]. -->
+
+                            <mean>0.0</mean>
+                            <stddev>0.007</stddev>
+                        </noise>
+                    </camera>
+                    <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+                        <ros>
+                            <namespace>triton/gazebo_drivers</namespace>
+                        </ros>
+                        <camera_name>front_camera</camera_name>
+                        <min_depth>0.1</min_depth>
+                        <max_depth>500</max_depth>
+                    </plugin>
+                </sensor>
+            </link>
+        </model>
+        <grid>0</grid>
+    </world>
+</sdf>

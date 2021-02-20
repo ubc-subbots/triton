@@ -8,12 +8,19 @@
   <license>TODO: License declaration</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>ament_cmake_python</buildtool_depend>
 
   <depend>gazebo_ros_pkgs</depend>
   <depend>gazebo</depend>
   <depend>gazebo_dev</depend>
   <depend>gazebo_ros</depend>
+  <depend>image_transport</depend>
+  <depend>sensor_msgs</depend>
   <depend>rclcpp</depend>
+  <depend>rclcpp_components</depend>
+  <depend>rclpy</depend>
+  <depend>cv_bridge</depend>
+  <depend>triton_interfaces</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>

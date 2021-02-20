@@ -5,12 +5,40 @@ This package contains the Gazebo models, worlds, and plugins needed to create a 
 
 ## Usage
 
+### Gazebo
 To run a Gazebo simulation with a world file given in the `worlds` directory, use the `gazebo_lanch.py` file as follows
 
     ros2 launch triton_gazebo gazebo_launch.py world:=<WORLD_FILE_NAME> headless:=<IS_HEADLESS>
 
 Where `<WORLD_FILE_NAME>` is the name of the world file you want to run in Gazebo (e.g `cube.world`) and `<IS_HEADLESS>` is true if you don't want to run the GUI (defaults to false). Remember to build this package (i.e `colcon build --packages-select triton_gazebo`) everytime you change a model or world and want that change to propogate when you relaunch Gazebo.
 
+### Underwater Camera
+To run the underwater camera node, use the following
+
+        ros2 launch triton_gazebo underwater_camera_launch.py
+
+Sets of parameters for the underwater camera node (water transmission, spectral sensitivity, etc.) are stored in `config/underwater_camera.yaml`. To change which parameters are used, `launch/underwater_camera_launch.py` can be modified
+
+### Generating Data with Bounding Box
+To run the data generation node, use the following
+
+        ros2 launch triton_gazebo gendata_launch.py
+
+This runs the Gazebo world `uc_gendata.world`, runs the underwater camera node with a random water type, and saves the output images along with label files containing the bounding box of the tracked model defined in `uc_gendata.world` under `bounding_box_controller/model_name`.
+
+## Nodes
+
+- `underwater_camera`: A node which produces synthesized underwater images from a RGB/depth image pair
+
+    ### Subscribed Topics
+     - `front_camera/image_raw` (`sensor_msgs/msg/Image.msg`) : Input RGB image
+     - `front_camera/depth/image_raw` (`sensor_msgs/msg/Image.msg`) : Input depth image
+
+    ### Published Topics
+    - `front_camera/underwater/image_raw` (`sensor_msgs/msg/Image.msg`) : Synthesized underwater image
+    - `repub/image_raw` (`sensor_msgs/msg/Image.msg`) : Republished RGB image
+    - `repub/depth/image_raw` (`sensor_msgs/msg/Image.msg`) : Republished depth image
+     
 ## Worlds
 
 `cube.world` 
@@ -22,17 +50,16 @@ Where `<WORLD_FILE_NAME>` is the name of the world file you want to run in Gazeb
 
         ros2 topic pub /triton/gazebo_drivers/force geometry_msgs/msg/Wrench "{force: {x: 1}}"
 
-# Importing Models From SolidWorks 
-## Description
+##  Importing Models From SolidWorks 
 
 This guide explains how we import mesh files and kinematic information from Solidworks into a Gazebo model.
 
-## Required Software
+### Required Software
 
 1. Solidworks (Windows)
 2. Blender 2.80 or higher(Ubuntu)
 
-## Process
+### Process
 
 1. In Windows, install the SolidWorks [URDF exporter](http://wiki.ros.org/sw_urdf_exporter) and follow the default installation instructions.
 2. In SolidWorks, open the part you wish to export.
@@ -54,7 +81,7 @@ At this point your model should be ready to be added to a Gazebo world, you can 
         `ros2 launch triton_gazebo gazebo_launch.py`
     and placing your model into the scene.
 
-## Referenced Material
+### Referenced Material
 
 [How to import Solidworks model into Gazebo](https://docs.google.com/document/d/1LrzAUCPOdZPh-uzIDg-aMNJGaX13d3AJjA7XWy2pFQQ/edit)
 
@@ -62,3 +89,4 @@ At this point your model should be ready to be added to a Gazebo world, you can 
 
 - Logan Fillo (logan.fillo@gmail.com)
 - Jake Cronin (jcronin97@live.ca)
+- Kevin Huang (kevinh42@student.ubc.ca)
