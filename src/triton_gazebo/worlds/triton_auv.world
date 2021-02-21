@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <sdf version="1.7">
   <world name="default">
+    <fluid_density>1028.00</fluid_density>
     <!-- A global light source -->
     <include>
       <uri>model://sun</uri>
@@ -12,6 +13,7 @@
 
     <include>
       <uri>model://triton_auv</uri>
+      <pose>0 0 2 0 0 0</pose>
     </include>
     <grid>0</grid>
   </world>

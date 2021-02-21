@@ -47,7 +47,19 @@ namespace triton_gazebo
         /**  
          * @brief Method to bind the Update function to the Gazebo Simulation update
          */
-        void Connect();
+        void Connect(void);
+
+        /**  
+         * @brief Collect parameters specified in the world description (gravity, fluid density)
+         * 
+         * @param world_sdf A pointer to the world description
+         */
+        bool GetWorldParameters(sdf::ElementPtr world_sdf);
+
+        /**  
+         * @brief Collect parameters specified in the robot model description
+         */
+        bool GetLinkParameters(sdf::ElementPtr link_sdf);
 
         /**
          * @brief Get the current 6-dimensional velocity vector from gazebo. 
@@ -76,14 +88,35 @@ namespace triton_gazebo
         void ComputeDampingMatrix(const Eigen::Vector6d& _vel, Eigen::Matrix6d &_D) const;
         Eigen::Matrix6d GetAddedMass() const;
 
+        Eigen::Vector6d ToNED(Eigen::Vector6d _vec);
+        Eigen::Vector6d FromNED(Eigen::Vector6d _vec);
+
         gazebo::physics::ModelPtr model;
         gazebo::event::ConnectionPtr updateConnection_;
         // For now, apply to frame but we should Apply hydrodynamics to all links 
         gazebo::physics::LinkPtr frame;
 
+        Eigen::Matrix6d added_mass;
+        Eigen::Matrix6d coriolis_matrix;
+        Eigen::Matrix6d damping_matrix;
+
+        Eigen::Matrix6d DLinForwardSpeed;
+
+        Eigen::Matrix6d linear_damping;
+        Eigen::Matrix6d non_linear_damping;
+        Eigen::Vector6d quadratic_damping;
+
         double mass;
         double fluid_density;
         double gravity;
+
+        // Params pulled from Plankton, likely these will be negligable
+        double scalingAddedMass; 
+        double offsetAddedMass; 
+        double scalingDamping;
+        double offsetLinearDamping;
+        double offsetLinForwardSpeedDamping;
+        double offsetNonLinDamping;
     };
 
 } //namespace triton_gazebo
