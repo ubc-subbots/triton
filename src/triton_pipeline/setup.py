@@ -26,7 +26,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'pipeline_manager = triton_pipeline.pipeline_manager:main'
+            'pipeline_manager = triton_pipeline.pipeline_manager:main',
+            'pipeline_sequence_manager = triton_pipeline.pipeline_sequence_manager:main'
         ],
     },
 )

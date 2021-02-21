@@ -39,6 +39,10 @@ Make sure that the `input` field is one of the accepted types given in `RunPipel
     - `namespace` (`string`): The namespace in which the components will be launched.
     - `remap_rules` (`string[]`): Declares the topic remapping rules for the pipeline components.
 
+- `pipeline_sequence_manager`: A standalone node used to autonomously manage the sequence of pipeline types that are run in the pipeline
+    ### Parameters
+    - `pipeline_sequence` (`string[]`): The sequence of pipeline types to manage. The list is ordered so that the first pipelien type ran is the first in the list and the last pipeline type ran is the last in the list
+
 ## Contributors
 
 - Logan Fillo (logan.fillo@gmail.com)
