@@ -77,6 +77,17 @@ ament_export_libraries(bounding_box_plugin)
 target_link_libraries(bounding_box_plugin ${GAZEBO_LIBRARIES})
 
 
+add_library(camera_orbit_plugin SHARED src/camera_orbit_plugin.cpp)
+target_include_directories(camera_orbit_plugin PUBLIC
+  include
+)
+target_link_libraries(camera_orbit_plugin ${GAZEBO_LIBRARIES})
+ament_target_dependencies(camera_orbit_plugin
+  "triton_interfaces"
+)
+ament_export_libraries(camera_orbit_plugin)
+target_link_libraries(camera_orbit_plugin ${GAZEBO_LIBRARIES})
+
 rclcpp_components_register_nodes(triton_gazebo "triton_gazebo::UnderwaterCamera")
 
 target_compile_definitions(triton_gazebo
@@ -100,6 +111,13 @@ install(TARGETS
 
 install(TARGETS
   bounding_box_plugin
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+)
+
+install(TARGETS
+  camera_orbit_plugin
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
