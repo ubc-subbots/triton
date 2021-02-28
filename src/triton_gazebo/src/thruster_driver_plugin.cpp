@@ -2,20 +2,17 @@
 #include <string.h>
 
 namespace triton_gazebo
-{
-
-    // Constructor
+{    
     ThrusterDriver::ThrusterDriver() : node{rclcpp::Node::make_shared("thruster_driver")} {}
 
-    // Destructor 
     ThrusterDriver::~ThrusterDriver() {}
 
     void ThrusterDriver::GetForceCmd(const std_msgs::msg::Float64MultiArray::SharedPtr joint_cmd)
     {
-        int array_size = joint_cmd->data.size();
-        RCLCPP_INFO(node->get_logger(), "received vector of size: %d\n", array_size);   
+        int vector_size = joint_cmd->data.size();
+        RCLCPP_INFO(node->get_logger(), "received vector of size: %d\n", vector_size);
 
-        for (int i = 0; i < array_size; i++)
+        for (int i = 0; i < vector_size; i++)
         {
             RCLCPP_INFO(node->get_logger(), "%f Newtons", joint_cmd->data[i]);
             thrust_values[i] = joint_cmd->data[i];
@@ -24,7 +21,7 @@ namespace triton_gazebo
 
     void ThrusterDriver::ApplyForce()
     {
-        for (int i = 0; i < 6; i++)
+        for (int i = 0; i < thruster_count; i++)
         {
             thruster[i]->AddLinkForce(ignition::math::Vector3d(0, 0, thrust_values[i]), ignition::math::Vector3d(0, 0, 0));
         }
@@ -37,14 +34,13 @@ namespace triton_gazebo
 
     void ThrusterDriver::Load(gazebo::physics::ModelPtr _model, sdf::ElementPtr _sdf)
     {
-
         if (_sdf->HasElement("thruster_count"))
         {
-           thruster_count = _sdf->Get<int>("thruster_count");
+            thruster_count = _sdf->Get<int>("thruster_count");
         }
         else
         {
-            thruster_count = 0;
+            gzerr << "thruster_count value not specified, exiting.\n";
         }
 
         if (_sdf->HasElement("topic_name"))
@@ -64,17 +60,16 @@ namespace triton_gazebo
 
         RCLCPP_INFO(node->get_logger(), "Subscriber node created.\n");
 
-        thruster.push_back(_model->GetLink("triton_auv::thruster1::thruster"));
-        thruster.push_back(_model->GetLink("triton_auv::thruster2::thruster"));
-        thruster.push_back(_model->GetLink("triton_auv::thruster3::thruster"));
-        thruster.push_back(_model->GetLink("triton_auv::thruster4::thruster"));
-        thruster.push_back(_model->GetLink("triton_auv::thruster5::thruster"));
-        thruster.push_back(_model->GetLink("triton_auv::thruster6::thruster"));
+        for(int i = 1; i <= this->thruster_count; i++)
+        {
+            std::string thruster_name = (std::string)"triton_auv::thruster" + std::to_string(i) + (std::string)"::thruster";
+            thruster.push_back(_model->GetLink(thruster_name));
+        }
 
-        // use the name in the sdf
-
-        for(int i=0; i < thruster_count;i++)
+        for(int i=0; i < thruster_count; i++)
+        {
             RCLCPP_INFO(node->get_logger(), thruster[i]->GetName());
+        }
     
         updateConnection_ = gazebo::event::Events::ConnectWorldUpdateBegin(
                                 std::bind(&ThrusterDriver::ApplyForce, this));
