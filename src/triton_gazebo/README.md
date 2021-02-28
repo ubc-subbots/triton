@@ -19,6 +19,13 @@ To run the underwater camera node, use the following
 
 Sets of parameters for the underwater camera node (water transmission, spectral sensitivity, etc.) are stored in `config/underwater_camera.yaml`. To change which parameters are used, `launch/underwater_camera_launch.py` can be modified
 
+### Generating Data with Bounding Box
+To run the data generation node, use the following
+
+        ros2 launch triton_gazebo gendata_launch.py
+
+This runs the Gazebo world `uc_gendata.world`, runs the underwater camera node with a random water type, and saves the output images along with label files containing the bounding box of the tracked model defined in `uc_gendata.world` under `bounding_box_controller/model_name`.
+
 ## Nodes
 
 - `underwater_camera`: A node which produces synthesized underwater images from a RGB/depth image pair
