@@ -31,10 +31,7 @@ namespace triton_gazebo
          */
         ~ThrusterDriver(void);
 
-        /**
-         * The load function for this plugin
-         * 
-         * Collects all neccessary parameters and initializes the ROS 2 node.
+        /** Collects all neccessary parameters and initializes the ROS 2 node.
          * 
          * @param _model A pointer to the attached mdoel
          * @param _sdf   A pointer to the robot's SDF description
