@@ -71,14 +71,7 @@ namespace triton_gazebo
 
         std::thread spinThread;
         std::string topic_name;
-
-        // void SpinNode(void);
-        // void GetForceCmd(const std_msgs::msg::Float64MultiArray::SharedPtr);
-        // void ApplyForce(void);
-    // public: 
-    //     ThrusterDriver(void);
-    //     ~ThrusterDriver(void);
-    //     virtual void Load(gazebo::physics::ModelPtr, sdf::ElementPtr);
+        
     };
 
     GZ_REGISTER_MODEL_PLUGIN(ThrusterDriver)
