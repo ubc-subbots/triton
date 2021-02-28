@@ -41,6 +41,7 @@ namespace triton_gazebo
         else
         {
             gzerr << "thruster_count value not specified, exiting.\n";
+            exit(1);
         }
 
         if (_sdf->HasElement("topic_name"))
@@ -60,13 +61,13 @@ namespace triton_gazebo
 
         RCLCPP_INFO(node->get_logger(), "Subscriber node created.\n");
 
-        for(int i = 1; i <= this->thruster_count; i++)
+        for(int i = 1; i <= thruster_count; i++)
         {
             std::string thruster_name = (std::string)"triton_auv::thruster" + std::to_string(i) + (std::string)"::thruster";
             thruster.push_back(_model->GetLink(thruster_name));
         }
 
-        for(int i=0; i < thruster_count; i++)
+        for(int i = 0; i < thruster_count; i++)
         {
             RCLCPP_INFO(node->get_logger(), thruster[i]->GetName());
         }
