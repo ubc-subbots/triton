@@ -1,5 +1,6 @@
 #include "triton_gazebo/thruster_driver_plugin.hpp"
 #include <string.h>
+
 namespace triton_gazebo
 {
 
@@ -9,10 +10,6 @@ namespace triton_gazebo
     // Destructor 
     ThrusterDriver::~ThrusterDriver() {}
 
-    /**
-     * This function will be called continuously and recieve a vector from the thrust allocation node,
-     * we need to read that value and pass the each force value to the correct thruster
-     */
     void ThrusterDriver::GetForceCmd(const std_msgs::msg::Float64MultiArray::SharedPtr joint_cmd)
     {
         int array_size = joint_cmd->data.size();
@@ -25,38 +22,31 @@ namespace triton_gazebo
         }
     }
 
-    /** 
-     * This function will update in sequence with gazebo's main world update function
-     */
     void ThrusterDriver::ApplyForce()
     {
         for (int i = 0; i < 6; i++)
         {
-            // thruster[i]->SetForce(ignition::math::Vector3d(0, 0, thrust_values[i]));
             thruster[i]->AddLinkForce(ignition::math::Vector3d(0, 0, thrust_values[i]), ignition::math::Vector3d(0, 0, 0));
-               
         }
     }
 
-    /** 
-     * Spin is a bloacking function, to allow the node to run with Gazebo we need to spin on a dedicated thread
-     */
     void ThrusterDriver::SpinNode()
     {
         rclcpp::spin(node);
     }
 
-    /**
-     * The load function for this plugin
-     * 
-     * Collects all neccessary parameters and initializes the ROS 2 node.
-     * 
-     * @param _sdf   A pointer to the robot's SDF description
-     * @param _model A pointer to the attached mdoel
-     * 
-     */
     void ThrusterDriver::Load(gazebo::physics::ModelPtr _model, sdf::ElementPtr _sdf)
     {
+
+        if (_sdf->HasElement("thruster_count"))
+        {
+           thruster_count = _sdf->Get<int>("thruster_count");
+        }
+        else
+        {
+            thruster_count = 0;
+        }
+
         if (_sdf->HasElement("topic_name"))
         {
             topic_name = _sdf->Get<std::string>("topic_name");
@@ -65,7 +55,8 @@ namespace triton_gazebo
         {
             topic_name = "triton_gazebo/thruster_vector";
         }
-        thrust_values = std::vector<double>(6, 0);
+
+        thrust_values = std::vector<double>(thruster_count, 0);
         force_cmd = node->create_subscription<std_msgs::msg::Float64MultiArray>(
                         topic_name, 
                         10, 
@@ -80,7 +71,9 @@ namespace triton_gazebo
         thruster.push_back(_model->GetLink("triton_auv::thruster5::thruster"));
         thruster.push_back(_model->GetLink("triton_auv::thruster6::thruster"));
 
-        for(int i=0;i<sizeof(thruster)/sizeof(thruster[0]);i++)
+        // use the name in the sdf
+
+        for(int i=0; i < thruster_count;i++)
             RCLCPP_INFO(node->get_logger(), thruster[i]->GetName());
     
         updateConnection_ = gazebo::event::Events::ConnectWorldUpdateBegin(

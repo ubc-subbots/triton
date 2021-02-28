@@ -187,6 +187,7 @@
 
     <!-- Thrust Vectors -->
     <plugin name="force_controller" filename="libthruster_driver_plugin.so">
+      <thruster_count>6</thruster_count>
     <!--
         <link_name>thruster1::thruster</link_name>
         <force_frame>link</force_frame>
