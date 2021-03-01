@@ -98,7 +98,7 @@
 
       <!-- Hydrodynamic model configuration data borrowed from Plankton.io rexrov model -->
       <neutrally_buoyant>0</neutrally_buoyant>
-      <volume>50</volume> <!-- Not Accurate! -->
+      <volume>50</volume>
       <box>
           <width>1.5</width>
           <length>2.6</length>
@@ -108,8 +108,6 @@
       <hydrodynamic_model>
           <type>fossen</type>
           <!-- Added mass: see p.28 in Berg2012 -->
-          <scalingAddedMass>0.001</scalingAddedMass>
-          <scalingDamping>0.001</scalingDamping>
           <added_mass>
                 779.79 -6.8773 -103.32  8.5426 -165.54 -7.8033
               -6.8773    1222   51.29  409.44 -5.8488  62.726

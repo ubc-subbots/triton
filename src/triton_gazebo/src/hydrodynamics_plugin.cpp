@@ -3,11 +3,15 @@
 namespace triton_gazebo
 {
 
+    /// @todo Create gazebo utility API to store these functions. 
+
     /**
-     * @brief Collects a parameter from an sdf description
+     * @brief Collects a parameter from an sdf description, 
+     * assigns a default value if not specified. 
      * 
-     * @param _sdf  A pointer to the model's SDF description
-     * @param param The name of the parameter being located
+     * @param status    Status indicating if the param was specified
+     * @param _sdf      A pointer to the model's SDF description
+     * @param param     The name of the parameter being located
      * 
      */
     template <typename parameter>
@@ -26,6 +30,16 @@ namespace triton_gazebo
     }
 
 
+    /**
+     * @brief Creates a 6x1 vector from a list of values in an SDF file. 
+     * 
+     * @todo defaul condition.
+     * 
+     * @param status    Status indicating if the param was specified
+     * @param _sdf      A pointer to the model's SDF description
+     * @param param     The name of the parameter being located
+     * 
+     */
     Eigen::Vector6d GetSdfVector(bool* status, sdf::ElementPtr _sdf, std::string param)
     {
         Eigen::Vector6d _vector;
@@ -52,6 +66,16 @@ namespace triton_gazebo
     }
 
 
+    /**
+     * @brief Creates a 6x6 matrix from a list of values in an SDF file. 
+     * 
+     * @todo defaul condition.
+     * 
+     * @param status    Status indicating if the param was specified
+     * @param _sdf      A pointer to the model's SDF description
+     * @param param     The name of the parameter being located
+     * 
+     */
     Eigen::Matrix6d GetSdfMatrix(bool* status, sdf::ElementPtr _sdf, std::string param)
     {
         Eigen::Matrix6d _matrix;
@@ -83,6 +107,7 @@ namespace triton_gazebo
     }
 
 
+    /// @todo Create math header for these. 
 
     inline Eigen::Matrix3d CrossProductOperator(Eigen::Vector3d _x)
     {
@@ -116,64 +141,16 @@ namespace triton_gazebo
                                    sdf::ElementPtr _sdf)
     {
         model = _model;
-        frame = model->GetLink("frame::frame");
+        frame = model->GetLink("cube::frame");
         this->mass = frame->GetInertial()->Mass();
 
         GetWorldParameters(_model->GetWorld()->SDF());
 
         GetLinkParameters(frame->GetSDF());
 
+        this->DLinForwardSpeed.setZero();
+
         this->Connect();
-    }
-
-
-    void HydrodynamicsPlugin::Connect()
-    {
-        updateConnection_ = gazebo::event::Events::ConnectWorldUpdateBegin(
-            std::bind(&HydrodynamicsPlugin::Update, this, std::placeholders::_1));
-    }
-
-
-    void HydrodynamicsPlugin::Update(const gazebo::common::UpdateInfo &_info)
-    {
-        Eigen::Vector6d velocity = this->GetVelocityVector();
-        Eigen::Vector6d acceleration = this->GetAccelerationVector(); // should we compute this??
-
-        Eigen::Vector6d velRel = this->ToNED(velocity); 
-
-        // Update added Coriolis matrix
-        this->ComputeAddedCoriolisMatrix(velRel, this->added_mass, this->coriolis_matrix);
-        gzerr << "Coriolis Matrix:\n" << this->coriolis_matrix << std::endl;
-
-        // Update damping matrix
-        this->ComputeDampingMatrix(velRel, this->damping_matrix);
-        gzerr << "Damping Matrix:\n" << this->damping_matrix << std::endl;
-
-        // We can now compute the additional forces/torques due to thisdynamic
-        // effects based on Eq. 8.136 on p.222 of Fossen: Handbook of Marine Craft ...
-
-        // Damping forces and torques
-        Eigen::Vector6d damping = -this->damping_matrix * velRel;
-        //gzerr << "Damping Force:\n" << damping << std::endl;
-
-        // Added-mass forces and torques
-        Eigen::Vector6d added = -this->GetAddedMass() * acceleration;//this->filteredAcc;
-        //gzerr << "Added Mass Force:\n" << added << std::endl;
-
-        // Added Coriolis term
-        Eigen::Vector6d cor = -this->coriolis_matrix * velRel;
-
-        // All additional (compared to standard rigid body) Fossen terms combined.
-        Eigen::Vector6d tau = damping + added + cor;
-
-        GZ_ASSERT(!std::isnan(tau.norm()), "Hydrodynamic forces vector is nan");
-
-        if (!std::isnan(tau.norm()))
-        {
-            this->SetWrenchVector(this->FromNED(tau));
-        }
-
-        //this->ApplyBuoyancyForce();
     }
 
     // Left as bool in case more parameters are added later
@@ -204,6 +181,7 @@ namespace triton_gazebo
         this->offsetNonLinDamping = GetSdfElement<double>(&status, hydro_model, "offsetNonLinDamping", 0.00);
 
         this->added_mass = GetSdfMatrix(&status, hydro_model, "added_mass");
+
         if (!status)
         {
             gzerr << "Added mass matrix not specified.\n";
@@ -211,30 +189,83 @@ namespace triton_gazebo
         }
 
         Eigen::Vector6d linear_damping_vec = GetSdfVector(&status, hydro_model, "linear_damping");
-        this->linear_damping = Eigen::Matrix6d::Identity(); 
+        this->linear_damping = Eigen::Matrix6d::Identity();
+
         if (!status)
         {
             gzerr << "Linear damping not specified.\n";
             exit(1);
         }
+
         for (int i = 0; i < MAX_DIMENSION; i++)
         {
             this->linear_damping(i, i) = linear_damping_vec(i);
         }
 
         this->quadratic_damping = GetSdfVector(&status, hydro_model, "quadratic_damping");
-        this->non_linear_damping = Eigen::Matrix6d::Identity(); 
+        this->non_linear_damping = Eigen::Matrix6d::Identity();
+
         if (!status)
         {
             gzerr << "Quadratic damping not specified.\n";
             exit(1);
         }
+
         for (int i = 0; i < MAX_DIMENSION; i++)
         {
             this->non_linear_damping(i, i) = quadratic_damping(i);
         }
 
         return status;
+    }
+
+
+    void HydrodynamicsPlugin::Connect()
+    {
+        updateConnection_ = gazebo::event::Events::ConnectWorldUpdateBegin(
+            std::bind(&HydrodynamicsPlugin::Update, this, std::placeholders::_1));
+    }
+
+
+    void HydrodynamicsPlugin::Update(const gazebo::common::UpdateInfo &_info)
+    {
+        Eigen::Vector6d velocity = this->GetVelocityVector();
+        Eigen::Vector6d acceleration = this->GetAccelerationVector(); // should we compute this??
+
+        //Eigen::Vector6d velRel = this->ToNED(velocity);
+        Eigen::Vector6d velRel = velocity;
+
+        // Update added Coriolis matrix
+        this->ComputeAddedCoriolisMatrix(velRel, this->added_mass, this->coriolis_matrix);
+
+        // Update damping matrix
+        this->ComputeDampingMatrix(velRel, this->damping_matrix);
+
+        Eigen::Matrix6d Ma = this->GetAddedMass();
+
+        // We can now compute the additional forces/torques due to thisdynamic
+        // effects based on Eq. 8.136 on p.222 of Fossen: Handbook of Marine Craft ...
+
+        // Damping forces and torques
+        Eigen::Vector6d damping = -this->damping_matrix * velRel;
+
+        // Added-mass forces and torques
+        Eigen::Vector6d added = -Ma * acceleration;//this->filteredAcc;
+
+        // Added Coriolis term
+        Eigen::Vector6d cor = -this->coriolis_matrix * velRel;
+
+        // All additional (compared to standard rigid body) Fossen terms combined.
+        Eigen::Vector6d tau = damping + added + cor;
+
+        GZ_ASSERT(!std::isnan(tau.norm()), "Hydrodynamic forces vector is nan");
+
+        if (!std::isnan(tau.norm()))
+        {
+            // this->SetWrenchVector(this->FromNED(tau));
+            this->SetWrenchVector(tau);
+        }
+        //this->ApplyBuoyancyForce();
     }
 
 
@@ -279,8 +310,9 @@ namespace triton_gazebo
         ignition::math::Vector3d force(wrench(0), wrench(1), wrench(2));
         ignition::math::Vector3d torque(wrench(3), wrench(4), wrench(5));
 
-        frame->AddForce(force);
-        frame->AddTorque(torque);
+
+        frame->AddRelativeForce(force);
+        frame->AddRelativeTorque(torque);
     }
 
 
@@ -311,8 +343,9 @@ namespace triton_gazebo
                     this->offsetLinForwardSpeedDamping * Eigen::Matrix6d::Identity());
 
         // Nonlinear damping matrix is considered as a diagonal matrix
-        for (int i = 0; i < 6; i++)
+        for (int i = 0; i < MAX_DIMENSION; i++)
         {
+            /// @todo _vel is causing this to grow exponentially 
             _D(i, i) += -1 * (this->non_linear_damping(i, i) + this->offsetNonLinDamping) * std::fabs(_vel[i]);
         }
         _D *= this->scalingDamping;
@@ -324,6 +357,12 @@ namespace triton_gazebo
         Eigen::Matrix6d M_d = this->added_mass + this->offsetAddedMass * Eigen::Matrix6d::Identity();
 
         return this->scalingAddedMass * M_d;
+    }
+
+    // Specific to cube object
+    double HydrodynamicsPlugin::ComputeScalerDrag(double cross_section_area)
+    {
+        return -0.5 * this->Cd * cross_section_area * this->fluid_density;
     }
 
 } // namespace triton_gazebo

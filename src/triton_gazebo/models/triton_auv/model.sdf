@@ -185,12 +185,10 @@
 
     -->
 
-    <!-- Thrust Vectors -->
     <plugin name="hydrodynamics" filename="libhydrodynamics_plugin.so">
     </plugin>
 
     <static>0</static>
     <allow_auto_disable>1</allow_auto_disable>
-
   </model>
 </sdf>

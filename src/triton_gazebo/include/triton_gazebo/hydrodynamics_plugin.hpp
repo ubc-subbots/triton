@@ -87,6 +87,7 @@ namespace triton_gazebo
         void ComputeAddedCoriolisMatrix(const Eigen::Vector6d& _vel, const Eigen::Matrix6d& _Ma, Eigen::Matrix6d &_Ca) const;
         void ComputeDampingMatrix(const Eigen::Vector6d& _vel, Eigen::Matrix6d &_D) const;
         Eigen::Matrix6d GetAddedMass() const;
+        double ComputeScalerDrag(double);
 
         Eigen::Vector6d ToNED(Eigen::Vector6d _vec);
         Eigen::Vector6d FromNED(Eigen::Vector6d _vec);
@@ -117,6 +118,12 @@ namespace triton_gazebo
         double offsetLinearDamping;
         double offsetLinForwardSpeedDamping;
         double offsetNonLinDamping;
+
+        double length;
+        double width;
+        double height;
+
+        double Cd;
     };
 
 } //namespace triton_gazebo

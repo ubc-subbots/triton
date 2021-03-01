@@ -10,10 +10,10 @@
     <include>
       <uri>model://ground_plane</uri>
     </include>
-
+    <gravity>0</gravity>
     <include>
       <uri>model://triton_auv</uri>
-      <pose>0 0 2 0 0 0</pose>
+      <pose>0 0 0 0 0 0</pose>
     </include>
     <grid>0</grid>
   </world>
