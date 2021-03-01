@@ -186,58 +186,12 @@
     -->
 
     <!-- Thrust Vectors -->
-    <plugin name="force_controller_t1" filename="libgazebo_ros_force.so">
-        <ros>
-            <namespace>/triton/gazebo_drivers</namespace>
-            <remapping>gazebo_ros_force:=force_t1</remapping>
-        </ros>
+    <plugin name="force_controller" filename="libthruster_driver_plugin.so">
+      <thruster_count>6</thruster_count>
+    <!--
         <link_name>thruster1::thruster</link_name>
         <force_frame>link</force_frame>
-    </plugin>
-
-    <plugin name="force_controller_t2" filename="libgazebo_ros_force.so">
-        <ros>
-            <namespace>/triton/gazebo_drivers</namespace>
-            <remapping>gazebo_ros_force:=force_t2</remapping>
-        </ros>
-        <link_name>thruster2::thruster</link_name>
-        <force_frame>link</force_frame>
-    </plugin>
-
-    <plugin name="force_controller_t3" filename="libgazebo_ros_force.so">
-        <ros>
-            <namespace>/triton/gazebo_drivers</namespace>
-            <remapping>gazebo_ros_force:=force_t3</remapping>
-        </ros>
-        <link_name>thruster3::thruster</link_name>
-        <force_frame>link</force_frame>
-    </plugin>
-
-    <plugin name="force_controller_t4" filename="libgazebo_ros_force.so">
-        <ros>
-            <namespace>/triton/gazebo_drivers</namespace>
-            <remapping>gazebo_ros_force:=force_t4</remapping>
-        </ros>
-        <link_name>thruster4::thruster</link_name>
-        <force_frame>link</force_frame>
-    </plugin>
-
-    <plugin name="force_controller_t5" filename="libgazebo_ros_force.so">
-        <ros>
-            <namespace>/triton/gazebo_drivers</namespace>
-            <remapping>gazebo_ros_force:=force_t5</remapping>
-        </ros>
-        <link_name>thruster5::thruster</link_name>
-        <force_frame>link</force_frame>
-    </plugin>
-
-    <plugin name="force_controller_t6" filename="libgazebo_ros_force.so">
-        <ros>
-            <namespace>/triton/gazebo_drivers</namespace>
-            <remapping>gazebo_ros_force:=force_t6</remapping>
-        </ros>
-        <link_name>thruster6::thruster</link_name>
-        <force_frame>link</force_frame>
+    -->
     </plugin>
 
     <static>0</static>

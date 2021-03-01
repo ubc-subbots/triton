@@ -40,6 +40,31 @@ include_directories(${GAZEBO_INCLUDE_DIRS})
 
 link_directories(${GAZEBO_LIBRARY_DIRS})
 
+link_directories(${gazebo_dev_LIBRARY_DIRS})
+
+add_library(thruster_driver_plugin SHARED
+  src/thruster_driver_plugin.cpp
+)
+target_include_directories(thruster_driver_plugin PUBLIC
+  include
+)
+ament_target_dependencies(thruster_driver_plugin
+  "gazebo_dev"
+  "gazebo_ros"
+)
+ament_export_libraries(thruster_driver_plugin)
+target_link_libraries(
+  thruster_driver_plugin 
+  ${GAZEBO_LIBRARIES}
+)
+
+install(TARGETS
+  thruster_driver_plugin
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+)
+
 add_executable(underwater_camera 
   src/underwater_camera.cpp
 )
