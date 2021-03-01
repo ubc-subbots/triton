@@ -24,12 +24,14 @@ find_package(triton_interfaces REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(OpenCV 4.2 REQUIRED)
+find_package(tf2 REQUIRED)
 
 include_directories(include ${catkin_INCLUDE_DIRS})
 
 add_executable(thrust_allocator 
   src/thrust_allocator.cpp
 )
+
 target_include_directories(thrust_allocator PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
@@ -50,9 +52,11 @@ install(TARGETS thrust_allocator
 
 add_library(triton_controls SHARED
   src/thrust_allocator.cpp
+  src/waypoint_marker.cpp
 )
 
 rclcpp_components_register_nodes(triton_controls "triton_controls::ThrustAllocator")
+rclcpp_components_register_nodes(triton_controls "triton_controls::WaypointMarker")
 
 target_compile_definitions(triton_controls
   PRIVATE "triton_controls_CPP_BUILDING_DLL"
@@ -66,6 +70,7 @@ ament_target_dependencies(triton_controls
   "geometry_msgs"
   "sensor_msgs"
   "OpenCV"
+  "tf2"
 )
 
 install(TARGETS
