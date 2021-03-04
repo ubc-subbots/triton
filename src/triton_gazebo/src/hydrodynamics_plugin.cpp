@@ -105,7 +105,7 @@ namespace triton_gazebo
 
         return _matrix;
     }
-
+ 
 
     /// @todo Create math header for these. 
 
@@ -232,8 +232,8 @@ namespace triton_gazebo
         Eigen::Vector6d velocity = this->GetVelocityVector();
         Eigen::Vector6d acceleration = this->GetAccelerationVector(); // should we compute this??
 
-        //Eigen::Vector6d velRel = this->ToNED(velocity);
-        Eigen::Vector6d velRel = velocity;
+        Eigen::Vector6d velRel = this->ToNED(velocity);
+        // Eigen::Vector6d velRel = velocity;
 
         // Update added Coriolis matrix
         this->ComputeAddedCoriolisMatrix(velRel, this->added_mass, this->coriolis_matrix);
@@ -262,8 +262,8 @@ namespace triton_gazebo
 
         if (!std::isnan(tau.norm()))
         {
-            // this->SetWrenchVector(this->FromNED(tau));
-            this->SetWrenchVector(tau);
+            this->SetWrenchVector(this->FromNED(tau));
+            // this->SetWrenchVector(tau);
         }
         //this->ApplyBuoyancyForce();
     }
