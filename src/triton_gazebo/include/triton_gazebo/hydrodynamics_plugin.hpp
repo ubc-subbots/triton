@@ -8,32 +8,30 @@
 #include <gazebo/physics/physics.hh>
 #include <gazebo/common/common.hh>
 
-#include <eigen3/Eigen/Core>
-#include <eigen3/Eigen/Geometry>
-
-#define MAX_DIMENSION 6
-
-/**
- * @brief Shorthand definitions for 6 dimensional matricies and vectors (double precision)
- */
-namespace Eigen
-{
-    typedef Matrix<double, 6, 6> Matrix6d;
-    typedef Matrix<double, 6, 1> Vector6d;
-} // namespace Eigen
+#include "include/gazebo_utils.hpp"
+#include "include/math_utils.hpp"
 
 namespace triton_gazebo 
 {
+
     class HydrodynamicsPlugin : public gazebo::ModelPlugin
     {
 
     public:
+        
         /// @brief Constructor
         HydrodynamicsPlugin ();
+
         /// @brief Destructor
         ~HydrodynamicsPlugin ();
 
     protected:
+
+        /** 
+         * @brief Load function called by Gazebo to initialize the plugin. 
+         * 
+         * 
+         */
         void Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf) override;
 
         /**
@@ -88,9 +86,7 @@ namespace triton_gazebo
         void ComputeDampingMatrix(const Eigen::Vector6d& _vel, Eigen::Matrix6d &_D) const;
         Eigen::Matrix6d GetAddedMass() const;
         double ComputeScalerDrag(double);
-
-        Eigen::Vector6d ToNED(Eigen::Vector6d _vec);
-        Eigen::Vector6d FromNED(Eigen::Vector6d _vec);
+        
 
         gazebo::physics::ModelPtr model;
         gazebo::event::ConnectionPtr updateConnection_;

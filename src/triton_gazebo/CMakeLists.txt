@@ -120,9 +120,13 @@ link_directories(${gazebo_dev_LIBRARY_DIRS})
 
 add_library(hydrodynamics_plugin SHARED
   src/hydrodynamics_plugin.cpp
+  gazebo_utils/src/gazebo_utils.cpp
+  math_utils/src/math_utils.cpp
 )
 target_include_directories(hydrodynamics_plugin PUBLIC
   include
+  gazebo_utils
+  math_utils
 )
 ament_target_dependencies(hydrodynamics_plugin
   "gazebo_dev"

@@ -3,134 +3,6 @@
 namespace triton_gazebo
 {
 
-    /// @todo Create gazebo utility API to store these functions. 
-
-    /**
-     * @brief Collects a parameter from an sdf description, 
-     * assigns a default value if not specified. 
-     * 
-     * @param status    Status indicating if the param was specified
-     * @param _sdf      A pointer to the model's SDF description
-     * @param param     The name of the parameter being located
-     * 
-     */
-    template <typename parameter>
-    parameter GetSdfElement(bool* status, sdf::ElementPtr _sdf, std::string param, const parameter def=(parameter)NULL)
-    {
-        parameter value = def;
-        *status = false;
-
-        if (_sdf->HasElement(param))
-        {
-            value = _sdf->Get<parameter>(param);
-            *status = true;
-        }
-
-        return value;
-    }
-
-
-    /**
-     * @brief Creates a 6x1 vector from a list of values in an SDF file. 
-     * 
-     * @todo defaul condition.
-     * 
-     * @param status    Status indicating if the param was specified
-     * @param _sdf      A pointer to the model's SDF description
-     * @param param     The name of the parameter being located
-     * 
-     */
-    Eigen::Vector6d GetSdfVector(bool* status, sdf::ElementPtr _sdf, std::string param)
-    {
-        Eigen::Vector6d _vector;
-        int idx = 0;
-        double val;
-
-        std::string sdf_data = GetSdfElement<std::string>(status, _sdf, param, "");
-
-        if (*status == false) { return _vector; }
-
-        std::istringstream iss(sdf_data);
-
-        while (iss >> val)
-        {
-            _vector(idx++, 1) = val;
-        }
-        if (idx != MAX_DIMENSION) 
-        {
-            gzerr << "Vector did not fully populate, continuing...\n";
-        }
-        *status = true;
-
-        return _vector;
-    }
-
-
-    /**
-     * @brief Creates a 6x6 matrix from a list of values in an SDF file. 
-     * 
-     * @todo defaul condition.
-     * 
-     * @param status    Status indicating if the param was specified
-     * @param _sdf      A pointer to the model's SDF description
-     * @param param     The name of the parameter being located
-     * 
-     */
-    Eigen::Matrix6d GetSdfMatrix(bool* status, sdf::ElementPtr _sdf, std::string param)
-    {
-        Eigen::Matrix6d _matrix;
-        int r_idx = 0, c_idx = 0;
-        double val;
-
-        std::string sdf_data = GetSdfElement<std::string>(status, _sdf, param, "");
-
-        if (*status == false) { return _matrix; }
-
-        std::istringstream iss(sdf_data);
-
-        while (iss >> val)
-        {
-            _matrix(r_idx, c_idx++) = val;
-            if (c_idx == MAX_DIMENSION)
-            {
-                c_idx = 0;
-                r_idx++;
-            }
-        }
-        if (r_idx != MAX_DIMENSION) 
-        {
-            gzerr << "Matrix did not fully populate, continuing...\n";
-        }
-        *status = true;
-
-        return _matrix;
-    }
- 
-
-    /// @todo Create math header for these. 
-
-    inline Eigen::Matrix3d CrossProductOperator(Eigen::Vector3d _x)
-    {
-        Eigen::Matrix3d output;
-        output << 0.0, -_x(2), _x(1), _x(2), 0.0, -_x(0), -_x(1), _x(0), 0.0;
-        return output;
-    }
-
-
-    Eigen::Vector6d HydrodynamicsPlugin::ToNED(Eigen::Vector6d _vec)
-    {
-        Eigen::Vector6d ned_vec;
-        ned_vec << _vec(0), -_vec(1), -_vec(2), _vec(3), -_vec(4), -_vec(5);
-        return ned_vec;
-    }
-
-
-    Eigen::Vector6d HydrodynamicsPlugin::FromNED(Eigen::Vector6d _vec)
-    {
-        return this->ToNED(_vec);
-    }
-
-
     HydrodynamicsPlugin::HydrodynamicsPlugin() {}
 
 
@@ -153,10 +25,10 @@ namespace triton_gazebo
         this->Connect();
     }
 
-    // Left as bool in case more parameters are added later
+    // Return a status flag if needed later on
     bool HydrodynamicsPlugin::GetWorldParameters(sdf::ElementPtr world_sdf)
     {
-        bool status = true; // Not checked as we have default values in place
+        bool status = true; // Not checked as we have default values in place for all params
     
         this->fluid_density = GetSdfElement<double>(&status, world_sdf, "fluid_density", 1028.00);
 
@@ -188,34 +60,24 @@ namespace triton_gazebo
             exit(1);
         }
 
+        // For now we will approximate linear damping as a diagnol matrix
         Eigen::Vector6d linear_damping_vec = GetSdfVector(&status, hydro_model, "linear_damping");
-        this->linear_damping = Eigen::Matrix6d::Identity();
-
         if (!status)
         {
             gzerr << "Linear damping not specified.\n";
             exit(1);
         }
+        this->linear_damping = ToDiagonalMatrix(linear_damping_vec);
 
-        for (int i = 0; i < MAX_DIMENSION; i++)
-        {
-            this->linear_damping(i, i) = linear_damping_vec(i);
-        }
-
+        // For now we will approximate non-linear damping as a diagnol matrix
         this->quadratic_damping = GetSdfVector(&status, hydro_model, "quadratic_damping");
-        this->non_linear_damping = Eigen::Matrix6d::Identity();
-
         if (!status)
         {
             gzerr << "Quadratic damping not specified.\n";
             exit(1);
         }
-
-        for (int i = 0; i < MAX_DIMENSION; i++)
-        {
-            this->non_linear_damping(i, i) = quadratic_damping(i);
-        }
-
+        this->non_linear_damping = ToDiagonalMatrix(quadratic_damping);
+    
         return status;
     }
 
@@ -232,8 +94,7 @@ namespace triton_gazebo
         Eigen::Vector6d velocity = this->GetVelocityVector();
         Eigen::Vector6d acceleration = this->GetAccelerationVector(); // should we compute this??
 
-        Eigen::Vector6d velRel = this->ToNED(velocity);
-        // Eigen::Vector6d velRel = velocity;
+        Eigen::Vector6d velRel = ToNED(velocity);
 
         // Update added Coriolis matrix
         this->ComputeAddedCoriolisMatrix(velRel, this->added_mass, this->coriolis_matrix);
@@ -262,8 +123,7 @@ namespace triton_gazebo
 
         if (!std::isnan(tau.norm()))
         {
-            this->SetWrenchVector(this->FromNED(tau));
-            // this->SetWrenchVector(tau);
+            this->SetWrenchVector(FromNED(tau));
         }
         //this->ApplyBuoyancyForce();
     }
