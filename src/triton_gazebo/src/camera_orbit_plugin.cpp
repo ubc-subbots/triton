@@ -30,8 +30,16 @@ namespace triton_gazebo
         // Get parameters
         if (_sdf->HasElement("period"))
             period_ = _sdf->Get<double>("period");
-        if (_sdf->HasElement("angle"))
-            angle_ = _sdf->Get<double>("angle");
+        if (_sdf->HasElement("orbit_angle_x"))
+            orbit_angle_x_ = _sdf->Get<double>("orbit_angle_x");
+        if (_sdf->HasElement("orbit_angle_y"))
+            orbit_angle_y_ = _sdf->Get<double>("orbit_angle_y");
+        if (_sdf->HasElement("camera_angle_x"))
+            camera_angle_x_ = _sdf->Get<double>("camera_angle_x");
+        if (_sdf->HasElement("camera_angle_y"))
+            camera_angle_y_ = _sdf->Get<double>("camera_angle_y");
+        if (_sdf->HasElement("camera_angle_z"))
+            camera_angle_z_ = _sdf->Get<double>("camera_angle_z");
 
         // Connect to the world update signal
         this->update_connection_ = event::Events::ConnectWorldUpdateBegin(
@@ -43,26 +51,38 @@ namespace triton_gazebo
     void CameraOrbitPlugin::Update(const common::UpdateInfo &_info)
     {
         // Calculate displacement vector from tracked object to camera
-        ignition::math::Vector3d r = camera_model_->WorldPose().Pos() - track_model_->WorldPose().Pos();
+        ignition::math::Vector3d d = camera_model_->WorldPose().Pos() - track_model_->WorldPose().Pos();
 
-        // Calculate speed required for stable orbit
-        double speed = r.Length()*ignition::math::Angle::TwoPi()/period_;
-
-        // Calculate up vector of orbit
-        ignition::math::Quaterniond orbit_rot;
-        orbit_rot.Axis(ignition::math::Vector3d::UnitY,angle_);
-        //ignition::math::Vector3d track_up = track_model_->WorldPose().Rot() * ignition::math::Vector3d::UnitZ;
-        ignition::math::Vector3d track_up = orbit_rot * ignition::math::Vector3d::UnitZ;
+        // Calculate up vector of orbit; we start with unit-z and rotate about the x-axis and y-axis to tilt the orbit axis
+        ignition::math::Quaterniond orbit_rot_x;
+        orbit_rot_x.Axis(ignition::math::Vector3d::UnitX,orbit_angle_x_);
+        ignition::math::Quaterniond orbit_rot_y;
+        orbit_rot_y.Axis(ignition::math::Vector3d::UnitY,orbit_angle_y_);
+        ignition::math::Quaterniond orbit_rot = orbit_rot_x*orbit_rot_y;
+        ignition::math::Vector3d orbit_up = orbit_rot * ignition::math::Vector3d::UnitZ;
 
         // Calculate direction of velocity (tangent to orbit circle)
-        ignition::math::Vector3d v_hat = track_up.Cross(r).Normalized();
+        ignition::math::Vector3d v_hat = orbit_up.Cross(d).Normalized();
+
+        // Calculate radial direction of orbit circle
+        ignition::math::Vector3d r_hat = v_hat.Cross(orbit_up).Normalized();
+
+        // Calculate speed required for stable orbit
+        double speed = r_hat.Dot(d)*ignition::math::Angle::TwoPi()/period_;
 
         // Calculate new velocity of camera, plus the tracked object's velocity
         ignition::math::Vector3d v = v_hat * speed + track_model_->WorldLinearVel();
 
-        // Calculate quaternion for camera looking at tracked object
+        // Calculate quaternion for camera; we start with -r_hat (looking toward orbit axis) and rotate about x,y,z axes (in camera coordinate frame)
+        ignition::math::Quaterniond camera_rot_x;
+        camera_rot_x.Axis(ignition::math::Vector3d::UnitX,camera_angle_x_);
+        ignition::math::Quaterniond camera_rot_y;
+        camera_rot_y.Axis(ignition::math::Vector3d::UnitY,camera_angle_y_);
+        ignition::math::Quaterniond camera_rot_z;
+        camera_rot_z.Axis(ignition::math::Vector3d::UnitZ,camera_angle_z_);
         ignition::math::Quaterniond camera_rot;
-        camera_rot.From2Axes(ignition::math::Vector3d::UnitX,-r.Normalized());
+        camera_rot.From2Axes(ignition::math::Vector3d::UnitX,-r_hat);
+        camera_rot = camera_rot*camera_rot_x*camera_rot_y*camera_rot_z;
 
         // Set new camera pose
         ignition::math::Pose3d camera_pose;

@@ -24,7 +24,11 @@ namespace triton_gazebo
 
     //double radius_;
     double period_ = 10;
-    double angle_ = 0;
+    double orbit_angle_x_ = 0;
+    double orbit_angle_y_ = 0;
+    double camera_angle_x_ = 0;
+    double camera_angle_y_ = 0;
+    double camera_angle_z_ = 0;
     gazebo::physics::ModelPtr track_model_;
     gazebo::physics::ModelPtr camera_model_;
     gazebo::physics::LinkPtr link_;
