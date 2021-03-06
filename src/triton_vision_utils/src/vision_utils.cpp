@@ -4,6 +4,7 @@
 #include <opencv2/opencv.hpp>
 #include <iostream>
 #include <string>
+#include <cmath> // for circle_position
 using namespace std;
 using namespace cv;
 using namespace vision_utils;
@@ -196,15 +197,6 @@ Mat ObjectDetector::util_segment(Mat src, int hue) {
     // Since the range of hue in OpenCV is 0 - 180
     if (low_H < 0) low_H += 180;
     if (high_H > 180) high_H -= 180;
-    /*
-    if (low_H > high_H) {
-        int h = low_H;
-        low_H - high_H;
-        high_H = h;
-    }
-    */
-
-    //cout << "low and high h: " << low_H << " " << high_H << endl;
 
     Mat segment;
     // Convert to HSV colorspace
@@ -228,9 +220,6 @@ Mat ObjectDetector::util_segment(Mat src, int hue) {
     // Since grad should be single-channel, grad_mean[0] and grad_std[0] should contain the values we need
     threshold(grad, grad_thres, (double)(grad_mean[0])+3*grad_std[0], 255, THRESH_BINARY);
 
-    // Combine the two binary image, note that the gradient threshold has the best response from farther away
-    // and the color mask works best at close distances, so by combining them, we have an image that produces
-    // a great response to the poles at all distances to them
     Mat segmented;
     bitwise_or(grad_thres, segment, segmented);
     return segmented;
@@ -239,13 +228,9 @@ Mat ObjectDetector::util_segment(Mat src, int hue) {
 vector<Vec3f> ObjectDetector::find_circles(Mat src, double minDist, int method, double dp, double cannyThreshold, double accumulatorThreshold, int minRadius, int maxRadius)
 {
     vector<Vec3f> circles;
-    /*
-    Mat close_k = getStructuringElement(MORPH_RECT, Size(10,10));
-    morphologyEx(src, src, MORPH_CLOSE, close_k);
-    //dilate(src, src, close_k);
-    */
+
     GaussianBlur(src, src, Size(9,9), 2, 2);
-    //medianBlur(src_gray, src_gray, 5);
+
     double mD;
     if (minDist == 0)
     {
@@ -258,19 +243,19 @@ vector<Vec3f> ObjectDetector::find_circles(Mat src, double minDist, int method, 
     return circles;
 }
 
-vector<Vec3f> ObjectDetector::auto_find_circles(Mat src, int expected)
+vector<Vec3f> ObjectDetector::auto_find_circles(Mat src, int expected, int hue)
 {
     ObjectDetector objdtr = ObjectDetector();
     double minDist = (double)src.rows/10;
     double minCircleArea = minDist * minDist / 4 * 3.14159 * 0.9;
     Mat pre = objdtr.preprocess(src);
     Mat enh = objdtr.enhance(pre, 0, 0, 0, 1);
-    Mat seg = objdtr.util_segment(enh, 10);
+    Mat seg = objdtr.util_segment(enh, hue);
     Mat mor = objdtr.filter_small_contours(seg, minCircleArea);
     // works best when openkernel is smaller and closekernel is really big
     mor = objdtr.morphological(mor, Size(3,3), Size(25,25));
     int accum_thres = 30;
-    vector<Vec3f> circles = objdtr.find_circles(mor, (int)mor.rows/10, 3, 1, 100, accum_thres, 0, 0); // even better for both
+    vector<Vec3f> circles = objdtr.find_circles(mor, (int)mor.rows/10, 3, 1, 100, accum_thres, 0, 0);
     while (circles.size() < expected && accum_thres >= 0) {
         circles = objdtr.find_circles(mor, (int)mor.rows/10, 3, 1, 100, accum_thres, 0, 0);
         accum_thres--;
@@ -287,4 +272,50 @@ double ObjectDetector::eccentricity(vector<Point> contour) {
         eccen = sqrt(1 - pow(minorAxis,2) / pow(majorAxis, 2));
     }
     return eccen;
+}
+
+vector<float> ObjectDetector::circle_position(Mat src, float radius, int hue) {
+
+    ObjectDetector objdtr = ObjectDetector();
+    vector<Vec3f> circles = objdtr.auto_find_circles(src, 1, hue);
+    vector<float> position;
+
+    // If no circles are found
+    if (circles.size() < 1) 
+        return position;
+
+    // Calculate the distane based on perceived size, real size, focal length, (and tilted angles?)
+    // Assume that the first circle found is the circle needed, if more than one is found
+    int circle_x = circles[0][0]; // Coordinates of the circle
+    int circle_y = circles[0][1];
+    int radius_pixel = circles[0][2]; // Radius of the circle in pixels
+
+    // Distance = Real Radius * Focal length in pixels / Radius on image in pixels
+    float distance = radius * this->focal / radius_pixel;
+
+    // Calculate the angles based on given x,y coordinates from auto_find_circles
+
+    // Obtain the coordinates of the circle in the image if the origin is at the center of the image.
+    int center_x = src.cols / 2;
+    int center_y = src.rows / 2;
+    int circle_x_from_center = circle_x - center_x;
+    int circle_y_from_center = circle_y - center_y;
+    // Calculate the horizontal and vertical distances from the x-axis (of the 3D spherical coordiante system) 
+    // in the same unit as circle radius
+    float circle_x_distance = circle_x_from_center * radius / radius_pixel;
+    float circle_y_distance = circle_y_from_center * radius / radius_pixel;
+    // Calcaulate phi
+    float phi = atan(circle_x_distance/circle_y_distance);
+    // Calculate theta
+    float opp_side = sqrt(circle_y_distance*circle_y_distance + circle_x_distance*circle_x_distance);
+    float theta = atan(opp_side / circle_y_distance);
+
+    position.push_back(distance);
+    position.push_back(theta);
+    position.push_back(phi);
+    position.push_back(circle_x);
+    position.push_back(circle_y);
+    position.push_back(radius_pixel);
+
+    return position;
 }

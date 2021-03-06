@@ -100,23 +100,44 @@ namespace vision_utils
 		 * 			    	 the accumulator has the same resolution as the input image.
 		 * @param minDist: 	 Minimum distance between centers of the detected circles. If = 0, minDist = src.rows/10
 		 * @param cannyThreshold: 	 First method-spicific parameter. In case of HOUGH_GRADIENT, it is the first 
-		 * 				  	 		 threshold for the hysteresis procedure used in the Canny algorithm
+		 * 				  	 		 threshold for the hysteresis procedure used in the Canny algorithm. Default is 100
 		 * @param accumulatorThreshold: 	 Second method-spicific parameter. In case of HOUGH_GRADIENT, it is the second 
-		 * 				  	 				 threshold for the hysteresis procedure used in the Canny algorithm
+		 * 				  	 				 threshold for the hysteresis procedure used in the Canny algorithm. Default is 33
 		 * @param minRadius: Minimum circle radius
 		 * @param maxRadius: Maximum circle radius. If <= 0, uses the maximum image dimension. If <0, 
 		 * 					 returns center without finding radius.
 		 * @return: 	 	 A vector of circles in the form of (x, y, radius), it would be modified
 		 */
 		vector<Vec3f> find_circles(Mat src, double minDist=0, int method = HOUGH_GRADIENT, double dp = 1, double cannyThreshold = 100, double accumulatorThreshold = 33, int minRadius = 0, int maxRadius = 0);
-		vector<Vec3f> auto_find_circles(Mat src, int expected);
+		/**
+		 * Finds circles but with default paramenters and an option to specify how many circles are expected to be found.
+		 * Also performs preprocesses and filtering to a copy of the source image before finding circles.
+		 * @param expected: The number of circles expected to be found
+		 * @param hue: The hue of circles in interest, default is 10
+		 */
+		vector<Vec3f> auto_find_circles(Mat src, int expected, int hue = 10);
 
 		/**
 		 * Calculate the eccentricity of an ellipse.
 		 * @param contour: contour of source ellipse
-		 * @return: 	   eccentricity between 0 and 1
+		 * @return: 	   eccentricity between 0 and 1.
+		 * 				   0: circle; 1: straight line
 		 */
 		double eccentricity(vector<Point> contour);
+
+		/**
+		 * Caculate the position and distance of a circle given its hue and diameter.
+		 * They are given in terms of spherical coordinates (r, theta, phi), with the camera as origin.
+		 * Positive x is the forwards direction, positive z is the upwards direction.
+		 * It also gives the position and radius of circle on the image, for better visualization and testing.
+		 * Uses auto_find_circles
+		 * @param src: The source image
+		 * @param hue: Hue of circle
+		 * @param radiuses: Radius of circle
+		 * @return: A vector with six elements representing (r, theta, phi, x, y, r_pixel) in this order.
+		 * 			Returns an empty vector if no circles are found in the image.
+		 */
+		vector<float> circle_position(Mat src, float radius, int hue=10);
 	};
 
 } // namespace vision_utils
