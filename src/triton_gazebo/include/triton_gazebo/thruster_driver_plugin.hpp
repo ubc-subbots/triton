@@ -1,7 +1,7 @@
 #ifndef TRITON_GAZEBO__THRUSTER_DRIVER_PLUGIN
 #define TRITON_GAZEBO__THRUSTER_DRIVER_PLUGIN
 
-#include <vector> 
+#include <vector>
 
 #include <gazebo/gazebo.hh>
 #include <gazebo/physics/physics.hh>
@@ -11,6 +11,7 @@
 
 namespace triton_gazebo
 {
+
     using std::placeholders::_1;
 
     class ThrusterDriver : public gazebo::ModelPlugin
@@ -18,17 +19,10 @@ namespace triton_gazebo
 
     public:
 
-        /** Constructor
-         * 
-         * Create subscriber to gazebo and publishers to publish
-         * thruster force values to gazebo
-         * 
-         */
+        // Constructor
         ThrusterDriver(void);
 
-        /** Destructor
-         * 
-         */
+        // Destructor
         ~ThrusterDriver(void);
 
         /** Collects all neccessary parameters and initializes the ROS 2 node.
@@ -39,6 +33,13 @@ namespace triton_gazebo
         virtual void Load(gazebo::physics::ModelPtr _model, sdf::ElementPtr _sdf);
 
     private:
+
+        /** Get information about topic publishing thrust values
+         * 
+         * @param ros_sdf SDF pointer to ros namespace params
+         * 
+         */
+        void GetRosNamespace(sdf::ElementPtr ros_sdf);
 
         /** Receives the force values as a vector from the thrust allocation node
          * 
@@ -55,22 +56,22 @@ namespace triton_gazebo
          */
         void ApplyForce(void);
 
-        /** Allows the node to run with Gazebo 
-         * 
-         * Blocking function that spins on a dedicated thread. 
+        /** Spins ROS2 node on a dedicated thread to remain non-blocking
          * 
          */
         void SpinNode(void);
 
-        int thruster_count;
         rclcpp::Node::SharedPtr node;
         rclcpp::Subscription<std_msgs::msg::Float64MultiArray>::SharedPtr force_cmd;
-        std::vector<gazebo::physics::LinkPtr> thruster;
-        std::vector<double> thrust_values;
         gazebo::event::ConnectionPtr updateConnection_;
 
+        std::vector<gazebo::physics::LinkPtr> thruster;
+        std::vector<double> thrust_values;
         std::thread spinThread;
         std::string topic_name;
+
+        // Number of thrusters attached to model, by convention they must be named thruster<num>
+        unsigned int thruster_count;
         
     };
 
