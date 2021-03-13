@@ -70,7 +70,7 @@ namespace triton_gazebo
         std::thread spinThread;
         std::string topic_name;
 
-        // Number of thrusters attached to model, by convention they must be named thruster<num>
+        // Number of thrusters attached to model, by convention they must be named thruster<num> in SDF description 
         unsigned int thruster_count;
         
     };
