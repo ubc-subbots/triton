@@ -28,11 +28,10 @@
             <static>false</static>
             <plugin name="track_orbit" filename="libcamera_orbit_plugin.so">
                 <period>20</period>
-                <orbit_angle_x>0</orbit_angle_x>
-                <orbit_angle_y>0</orbit_angle_y>
-                <camera_angle_x>0</camera_angle_x>
-                <camera_angle_y>0</camera_angle_y>
-                <camera_angle_z>0</camera_angle_z>
+                <radius_range>2 5</radius_range>
+                <height_range>-2 2</height_range>
+                <orbit_angle_range>-0.3 0.3</orbit_angle_range>
+                <camera_angle_range>-0.3 0.3</camera_angle_range>
                 <track_model>cube1</track_model>
             </plugin>
             <link name="camera_link">

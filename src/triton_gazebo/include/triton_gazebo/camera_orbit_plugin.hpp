@@ -33,6 +33,12 @@ namespace triton_gazebo
     gazebo::physics::ModelPtr camera_model_;
     gazebo::physics::LinkPtr link_;
     gazebo::event::ConnectionPtr update_connection_;
+    gazebo::common::Time prev_update_;
+
+    ignition::math::Vector2d radius_range_;
+    ignition::math::Vector2d height_range_;
+    ignition::math::Vector2d orbit_angle_range_;
+    ignition::math::Vector2d camera_angle_range_;
   };
 }
 #endif

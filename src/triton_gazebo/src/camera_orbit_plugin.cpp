@@ -3,6 +3,7 @@
 #include <gazebo/physics/Model.hh>
 #include <gazebo/physics/World.hh>
 #include "triton_gazebo/camera_orbit_plugin.hpp"
+#include <random>
 
 using namespace gazebo;
 
@@ -30,23 +31,52 @@ namespace triton_gazebo
         // Get parameters
         if (_sdf->HasElement("period"))
             period_ = _sdf->Get<double>("period");
-        if (_sdf->HasElement("orbit_angle_x"))
-            orbit_angle_x_ = _sdf->Get<double>("orbit_angle_x");
-        if (_sdf->HasElement("orbit_angle_y"))
-            orbit_angle_y_ = _sdf->Get<double>("orbit_angle_y");
-        if (_sdf->HasElement("camera_angle_x"))
-            camera_angle_x_ = _sdf->Get<double>("camera_angle_x");
-        if (_sdf->HasElement("camera_angle_y"))
-            camera_angle_y_ = _sdf->Get<double>("camera_angle_y");
-        if (_sdf->HasElement("camera_angle_z"))
-            camera_angle_z_ = _sdf->Get<double>("camera_angle_z");
+
+        // Get ranges for random parameters; Resets after each period
+        if (_sdf->HasElement("radius_range"))
+            radius_range_ = _sdf->Get<ignition::math::Vector2d>("radius_range");
+        else
+            radius_range_ = {2,5};
+        if (_sdf->HasElement("height_range"))
+            height_range_ = _sdf->Get<ignition::math::Vector2d>("height_range");
+        else
+            height_range_ = {-2,2};
+        if (_sdf->HasElement("orbit_angle_range"))
+            orbit_angle_range_ = _sdf->Get<ignition::math::Vector2d>("orbit_angle_range");
+        else
+            orbit_angle_range_ = {-0.3,0.3};
+        if (_sdf->HasElement("camera_angle_range"))
+            camera_angle_range_ = _sdf->Get<ignition::math::Vector2d>("camera_angle_range");
+        else
+            camera_angle_range_ = {-0.3,0.3};
 
         // Connect to the world update signal
         this->update_connection_ = event::Events::ConnectWorldUpdateBegin(
             std::bind(&CameraOrbitPlugin::Update, this, std::placeholders::_1));
     }
 
-    void CameraOrbitPlugin::Reset(){}
+    void CameraOrbitPlugin::Reset()
+    {
+        // Random number generator
+        std::uniform_real_distribution<double> unif(0,1);
+        std::default_random_engine re;
+
+        // Set random height and radius offset from tracked model's position
+        double radius  = unif(re) * (radius_range_.Y()-radius_range_.X()) + radius_range_.X();
+        double height  = unif(re) * (height_range_.Y()-height_range_.X()) + height_range_.X();
+        ignition::math::Vector3d initial_pos = track_model_->WorldPose().Pos();
+        initial_pos.Set(initial_pos.X()+radius, initial_pos.Y(), initial_pos.Z()+height);
+        ignition::math::Pose3d initial_pose = camera_model_->WorldPose();
+        initial_pose.Set(initial_pos,initial_pose.Rot());
+        camera_model_->SetWorldPose(initial_pose);
+
+        // Randomize orbit angle and camera angle
+        orbit_angle_x_  = unif(re) * (orbit_angle_range_.Y()-orbit_angle_range_.X()) + orbit_angle_range_.X();
+        orbit_angle_y_  = unif(re) * (orbit_angle_range_.Y()-orbit_angle_range_.X()) + orbit_angle_range_.X();
+        camera_angle_x_ = unif(re) * (camera_angle_range_.Y()-camera_angle_range_.X()) + camera_angle_range_.X();
+        camera_angle_y_ = unif(re) * (camera_angle_range_.Y()-camera_angle_range_.X()) + camera_angle_range_.X();
+        camera_angle_z_ = unif(re) * (camera_angle_range_.Y()-camera_angle_range_.X()) + camera_angle_range_.X();
+    }
 
     void CameraOrbitPlugin::Update(const common::UpdateInfo &_info)
     {
@@ -92,11 +122,12 @@ namespace triton_gazebo
         // Apply velocity to camera
         camera_model_->SetLinearVel(v);
 
-        // // Change direction when enough time has elapsed
-        // if (_info.simTime - this->dataPtr->prevUpdate > this->dataPtr->updatePeriod)
-        // {
-        //     this->dataPtr->prevUpdate = _info.simTime;
-        // }
+        // Reinitialize camera and orbit with new parameters when enough time has elapsed
+        if (_info.simTime - prev_update_ > period_)
+        {
+            prev_update_ = _info.simTime;
+            Reset();
+        }
     }
 }
 
