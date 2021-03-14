@@ -8,7 +8,7 @@
         - triton_example
         - triton_example
       param_files:
-        - params_one.yaml
+        - ''
         - params_two.yaml
       namespace: /triton
       remap_rules:

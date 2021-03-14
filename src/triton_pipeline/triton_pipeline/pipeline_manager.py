@@ -92,7 +92,7 @@ class PipelineManager(Node):
             'configure_pipeline',
             self.configure_pipeline
         )
-        self.get_logger().info('Pipeline manager successfully started!')            
+        self.get_logger().info('Pipeline manager successfully started!')  
 
     def feedback_callback(self, msg):
         """
@@ -129,7 +129,7 @@ class PipelineManager(Node):
             config_file_name = pipeline_type if not request.config_file_name else request.config_file_name
             config_file = '{}.yaml'.format(config_file_name)
             self.get_logger().info('Using the configuration file "{}"'.format(config_file))
-            config_path = os.path.join(manager_dir, config_file)
+            config_path = os.path.join(manager_dir, 'config',config_file)
             config_yaml = None
             if os.path.isfile(config_path):
                 with open(config_path, 'r') as stream:
