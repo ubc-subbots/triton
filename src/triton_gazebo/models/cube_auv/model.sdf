@@ -149,6 +149,76 @@
             <link_name>thruster_6::thruster</link_name>
             <force_frame>link</force_frame>
         </plugin>
+
+        <link name="sensors">
+            <gravity>0</gravity>
+            <visual name='front_camera_visual'>
+                <geometry>
+                  <box>
+                    <size>0.1 0.1 0.1</size>
+                  </box>
+                </geometry>
+            </visual>
+            <sensor type="camera" name="front_camera">
+                <pose>0.5 0 0 0 0 0</pose>
+                <update_rate>60</update_rate>
+                <visualize>true</visualize>
+                <camera name="head">
+                  <horizontal_fov>1.3962634</horizontal_fov>
+                  <image>
+                    <width>640</width>
+                    <height>480</height>
+                    <format>R8G8B8</format>
+                  </image>
+                  <clip>
+                    <near>0.02</near>
+                    <far>300</far>
+                  </clip>
+                  <noise>
+                    <type>gaussian</type>
+                    <mean>0.0</mean>
+                    <stddev>0.007</stddev>
+                  </noise>
+                </camera>
+                <plugin name="gazebo_camera_controller" filename="libgazebo_ros_camera.so">
+                  <ros>
+                    <namespace>/triton/drivers</namespace>
+                  </ros>
+                </plugin>
+              </sensor>
+              <sensor type="camera" name="down_camera">
+                <pose>0 0 -0.5 0 1.57 0</pose>
+                <update_rate>60</update_rate>
+                <visualize>true</visualize>
+                <camera name="head">
+                  <horizontal_fov>1.3962634</horizontal_fov>
+                  <image>
+                    <width>640</width>
+                    <height>480</height>
+                    <format>R8G8B8</format>
+                  </image>
+                  <clip>
+                    <near>0.02</near>
+                    <far>300</far>
+                  </clip>
+                  <noise>
+                    <type>gaussian</type>
+                    <mean>0.0</mean>
+                    <stddev>0.007</stddev>
+                  </noise>
+                </camera>
+                <plugin name="gazebo_camera_controller" filename="libgazebo_ros_camera.so">
+                  <ros>
+                    <namespace>/triton/drivers</namespace>
+                  </ros>
+                </plugin>
+              </sensor>
+        </link>
+
+        <joint name="sensor_joint" type="fixed">
+            <parent>frame</parent>
+            <child>sensors</child>
+        </joint>
         
     </model>
 </sdf>

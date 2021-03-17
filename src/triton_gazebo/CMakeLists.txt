@@ -151,7 +151,8 @@ ament_python_install_package(${PROJECT_NAME})
 
 # Install Python executables
 install(PROGRAMS
-  bounding_box_image_saver.py
+  triton_gazebo/bounding_box_image_saver.py
+  triton_gazebo/auv_transform_publisher.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
