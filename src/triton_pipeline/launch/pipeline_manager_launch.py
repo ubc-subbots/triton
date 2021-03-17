@@ -1,7 +1,5 @@
 import os
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument
-from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import ComposableNodeContainer
 from launch_ros.actions import Node
 
@@ -11,30 +9,12 @@ def generate_launch_description():
 
     ld = LaunchDescription()
 
-    config_arg = DeclareLaunchArgument(
-            'sequence',
-            default_value='example_sequence.yaml',
-            description='Sequence config file'
-    )
-
-    config = [get_package_share_directory('triton_pipeline'),'/', LaunchConfiguration('sequence')]
-
-
     pipeline_manager = Node(
         name='pipeline_manager',
         namespace='/triton',
         package='triton_pipeline',
         executable='pipeline_manager',
         output='screen'
-    )
-
-    pipeline_sequence_manager = Node(
-        name='pipeline_sequence_manager',
-        namespace='/triton',
-        package='triton_pipeline',
-        executable='pipeline_sequence_manager',
-        output='screen',
-        parameters=[config]
     )
 
     pipeline_container = ComposableNodeContainer(
@@ -45,7 +25,6 @@ def generate_launch_description():
     )
 
     ld.add_action(pipeline_manager)
-    ld.add_action(pipeline_sequence_manager)
     ld.add_action(pipeline_container)
 
     return ld

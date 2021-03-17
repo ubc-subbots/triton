@@ -8,6 +8,8 @@ namespace triton_example
 ComponentTwo::ComponentTwo(const rclcpp::NodeOptions & options)
 : Node("component_two", options) 
 {
+    this->declare_parameter<int>("example_param", 0);
+    
     feedback_pub_ = this->create_publisher<triton_interfaces::msg::PipelineFeedback>(
         "/triton/pipeline_feedback", 10
     );
