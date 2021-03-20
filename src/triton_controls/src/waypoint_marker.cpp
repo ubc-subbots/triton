@@ -57,20 +57,20 @@ namespace triton_controls
     this->get_parameter("threshold.type", threshold_type_);
 
     if (threshold_type_ == "passby") {
-        this->declare_parameter("threshold.distance", threshold_value0_);
-        this->get_parameter("threshold.distance", threshold_value0_);
+        this->declare_parameter("threshold.distance", threshold_value_0_);
+        this->get_parameter("threshold.distance", threshold_value_0_);
     } else if (threshold_type_ == "orient") {
-        this->declare_parameter("threshold.distance", threshold_value0_);
-        this->declare_parameter("threshold.ang_diff", threshold_value1_);
-        this->get_parameter("threshold.distance", threshold_value0_);
-        this->get_parameter("threshold.ang_diff", threshold_value1_);
+        this->declare_parameter("threshold.distance", threshold_value_0_);
+        this->declare_parameter("threshold.ang_diff", threshold_value_1_);
+        this->get_parameter("threshold.distance", threshold_value_0_);
+        this->get_parameter("threshold.ang_diff", threshold_value_1_);
     } else if (threshold_type_ == "stabilize") {
-        this->declare_parameter("threshold.distance", threshold_value0_);
-        this->declare_parameter("threshold.ang_diff", threshold_value1_);
-        this->declare_parameter("threshold.consecutive", threshold_value2_);
-        this->get_parameter("threshold.distance", threshold_value0_);
-        this->get_parameter("threshold.ang_diff", threshold_value1_);
-        this->get_parameter("threshold.consecutive", threshold_value2_);
+        this->declare_parameter("threshold.distance", threshold_value_0_);
+        this->declare_parameter("threshold.ang_diff", threshold_value_1_);
+        this->declare_parameter("threshold.consecutive", threshold_value_2_);
+        this->get_parameter("threshold.distance", threshold_value_0_);
+        this->get_parameter("threshold.ang_diff", threshold_value_1_);
+        this->get_parameter("threshold.consecutive", threshold_value_2_);
     }
 
     feedback_pub_ = this->create_publisher<triton_interfaces::msg::PipelineFeedback>(
@@ -124,7 +124,7 @@ namespace triton_controls
             double distance = std::pow(msg->position.x - reply_msg.position.x, 2) + std::pow(msg->position.y - reply_msg.position.y, 2) + std::pow(msg->position.z - reply_msg.position.z, 2);
             distance = std::sqrt(distance);
 
-            if (distance < threshold_value0_) {
+            if (distance < threshold_value_0_) {
                 trigger_thresh = true;
                 waypoint_values_.pop_back();
             }
@@ -137,9 +137,9 @@ namespace triton_controls
             distance = std::sqrt(distance);
 
             //Angular difference by comparing the quaternions
-            double angle_diff = quat.angle(tf2::Quaternion(msg->orientation.x, msg->orientation.y, msg->orientation.z, msg->orientation.w));
+            double angle_diff = 2 * quat.angle(tf2::Quaternion(msg->orientation.x, msg->orientation.y, msg->orientation.z, msg->orientation.w));
 
-            if (distance < threshold_value0_ && angle_diff < threshold_value1_) {
+            if (distance < threshold_value_0_ && angle_diff < threshold_value_1_) {
                 trigger_thresh = true;
                 waypoint_values_.pop_back();
             }
@@ -154,12 +154,12 @@ namespace triton_controls
             //Angular difference by comparing the quaternions
             double angle_diff = quat.angle(tf2::Quaternion(msg->orientation.x, msg->orientation.y, msg->orientation.z, msg->orientation.w));
 
-            if (distance < threshold_value0_ && angle_diff < threshold_value1_)
+            if (distance < threshold_value_0_ && angle_diff < threshold_value_1_)
                 threshold_counter_++;
             else
                 threshold_counter_ = 0;
 
-            if (threshold_counter_ >= threshold_value2_) {
+            if (threshold_counter_ >= threshold_value_2_) {
                 threshold_counter_ = 0;
                 trigger_thresh = true;
                 waypoint_values_.pop_back();

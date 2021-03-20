@@ -47,9 +47,9 @@ namespace triton_controls
         std::vector<std::vector<double>> waypoint_values_;
         //geometry_msgs::msg::Pose pose_offset_;
         std::string threshold_type_;
-        int threshold_value0_;
-        int threshold_value1_;
-        int threshold_value2_;
+        double threshold_value_0_;
+        double threshold_value_1_;
+        int threshold_value_2_;
 
         int threshold_counter_;
 
