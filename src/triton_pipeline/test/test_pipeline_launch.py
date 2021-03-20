@@ -15,7 +15,7 @@ def generate_test_description():
     ld = LaunchDescription()
 
     pkg_name = 'triton_pipeline'
-    launch_file_name = 'pipeline_launch.py'
+    launch_file_name = 'pipeline_manager_launch.py'
 
     launch_file = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
