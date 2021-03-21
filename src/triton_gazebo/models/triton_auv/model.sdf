@@ -187,12 +187,12 @@
     <plugin name="hydrodynamics" filename="libhydrodynamics_plugin.so">
     </plugin>
     <!-- Thrust Vectors -->
-    <plugin name="force_controller" filename="libthruster_driver_plugin.so">
-      <thruster_count>6</thruster_count>
-    <!--
-        <link_name>thruster1::thruster</link_name>
-        <force_frame>link</force_frame>
-    -->
+    <plugin name="thruster_array" filename="libthruster_driver_plugin.so">
+        <thruster_count>6</thruster_count>
+        <ros>
+            <namespace>/triton/controls</namespace>
+            <remapping>output_forces</remapping>
+        </ros>
     </plugin>
 
     <static>0</static>

@@ -58,125 +58,77 @@
 
         <include>
             <uri>model://cube_thruster</uri>
-            <pose>-0.5 -0.5 0 0 0 2.35619</pose>
-            <name>thruster_1</name>
+            <pose>-0.5 -0.5 0 0 1.5707 2.35619</pose>
+            <name>thruster1</name>
         </include>
 
         <include>
             <uri>model://cube_thruster</uri>
-            <pose>-0.5 0.5 0 0 0 3.92699</pose>
-            <name>thruster_2</name>
+            <pose>-0.5 0.5 0 0 -1.5707 0.785398</pose>
+            <name>thruster2</name>
         </include>
 
         <include>
             <uri>model://cube_thruster</uri>
-            <pose>0.5 0.5 0 0 0 -0.785398</pose>
-            <name>thruster_3</name>
+            <pose>0.5 0.5 0 0 1.5707 -0.785398</pose>
+            <name>thruster3</name>
         </include>
 
         <include>
             <uri>model://cube_thruster</uri>
-            <pose>0.5 -0.5 0 0 0 0.785398</pose>
-            <name>thruster_4</name>
+            <pose>0.5 -0.5 0 0 -1.5707 -2.35619</pose>
+            <name>thruster4</name>
         </include>
 
         <include>
             <uri>model://cube_thruster</uri>
-            <pose>0 -0.5 0 0 1.570796 0</pose>
-            <name>thruster_5</name>
+            <pose>0 -0.5 0 3.1415 3.1415 0</pose>
+            <name>thruster5</name>
         </include>
 
         <include>
             <uri>model://cube_thruster</uri>
-            <pose>0 0.5 0 0 1.570796 0</pose>
-            <name>thruster_6</name>
+            <pose>0 0.5 0 3.1415 3.1415 3.1415</pose>
+            <name>thruster6</name>
         </include>
 
-        <joint name="thruster_1_joint" type='fixed' >
+        <joint name="thruster1_joint" type='fixed' >
             <parent>frame</parent>
-            <child>thruster_1::thruster</child>
+            <child>thruster1::thruster</child>
         </joint>
 
-        <joint name="thruster_2_joint" type='fixed' >
+        <joint name="thruster2_joint" type='fixed' >
             <parent>frame</parent>
-            <child>thruster_2::thruster</child>
+            <child>thruster2::thruster</child>
         </joint>
 
-        <joint name="thruster_3_joint" type='fixed' >
+        <joint name="thruster3_joint" type='fixed' >
             <parent>frame</parent>
-            <child>thruster_3::thruster</child>
+            <child>thruster3::thruster</child>
         </joint>
 
-        <joint name="thruster_4_joint" type='fixed' >
+        <joint name="thruster4_joint" type='fixed' >
             <parent>frame</parent>
-            <child>thruster_4::thruster</child>
+            <child>thruster4::thruster</child>
         </joint>
 
-        <joint name="thruster_5_joint" type='fixed' >
+        <joint name="thruster5_joint" type='fixed' >
             <parent>frame</parent>
-            <child>thruster_5::thruster</child>
+            <child>thruster5::thruster</child>
         </joint>
 
-        <joint name="thruster_6_joint" type='fixed' >
+        <joint name="thruster6_joint" type='fixed' >
             <parent>frame</parent>
-            <child>thruster_6::thruster</child>
+            <child>thruster6::thruster</child>
         </joint>
 
-        <plugin name="thruster_1_controller" filename="libgazebo_ros_force.so">
+        <!-- Thrust Vectors -->
+        <plugin name="thruster_array" filename="libthruster_driver_plugin.so">
+            <thruster_count>6</thruster_count>
             <ros>
-                <namespace>/triton/gazebo_drivers</namespace>
-                <remapping>gazebo_ros_force:=thruster_1</remapping>
+                <namespace>/triton/controls</namespace>
+                <remapping>output_forces</remapping>
             </ros>
-            <link_name>thruster_1::thruster</link_name>
-            <force_frame>link</force_frame>
-        </plugin>
-
-        <plugin name="thruster_2_controller" filename="libgazebo_ros_force.so">
-            <ros>
-                <namespace>/triton/gazebo_drivers</namespace>
-                <remapping>gazebo_ros_force:=thruster_2</remapping>
-            </ros>
-            <link_name>thruster_2::thruster</link_name>
-            <force_frame>link</force_frame>
-        </plugin>
-
-        <plugin name="thruster_3_controller" filename="libgazebo_ros_force.so">
-            <ros>
-                <namespace>/triton/gazebo_drivers</namespace>
-                <remapping>gazebo_ros_force:=thruster_3</remapping>
-            </ros>
-            <link_name>thruster_3::thruster</link_name>
-            <force_frame>link</force_frame>
-        </plugin>
-
-        <plugin name="thruster_4_controller" filename="libgazebo_ros_force.so">
-            <ros>
-                <namespace>/triton/gazebo_drivers</namespace>
-                <remapping>gazebo_ros_force:=thruster_4</remapping>
-            </ros>
-            <link_name>thruster_4::thruster</link_name>
-            <force_frame>link</force_frame>
-        </plugin>
-
-        <plugin name="thruster_5_controller" filename="libgazebo_ros_force.so">
-            <ros>
-                <namespace>/triton/gazebo_drivers</namespace>
-                <remapping>gazebo_ros_force:=thruster_5</remapping>
-            </ros>
-            <link_name>thruster_5::thruster</link_name>
-            <force_frame>link</force_frame>
-        </plugin>
-
-        <plugin name="thruster_6_controller" filename="libgazebo_ros_force.so">
-            <ros>
-                <namespace>/triton/gazebo_drivers</namespace>
-                <remapping>gazebo_ros_force:=thruster_6</remapping>
-            </ros>
-            <link_name>thruster_6::thruster</link_name>
-            <force_frame>link</force_frame>
-        </plugin>
-            
-        <plugin name="hydrodynamics" filename="libhydrodynamics_plugin.so">
         </plugin>
     </model>
 </sdf>

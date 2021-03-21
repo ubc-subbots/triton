@@ -28,9 +28,9 @@
       ly: -0.5
     t5:
       contrib:
-        z: -1.0
+        z: 1.0
       ly: -0.5
     t6:
       contrib:
-        z: -1.0
+        z: 1.0
       ly: 0.5
