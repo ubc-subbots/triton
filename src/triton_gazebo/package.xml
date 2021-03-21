@@ -21,6 +21,7 @@
   <depend>rclpy</depend>
   <depend>cv_bridge</depend>
   <depend>triton_interfaces</depend>
+  <depend>python-gdown-pip</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
