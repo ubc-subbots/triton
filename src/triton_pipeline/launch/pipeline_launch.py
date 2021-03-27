@@ -17,7 +17,7 @@ def generate_launch_description():
             description='Sequence config file'
     )
 
-    config = [get_package_share_directory('triton_pipeline'),'/', LaunchConfiguration('sequence')]
+    config = [get_package_share_directory('triton_pipeline'),'/config/', LaunchConfiguration('sequence')]
 
 
     pipeline_manager = Node(

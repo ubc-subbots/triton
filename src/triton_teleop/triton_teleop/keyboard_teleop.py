@@ -41,7 +41,6 @@ class KeyboardTeleop(Node):
 
         @param key: They character of the key pressed
         """
-        self.get_logger().info('KEY PRESSED: {}\n'.format(key))
         msg = Wrench()
         if key == keyboard.Key.up:
             msg.torque.x = -self.torque_mags[0]
@@ -72,7 +71,6 @@ class KeyboardTeleop(Node):
 
         @param key: They character of the key released
         """
-        self.get_logger().info("KEY RELEASED: {}\n".format(key))
         msg = Wrench()
         if key == keyboard.Key.up:
             msg.torque.x = 0.0

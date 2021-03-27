@@ -15,24 +15,20 @@ class AUVTransformPublisher(Node):
         super().__init__('auv_transform_publisher')
 
         qos_profile = QoSProfile(depth=10)
-
         self.state_subscriber = self.create_subscription(
             PoseStamped,
             '/triton/state',
             self.state_callback,
             10
-        )
 
-        qos_profile = QoSProfile(depth=10)
+        )
         self.path_publisher = self.create_publisher(
             Path,
             '/triton/path',
             qos_profile
         )
         self.pose_array = []
-
         self.broadcaster = TransformBroadcaster(self, qos=qos_profile)
-        self.nodeName = self.get_name()
         self.get_logger().info("AUVTransformPublisher successfully started!")
 
     def state_callback(self, msg):

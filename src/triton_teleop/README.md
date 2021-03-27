@@ -5,9 +5,9 @@ This package is for teleoperation (i.e manual control) of the AUV.
 
 ## Usage
 
-To launch the keyboard teleoperation simulation of the simple cube AUV, use the following command
+To launch the keyboard teleoperation simulation of the AUV, use the following command
 
-    ros2 launch triton_teleop keyboard_teleop_sim_launch.py 
+    ros2 launch triton_bringup teleop_sim_bringup_launch.py
 
 This will open up Gazebo and allow you to control the AUV with a keyboard, below are the key controls 
 

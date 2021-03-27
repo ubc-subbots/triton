@@ -52,13 +52,13 @@ namespace triton_controls
       cv::invert(alloc_mat, pinv_alloc_, cv::DECOMP_SVD);
 
       forces_pub_ = this->create_publisher<std_msgs::msg::Float64MultiArray>(
-        "controls/output_forces", 10);
+        "output_forces", 10);
 
       signals_pub_ = this->create_publisher<std_msgs::msg::Float64MultiArray>(
-        "controls/signals", 10);
+        "signals", 10);
 
       forces_sub_ = this->create_subscription<geometry_msgs::msg::Wrench>(
-        "controls/input_forces", 10, std::bind(&ThrustAllocator::wrenchCallback, this, _1));
+        "input_forces", 10, std::bind(&ThrustAllocator::wrenchCallback, this, _1));
 
       RCLCPP_INFO(this->get_logger(), "Thrust Allocator succesfully started!");
   }
