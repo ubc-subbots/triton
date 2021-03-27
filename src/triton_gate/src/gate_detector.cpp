@@ -1,7 +1,6 @@
 #include <iostream>
 #include <cmath>
 #include <unistd.h>
-//#include <filesystem> //for filepath, can be used in C++17
 #include <opencv2/opencv.hpp>
 #include "triton_vision_utils/vision_utils.hpp"
 #include "featurize.cpp"
@@ -266,115 +265,6 @@ public:
 #include <sstream>
 int main()
 {
-    cv::Mat src;
-    ObjectDetector objdtr = ObjectDetector(1, true, 400);
-    //GateDetector gatedtr = GateDetector(1, true, 400);
-
-    //src = cv::imread("/home/jared/Downloads/underwater_ball.jpeg"); // accum threshold 28
-    //src = cv::imread("/home/jared/Downloads/underwater_ball2.jpeg"); // accum threshold 30 (default)
-    //src = cv::imread("/home/jared/Downloads/underwater_ball3.jpeg"); // accum threshold 21
-    src = cv::imread("/home/jared/Downloads/underwater_ball4.jpeg"); // accum threshold 29 
-    //src = cv::imread("/home/jared/Downloads/water_buoy.jpeg"); // accum threshold 26
-    //src = cv::imread("/home/jared/Downloads/water_balloons.jpeg"); // accum threshold 30 (default)
-    //src = cv::imread("/home/jared/Downloads/water_balloons2.jpeg"); // circles are stacked together
-    //src = cv::imread("/home/jared/Downloads/water_balloons3.jpeg"); // accum threshold 21, unsuccessful, balloons are not round enough
-    //src = cv::imread("/home/jared/Downloads/19.jpg"); // no circles were found (correct)
-    //src = cv::imread("/home/jared/Downloads/orange_circles.png");
-    //src = cv::imread("/home/jared/Downloads/noisy_circle.png");
-    //src = cv::imread("/home/jared/Downloads/orange_outlines.png");
-
-    /* test for find_circles
-    size_t expected = 1; // for dynamicall adjusting accum threshold
-
-    double minDist = (double)src.rows/10;
-    double minCircleArea = minDist * minDist / 4 * 3.14159 * 0.9;
-    Mat pre = objdtr.preprocess(src);
-    Mat enh = objdtr.enhance(pre, 0, 0, 0, 1);
-    Mat seg = objdtr.util_segment(enh, 10);
-    Mat mor = objdtr.filter_small_contours(seg, minCircleArea);
-    //Mat mor = objdtr.morphological(seg, Size(3,3), Size(18,18));
-    // works best when openkernel is smaller and closekernel is really big
-    mor = objdtr.morphological(mor, Size(3,3), Size(25,25));
-
-    vector<vector<Point>> contours;
-    vector<vector<Point>> ellipses;
-    findContours(mor, contours, RETR_TREE, CHAIN_APPROX_SIMPLE);
-    for (int i = 0; i < contours.size(); i++) {
-        double ecc  = objdtr.eccentricity(contours[i]);
-        cout << "eccen of cnt: " << ecc << endl;
-        if (ecc < 0.6) {
-            ellipses.push_back(contours[i]);
-        }
-    }
-
-  //medianBlur(seg, seg, 5);
-    imwrite("/home/jared/Downloads/seged_circles.jpg", seg);
-    imshow( "seg", seg );
-    waitKey(0);
-    imshow( "mor", mor );
-    waitKey(0);
-
-    //vector<Vec3f> circles = objdtr.find_circles(seg, (int)seg.rows/10, 3, 1, 25, 43, 0, 0); // good for underwater ball.jpeg
-    //vector<Vec3f> circles = objdtr.find_circles(seg, (int)seg.rows/10, 3, 1, 95, 50, 0, 0); // good for underwater ball2.jpeg
-    //vector<Vec3f> circles = objdtr.find_circles(mor, (int)mor.rows/10, 3, 1, 255, 40, 0, 0); // kind of good for both
-    int accum_thres = 30;
-    vector<Vec3f> circles = objdtr.find_circles(mor, (int)mor.rows/10, 3, 1, 100, accum_thres, 0, 0); // even better for both
-    //size_t expected = 3;
-    while (circles.size() < expected && accum_thres >= 0) {
-        circles = objdtr.find_circles(mor, (int)mor.rows/10, 3, 1, 100, accum_thres, 0, 0);
-        accum_thres--;
-    }
-
-    cvtColor(mor, mor, COLOR_GRAY2BGR);
-    cout << "Number of circles: " << circles.size() << endl;
-    cout << "Accumulato threshold: " << accum_thres << endl;
-
-// draw circles
-
-   drawContours(mor, ellipses, -1, Scalar(255,0,0), 5);
-
-    for( size_t i = 0; i < circles.size(); i++ )
-    {
-         Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
-         int radius = cvRound(circles[i][2]);
-         // draw the circle center
-         circle( mor, center, 3, Scalar(0,255,0), -1, 8, 0 );
-         // draw the circle outline
-         circle( mor, center, radius, Scalar(0,0,255), 3, 8, 0 );
-    }
-    namedWindow( "circles", 1 );
-    imshow( "circles", mor );
-    waitKey(0);
-    imwrite("/home/jared/Downloads/circles.jpg", mor);
-
-    */
-    float tennis_ball_radius = 0.035; // meters
-    float larger_ball_radius = 0.1;
-    float ball_radius = tennis_ball_radius;
-    vector<float> circle_pos = objdtr.circle_position(src, ball_radius);
-    Point center(cvRound(circle_pos[3]), cvRound(circle_pos[4]));
-    int radius = cvRound(circle_pos[5]);
-
-    cvtColor(src, src, COLOR_BGR2GRAY);
-    cvtColor(src, src, COLOR_GRAY2BGR);
-    // draw the circle center
-    circle( src, center, 3, Scalar(0,255,0), -1, 8, 0 );
-    // draw the circle outline
-    circle( src, center, radius, Scalar(0,0,255), 3, 8, 0 );
-    ostringstream str;
-    str << "( " << circle_pos[0] << "m, " << circle_pos[1] << ", " << circle_pos[2] << ")";
-    cout << "Distance: " << circle_pos[0] << "\n";
-    string circle_info = str.str();
-    ostringstream str2;
-    str2 << "Focal: " << 400 << " pixels  " << "Ball radius: " << ball_radius << "m";
-    string more_info = str2.str();
-    putText(src, circle_info, center, FONT_HERSHEY_SIMPLEX, 1, Scalar(255,200,200), 2);
-    putText(src, more_info, Point(20,20), FONT_HERSHEY_PLAIN, 1, Scalar(255,200,200), 1);
-    namedWindow( "circles", 1 );
-    imshow( "circles", src );
-    waitKey(0);
-    imwrite("/home/jared/Downloads/circles_info.jpg", src);
-
-
+    std::cout << "Nothing in gate_detectot main." << std::endl;
     return 0;
 }

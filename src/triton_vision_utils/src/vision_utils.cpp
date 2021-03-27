@@ -4,7 +4,6 @@
 #include <opencv2/opencv.hpp>
 #include <iostream>
 #include <string>
-#include <cmath> // for circle_position
 using namespace std;
 using namespace cv;
 using namespace vision_utils;
@@ -223,99 +222,4 @@ Mat ObjectDetector::util_segment(Mat src, int hue) {
     Mat segmented;
     bitwise_or(grad_thres, segment, segmented);
     return segmented;
-}
-
-vector<Vec3f> ObjectDetector::find_circles(Mat src, double minDist, int method, double dp, double cannyThreshold, double accumulatorThreshold, int minRadius, int maxRadius)
-{
-    vector<Vec3f> circles;
-
-    GaussianBlur(src, src, Size(9,9), 2, 2);
-
-    double mD;
-    if (minDist == 0)
-    {
-        mD = src.rows/10;
-    }
-    else {
-        mD = minDist;
-    }
-    HoughCircles(src, circles, method, dp, mD, cannyThreshold, accumulatorThreshold, minRadius, maxRadius);
-    return circles;
-}
-
-vector<Vec3f> ObjectDetector::auto_find_circles(Mat src, int expected, int hue)
-{
-    ObjectDetector objdtr = ObjectDetector();
-    double minDist = (double)src.rows/10;
-    double minCircleArea = minDist * minDist / 4 * 3.14159 * 0.9;
-    Mat pre = objdtr.preprocess(src);
-    Mat enh = objdtr.enhance(pre, 0, 0, 0, 1);
-    Mat seg = objdtr.util_segment(enh, hue);
-    Mat mor = objdtr.filter_small_contours(seg, minCircleArea);
-    // works best when openkernel is smaller and closekernel is really big
-    mor = objdtr.morphological(mor, Size(3,3), Size(25,25));
-    int accum_thres = 30;
-    vector<Vec3f> circles = objdtr.find_circles(mor, (int)mor.rows/10, 3, 1, 100, accum_thres, 0, 0);
-    while (circles.size() < expected && accum_thres >= 0) {
-        circles = objdtr.find_circles(mor, (int)mor.rows/10, 3, 1, 100, accum_thres, 0, 0);
-        accum_thres--;
-    }
-    return circles;
-}
-
-double ObjectDetector::eccentricity(vector<Point> contour) {
-    double eccen = 1;
-    if (contour.size() >= 5) {
-        RotatedRect box = fitEllipse(contour);
-        double majorAxis = box.size.height;
-        double minorAxis = box.size.width;
-        eccen = sqrt(1 - pow(minorAxis,2) / pow(majorAxis, 2));
-    }
-    return eccen;
-}
-
-vector<float> ObjectDetector::circle_position(Mat src, float radius, int hue) {
-
-    ObjectDetector objdtr = ObjectDetector();
-    vector<Vec3f> circles = objdtr.auto_find_circles(src, 1, hue);
-    vector<float> position;
-
-    // If no circles are found
-    if (circles.size() < 1) 
-        return position;
-
-    // Calculate the distane based on perceived size, real size, focal length, (and tilted angles?)
-    // Assume that the first circle found is the circle needed, if more than one is found
-    int circle_x = circles[0][0]; // Coordinates of the circle
-    int circle_y = circles[0][1];
-    int radius_pixel = circles[0][2]; // Radius of the circle in pixels
-
-    // Distance = Real Radius * Focal length in pixels / Radius on image in pixels
-    float distance = radius * this->focal / radius_pixel;
-
-    // Calculate the angles based on given x,y coordinates from auto_find_circles
-
-    // Obtain the coordinates of the circle in the image if the origin is at the center of the image.
-    int center_x = src.cols / 2;
-    int center_y = src.rows / 2;
-    int circle_x_from_center = circle_x - center_x;
-    int circle_y_from_center = circle_y - center_y;
-    // Calculate the horizontal and vertical distances from the x-axis (of the 3D spherical coordiante system) 
-    // in the same unit as circle radius
-    float circle_x_distance = circle_x_from_center * radius / radius_pixel;
-    float circle_y_distance = circle_y_from_center * radius / radius_pixel;
-    // Calcaulate phi
-    float phi = atan(circle_x_distance/circle_y_distance);
-    // Calculate theta
-    float opp_side = sqrt(circle_y_distance*circle_y_distance + circle_x_distance*circle_x_distance);
-    float theta = atan(opp_side / circle_y_distance);
-
-    position.push_back(distance);
-    position.push_back(theta);
-    position.push_back(phi);
-    position.push_back(circle_x);
-    position.push_back(circle_y);
-    position.push_back(radius_pixel);
-
-    return position;
 }
