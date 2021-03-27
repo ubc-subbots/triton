@@ -80,20 +80,22 @@
     <hydrodynamic_model>
         <!-- Added mass: see p.28 in Berg2012 -->
         <added_mass>
-          4.7028	0	      0	      0	          0	          0
-          0	      16.6719	0	      0	          0	          0
-          0	      0	      32.132	0	          0	          0
-          0	      0	      0	      0.67822282	0	          0
-          0	      0	      0	      0	          1.76147411	0
-          0	      0	      0	      0	          0	          1.78571274
+          5.579266667 0           0           0         0           0
+          0           15.09083333 0           0         0           0
+          0           0           30.55093333 0         0           0
+          0           0           0           7.2955698 0           0
+          0           0           0           0         15.51297973 0
+          0           0           0           0         0           16.14743877
         </added_mass>
+        <!-- Added mass values calculated seem too large -->
+        <scalingAddedMass>0.01</scalingAddedMass>
         <!-- Linear damping: see p.31 in Berg2012 -->
         <linear_damping>
-            -0.2229119791 -1.105547605	-0.2472084207 0 0 0
+            -0.2229119791 -1.105547605 -0.2472084207 -0.02229119791 -0.1105547605 -0.02472084207
         </linear_damping>
         <!-- Non-linear damping: see p.30 in Berg2012 -->
         <quadratic_damping>
-            -59.75066625	-71.13459739	-67.099009 0 0 0
+            -59.75066625 -71.13459739 -67.099009 -5.975066625 -7.113459739 -6.7099009
         </quadratic_damping>
     </hydrodynamic_model>
 
