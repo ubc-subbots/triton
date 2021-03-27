@@ -2,24 +2,25 @@
 <sdf version='1.7'>
   <model name='triton_frame'>
     <link name='frame'>
+
       <!-- pose relaive to STL file origin, was moved to AUV center using Blender -->
       <inertial>
         <mass>17.43388</mass>
         <inertia>
-          <ixx>0.426592</ixx>
-          <ixy>0.000913</ixy>
-          <ixz>-0.00614</ixz>
-          <iyy>0.478627</iyy>
-          <iyz>-0.00225</iyz>
-          <izz>0.425751</izz>
+          <ixx> 0.42659179587</ixx>
+          <ixy> 0.00091257391</ixy>
+          <ixz>-0.00613671114</ixz>
+          <iyy> 0.47862692534</iyy>
+          <iyz>-0.00224649356</iyz>
+          <izz> 0.42575057622</izz>
         </inertia>
-        <pose>0 0 0 0 -0 0</pose>
+        <pose>-0.14826 -0.1687 0.19368 0 -0 0</pose>
       </inertial>
 
       <gravity>0</gravity>
       <!-- Visual Data -->
       <visual name='visual'>
-        <pose>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <geometry>
           <mesh>
             <uri>model://triton_frame/meshes/triton_frame.dae</uri>
@@ -28,21 +29,17 @@
         </geometry>
         <material>
           <lighting>1</lighting>
-          <script>
-            <uri>file://media/materials/scripts/gazebo.material</uri>
-            <name>Gazebo/White</name>
-          </script>
           <shader type='pixel'/>
         </material>
         <transparency>0</transparency>
         <cast_shadows>1</cast_shadows>
       </visual>
 
-      <!-- Collision Data -->
+      <!-- Collision Data-->
       <collision name='collision'>
         <laser_retro>0</laser_retro>
         <max_contacts>10</max_contacts>
-        <pose>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <geometry>
           <mesh>
             <uri>model://triton_frame/meshes/triton_frame.dae</uri>
@@ -96,37 +93,8 @@
           </contact>
         </surface>
       </collision>
-
-      <!-- Hydrodynamic model configuration data borrowed from Plankton.io rexrov model -->
-      <neutrally_buoyant>0</neutrally_buoyant>
-      <volume>50</volume>
-      <box>
-          <width>1.5</width>
-          <length>2.6</length>
-          <height>1.6</height>
-      </box>
-      <center_of_buoyancy>${cob}</center_of_buoyancy>
-      <hydrodynamic_model>
-          <type>fossen</type>
-          <!-- Added mass: see p.28 in Berg2012 -->
-          <added_mass>
-                779.79 -6.8773 -103.32  8.5426 -165.54 -7.8033
-              -6.8773    1222   51.29  409.44 -5.8488  62.726
-              -103.32   51.29  3659.9  6.1112 -386.42  10.774
-                8.5426  409.44  6.1112   534.9 -10.027  21.019
-              -165.54 -5.8488 -386.42 -10.027  842.69 -1.1162
-              -7.8033  62.726  10.775  21.019 -1.1162  224.32
-          </added_mass>
-          <!-- Linear damping: see p.31 in Berg2012 -->
-          <linear_damping>
-              -74.82 -69.48 -728.4 -268.8 -309.77 -105
-          </linear_damping>
-          <!-- Non-linear damping: see p.30 in Berg2012 -->
-          <quadratic_damping>
-              -748.22 -992.53 -1821.01 -672 -774.44 -523.27
-          </quadratic_damping>
-      </hydrodynamic_model>
     </link>
+
     <static>0</static>
     <allow_auto_disable>1</allow_auto_disable>
   </model>

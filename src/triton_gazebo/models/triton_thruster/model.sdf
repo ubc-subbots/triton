@@ -4,7 +4,7 @@
     <link name='thruster'>
       <pose>-0 0 0 0 -0 0</pose>
       <inertial>
-        <mass>0.38044</mass>
+        <mass>0.1542214</mass>
         <inertia>
           <ixx>0.00030988</ixx>
           <ixy>5.5564e-08</ixy>
@@ -16,7 +16,6 @@
       </inertial>
 
       <gravity>0</gravity>
-
       <!-- Visual Data -->
       <visual name='visual'>
         <pose>0 0 0 0 -0 0</pose>
@@ -28,10 +27,6 @@
         </geometry>
         <material>
           <lighting>1</lighting>
-          <script>
-            <uri>file://media/materials/scripts/gazebo.material</uri>
-            <name>Gazebo/DarkGrey</name>
-          </script>
           <shader type='pixel'/>
         </material>
         <transparency>0</transparency>
@@ -96,6 +91,7 @@
           </contact>
         </surface>
       </collision>
+
     </link>
     <static>0</static>
     <allow_auto_disable>1</allow_auto_disable>

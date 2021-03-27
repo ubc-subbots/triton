@@ -9,16 +9,15 @@ namespace triton_gazebo
     HydrodynamicsPlugin::~HydrodynamicsPlugin() {}
 
 
-    void HydrodynamicsPlugin::Load(gazebo::physics::ModelPtr _model, 
-                                   sdf::ElementPtr _sdf)
+    void HydrodynamicsPlugin::Load(gazebo::physics::ModelPtr _model, sdf::ElementPtr _sdf)
     {
         model = _model;
-        frame = model->GetLink("cube::frame");
+        frame = model->GetLink("frame::frame");
         this->mass = frame->GetInertial()->Mass();
 
         GetWorldParameters(_model->GetWorld()->SDF());
 
-        GetLinkParameters(frame->GetSDF());
+        GetLinkParameters(model->GetSDF());
 
         this->DLinForwardSpeed.setZero();
 

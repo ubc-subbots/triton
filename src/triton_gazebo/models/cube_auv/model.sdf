@@ -28,32 +28,6 @@
                     </box>
                 </geometry>
             </collision>
-            <!-- Hydrodynamic model configuration data borrowed from Plankton.io rexrov model -->
-            <neutrally_buoyant>0</neutrally_buoyant>
-            <center_of_buoyancy></center_of_buoyancy>
-            <volume>1</volume> 
-            <box>
-                <width>1</width>
-                <length>1</length>
-                <height>1</height>
-            </box>
-            <hydrodynamic_model>
-                <type>fossen</type>
-                <added_mass>
-                    0 0 0 0 0 0
-                    0 0 0 0 0 0
-                    0 0 0 0 0 0
-                    0 0 0 0 0 0
-                    0 0 0 0 0 0
-                    0 0 0 0 0 0
-                </added_mass>
-                <linear_damping>
-                    -5.14 -5.14 -5.14 -5.14 -5.14 -5.14
-                </linear_damping>
-                <quadratic_damping>
-                    0 0 0 0 0 0
-                </quadratic_damping>
-            </hydrodynamic_model>
         </link>
 
         <include>
