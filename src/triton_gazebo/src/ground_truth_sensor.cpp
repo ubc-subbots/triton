@@ -47,7 +47,7 @@ namespace triton_gazebo
         msg.pose.orientation.w = pose.Rot().W();
         msg.header.stamp = node->now();
         msg.header.frame_id = "odom";
-        if (count % 10 == 0) // send every 10 updates, should instead send on a given frequency
+        if (count % 1000 == 0) // send every 1000 updates, should instead send on a given frequency
         {
             state_publisher->publish(msg);
         }
