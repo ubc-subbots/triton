@@ -7,7 +7,7 @@ This package is for creating a pipeline which can autonomously manage the states
 
 To define a pipeline type, follow the syntax given in `example.yaml` in the `config` folder which contains the parameters for the `pipeline_manager`. After defining your pipeline type, you have to add it to `PipelineType.msg` in `triton_interfaces` for you to be able to configure and run it. When naming a pipeline config file, you must have the name of the pipeline type match the name of the yaml (i.e after defining `example.yaml`, you have to add `string TYPE_EXAMPLE = "example"` to `PipelineType.msg`). To define a pipeline sequence, follow the syntax given in `example_sequence.yaml` in the `config` folder. The values for the sequences should all be pipeline types defined in `PipelineType.msg`. Next you can launch the pipeline as follows
 
-    ros2 launch triton_pipeline pipeline_launch.py sequence:=<SEQUENCE_CONFIG_FILE>
+    ros2 launch triton_pipeline pipeline_launch.py config:=<SEQUENCE_CONFIG_FILE>
 
 Where `<SEQUENCE_CONFIG_FILE>` is the name of a yaml file in the `config` folder of `triton_pipeline` which contains the `pipeline_sequence_manager` parameters (e.g see `triton_example` for a concrete example of using the pipeline).
 

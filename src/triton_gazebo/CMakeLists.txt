@@ -26,6 +26,7 @@ find_package(gazebo_dev REQUIRED)
 find_package(gazebo_ros REQUIRED)
 find_package(image_transport REQUIRED)
 find_package(sensor_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
 find_package(message_filters REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_components REQUIRED)
@@ -41,6 +42,30 @@ include_directories(${GAZEBO_INCLUDE_DIRS})
 link_directories(${GAZEBO_LIBRARY_DIRS})
 
 link_directories(${gazebo_dev_LIBRARY_DIRS})
+
+add_library(ground_truth_sensor SHARED
+  src/ground_truth_sensor.cpp
+)
+target_include_directories(ground_truth_sensor PUBLIC
+  include
+)
+ament_target_dependencies(ground_truth_sensor
+  "gazebo_dev"
+  "gazebo_ros"
+)
+ament_export_libraries(ground_truth_sensor)
+target_link_libraries(
+  ground_truth_sensor
+  ${geometry_msgs_LIBRARIES} 
+  ${GAZEBO_LIBRARIES}
+)
+
+install(TARGETS
+  ground_truth_sensor
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+)
 
 add_library(thruster_driver_plugin SHARED
   src/thruster_driver_plugin.cpp
@@ -114,32 +139,7 @@ ament_target_dependencies(triton_gazebo
   "image_transport"
   "sensor_msgs"
   "message_filters"
-)
-
-link_directories(${gazebo_dev_LIBRARY_DIRS})
-
-add_library(hydrodynamics_plugin SHARED
-  src/hydrodynamics_plugin.cpp
-  gazebo_utils/src/gazebo_utils.cpp
-  math_utils/src/math_utils.cpp
-)
-target_include_directories(hydrodynamics_plugin PUBLIC
-  include
-  gazebo_utils
-  math_utils
-)
-ament_target_dependencies(hydrodynamics_plugin
-  "gazebo_dev"
-  "gazebo_ros"
-)
-ament_export_libraries(hydrodynamics_plugin)
-target_link_libraries(hydrodynamics_plugin ${GAZEBO_LIBRARIES})
-
-install(TARGETS
-  hydrodynamics_plugin
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib
-  RUNTIME DESTINATION bin
+  "geometry_msgs"
 )
 
 install(TARGETS
@@ -177,7 +177,7 @@ ament_python_install_package(${PROJECT_NAME})
 
 # Install Python executables
 install(PROGRAMS
-  bounding_box_image_saver.py
+  triton_gazebo/bounding_box_image_saver.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
