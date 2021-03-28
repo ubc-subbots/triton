@@ -54,6 +54,7 @@ ament_target_dependencies(underwater_camera
   "rclcpp"
   "OpenCV"
   "cv_bridge"
+  "triton_interfaces"
 )
 
 install(TARGETS 
@@ -100,6 +101,7 @@ ament_target_dependencies(triton_gazebo
   "image_transport"
   "sensor_msgs"
   "message_filters"
+  "triton_interfaces"
 )
 
 install(TARGETS

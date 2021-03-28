@@ -3,8 +3,8 @@
 
 #include <gazebo/gazebo.hh>
 #include <gazebo/sensors/CameraSensor.hh>
-#include "rclcpp/rclcpp.hpp"
-#include "triton_interfaces/msg/detection_box.hpp"
+#include <gazebo_ros/node.hpp>
+#include "triton_interfaces/msg/detection_box_array.hpp"
 
 namespace triton_gazebo
 {
@@ -25,8 +25,8 @@ namespace triton_gazebo
     std::string model_name_;
 
     //ROS
-    rclcpp::Node * node_;
-    rclcpp::Publisher<triton_interfaces::msg::DetectionBox>::SharedPtr publisher_; 
+    gazebo_ros::Node::SharedPtr node_;
+    rclcpp::Publisher<triton_interfaces::msg::DetectionBoxArray>::SharedPtr publisher_; 
 
     static int powint(int x, int p)//https://stackoverflow.com/a/1505791
     {

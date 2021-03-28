@@ -4,7 +4,7 @@ from rclpy.node import Node
 import os
 from std_msgs.msg import String
 from sensor_msgs.msg import Image
-from triton_interfaces.msg import DetectionBox
+from triton_interfaces.msg import DetectionBoxArray
 import cv_bridge
 from cv2 import cv2
 import numpy as np
@@ -16,7 +16,7 @@ class BoundingBoxImageSaver(Node):
     def __init__(self):
         super().__init__('bounding_box_image_saver')
         self.subscribe_image = self.create_subscription(Image, "/triton/gazebo_drivers/front_camera/underwater/image_raw", self.save_image, 10)
-        self.subscriber_bbox = self.create_subscription(DetectionBox, "/triton/gazebo_drivers/front_camera/bounding_box", self.save_bbox, 10)
+        self.subscriber_bbox = self.create_subscription(DetectionBoxArray, "/triton/gazebo_drivers/repub/bounding_box", self.save_bbox, 10)
 
     def save_image(self, msg: Image):
         self.get_logger().info("Getting image...")
@@ -24,7 +24,10 @@ class BoundingBoxImageSaver(Node):
         im = br.imgmsg_to_cv2(msg, "passthrough")
         self.current_image = im
 
-    def save_bbox(self, msg: DetectionBox):
+    def save_bbox(self, msg: DetectionBoxArray):
+        if len(msg.boxes)==0:
+            return
+        msg = msg.boxes[0]
         if (msg.width <= 0 or msg.height <= 0):
             self.get_logger().info("Bounding box has zero size.")
             return
