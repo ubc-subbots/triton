@@ -86,7 +86,8 @@ namespace triton_gazebo
         void ComputeDampingMatrix(const Eigen::Vector6d& _vel, Eigen::Matrix6d &_D) const;
         Eigen::Matrix6d GetAddedMass() const;
         double ComputeScalerDrag(double);
-        
+        void ApplyBuoyancyForce(void);
+
 
         gazebo::physics::ModelPtr model;
         gazebo::event::ConnectionPtr updateConnection_;
@@ -114,6 +115,7 @@ namespace triton_gazebo
         double offsetLinearDamping;
         double offsetLinForwardSpeedDamping;
         double offsetNonLinDamping;
+        double volume;
 
         double length;
         double width;

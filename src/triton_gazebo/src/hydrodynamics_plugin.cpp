@@ -53,6 +53,8 @@ namespace triton_gazebo
 
         this->added_mass = GetSdfMatrix(&status, hydro_model, "added_mass");
 
+        this->volume = GetSdfElement<double>(&status, link_sdf, "volume", 1.00);
+
         if (!status)
         {
             gzerr << "Added mass matrix not specified.\n";
@@ -218,10 +220,23 @@ namespace triton_gazebo
         return this->scalingAddedMass * M_d;
     }
 
-    // Specific to cube object
+    // Specific to cube objects
     double HydrodynamicsPlugin::ComputeScalerDrag(double cross_section_area)
     {
         return -0.5 * this->Cd * cross_section_area * this->fluid_density;
+    }
+
+    // Constant vertical force on center of mass. 
+    void HydrodynamicsPlugin::ApplyBuoyancyForce(){
+        double g = this->gravity;
+        double vol = this->volume;
+        double rho = this->fluid_density;
+
+        // the buoyant force: Fb = fluid_density * gravity * volume of fluid displaced
+        double buoyancy_force = rho * g * vol;
+
+        ignition::math::Vector3d buoyancy_vector(0.0, 0.0, buoyancy_force);
+        frame->AddRelativeForce(buoyancy_vector);
     }
 
 } // namespace triton_gazebo
