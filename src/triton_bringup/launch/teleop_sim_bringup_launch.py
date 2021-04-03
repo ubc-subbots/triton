@@ -34,18 +34,6 @@ def generate_launch_description():
         actions=[rviz]
     )
 
-    thrust_allocator = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(get_package_share_directory('triton_controls'), 'launch', 'thrust_allocator_launch.py')
-        )
-    )
-
-    keyboard_teleop = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(get_package_share_directory('triton_teleop'), 'launch', 'keyboard_teleop_launch.py')
-        )
-    )
-
     state_publisher = Node(
         package='robot_state_publisher', 
         executable='robot_state_publisher',
@@ -58,6 +46,18 @@ def generate_launch_description():
         executable='auv_transform_publisher.py',
         name='auv_transform_publisher',
         output='screen'
+    )
+
+    thrust_allocator = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(get_package_share_directory('triton_controls'), 'launch', 'thrust_allocator_launch.py')
+        )
+    )
+
+    keyboard_teleop = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(get_package_share_directory('triton_teleop'), 'launch', 'keyboard_teleop_launch.py')
+        )
     )
     
     ld.add_action(gazebo)

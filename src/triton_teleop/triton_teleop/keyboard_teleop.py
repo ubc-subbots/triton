@@ -98,11 +98,11 @@ class KeyboardTeleop(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-
     keyboard_teleop = KeyboardTeleop()
-    rclpy.spin(keyboard_teleop)
-
-    keyboard_teleop.destroy_node()
+    try:
+        rclpy.spin(keyboard_teleop)
+    except KeyboardInterrupt:
+        pass # To force exit code 0
     rclpy.shutdown()
 
 
