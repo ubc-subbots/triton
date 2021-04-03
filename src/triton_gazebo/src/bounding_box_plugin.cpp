@@ -140,7 +140,13 @@ namespace triton_gazebo
         bbox.y = y_min;
         bbox.width = x_max-x_min;
         bbox.height = y_max-y_min;
-        bbox_arr.boxes.push_back(bbox);
+
+        //Publish empty array if bounding box has 0 size or takes up entire image or model is behind the camera
+        if (bbox.width > 0 && bbox.width < this->parentSensor->Camera()->ViewportWidth() - 1 &&
+            bbox.height > 0 && bbox.height < this->parentSensor->Camera()->ViewportHeight() - 1 &&
+            (visual->Position() - this->parentSensor->Camera()->WorldPosition()).Dot(this->parentSensor->Camera()->Direction()) > 0)
+            bbox_arr.boxes.push_back(bbox);
+
         bbox_arr.header.stamp = node_->get_clock()->now();
         publisher_->publish(bbox_arr);
     }

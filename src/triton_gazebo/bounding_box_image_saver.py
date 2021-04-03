@@ -17,6 +17,7 @@ class BoundingBoxImageSaver(Node):
         super().__init__('bounding_box_image_saver')
         self.subscribe_image = self.create_subscription(Image, "/triton/gazebo_drivers/front_camera/underwater/image_raw", self.save_image, 10)
         self.subscriber_bbox = self.create_subscription(DetectionBoxArray, "/triton/gazebo_drivers/repub/bounding_box", self.save_bbox, 10)
+        self.lastmsg = None
 
     def save_image(self, msg: Image):
         self.get_logger().info("Getting image...")
@@ -33,6 +34,9 @@ class BoundingBoxImageSaver(Node):
             return
 
         try:
+            if (self.lastmsg and msg.x == self.lastmsg.x and msg.y == self.lastmsg.y): #avoid duplicate images/bounding boxes
+                return
+            self.lastmsg = msg
             rows,cols,channels = self.current_image.shape
            
             centre_x = (msg.x + msg.width/2)/cols
