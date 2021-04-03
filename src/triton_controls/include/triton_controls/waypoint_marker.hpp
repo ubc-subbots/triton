@@ -34,22 +34,26 @@ namespace triton_controls
          * @param msg geometry pose message witth position and orientation
          */
         void callback(const geometry_msgs::msg::Pose::SharedPtr msg);
+        rcl_interfaces::msg::SetParametersResult parameter_callback(const std::vector<rclcpp::Parameter> & parameters);
 
         rclcpp::Publisher<triton_interfaces::msg::PipelineFeedback>::SharedPtr feedback_pub_;
 
         rclcpp::Publisher<geometry_msgs::msg::Pose>::SharedPtr publisher_;
         rclcpp::Subscription<geometry_msgs::msg::Pose>::SharedPtr subscription_;
 
+        const int max_waypoints_ = 20; //later lets try other data structure like hash table?
+        rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr param_callback_handle_;
+
         bool has_pose_;
         geometry_msgs::msg::Pose pose_;
-        //std::vector<double> pose_offset_value_;
+
         int num_waypoints_;
         std::vector<std::vector<double>> waypoint_values_;
-        //geometry_msgs::msg::Pose pose_offset_;
+
         std::string threshold_type_;
-        double threshold_value_0_;
-        double threshold_value_1_;
-        int threshold_value_2_;
+        double threshold_dist_;
+        double threshold_ang_diff_;
+        int threshold_consect_;
 
         int threshold_counter_;
 

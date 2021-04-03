@@ -1,0 +1,23 @@
+waypoint_marker:
+  ros__parameters:
+    num_waypoints: 2
+    waypoint_0:
+        x: 20.0
+        y: 0.0
+        z: 0.0
+        roll: 0.0
+        pitch: 0.0
+        yaw: 0.0
+    waypoint_1:
+        x: 30.0
+        y: 0.0
+        z: 0.0
+        roll: 0.0
+        pitch: 0.0
+        yaw: 0.0
+    threshold:
+        type: stabilize
+        distance: 0.5
+        angle_diff: 0.5
+        consecutive: 3
+

@@ -5,5 +5,7 @@ pipeline_manager:
         - triton_controls::WaypointMarker
       pkg_names:
         - triton_controls
+      param_files:
+        - waypoint_config.yaml
       namespace: /triton/waypoint
     use_sim_time: false
