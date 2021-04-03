@@ -2,6 +2,8 @@
 #include <string>
 #include <utility> // For finding circles
 #include "triton_vision_utils/vision_utils.hpp"
+#include "triton_interfaces/msg/sphere_position.hpp"
+#include "geometry_msgs/msg/point.hpp"
 using namespace std;
 using namespace cv;
 using namespace vision_utils;
@@ -11,6 +13,7 @@ class SphereDetector : public ObjectDetector
 private:
 	float focal;
 	vector<vector<float>> circle_pos;
+    vector<geometry_msgs::msg::Point> circle_pos_pt;
 	pair<int, int> acc_thres_hist = pair<int, int>(999, 10);
 
 public:
@@ -62,5 +65,18 @@ public:
 	 * 			Returns an empty vector if no circles are found in the image.
 	 */
 	vector<vector<float>> circles_positions(Mat &src, float radius, int number, int hue=10);
+
+	/**
+	 * Caculate the position of a circle given its hue and diameter.
+	 * It is given as a Point in free space.
+	 * Positive x is the forwards direction, positive z is the upwards direction, positive y is the leftwards direction.
+	 * Uses auto_find_circles
+	 * @param src: The source image
+	 * @param hue: Hue of circles
+	 * @param radius: Radius of circles
+	 * @param number: Number of circles
+	 * @return: A message of sphere distances and positions
+	 */
+	triton_interfaces::msg::SpherePosition circles_positions_msg(Mat &src, float radius, int number, int hue=10);
 };
 

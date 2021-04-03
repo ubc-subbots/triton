@@ -1,4 +1,5 @@
 #include "triton_sphere/sphere_detector.hpp"
+#include "geometry_msgs/msg/point.hpp"
 //#include <opencv2/core/mat.hpp>
 
 #include <opencv2/opencv.hpp>
@@ -96,18 +97,18 @@ vector<vector<float>> SphereDetector::circles_positions(Mat &src, float radius, 
       // Obtain the coordinates of the circle in the image if the origin is at the center of the image.
       int center_x = src.cols / 2;
       int center_y = src.rows / 2;
-      int circle_x_from_center = circle_x - center_x;
-      int circle_y_from_center = circle_y - center_y;
+      int circle_y_from_center = circle_x - center_x;
+      int circle_z_from_center = circle_y - center_y;
       // Calculate the horizontal and vertical distances from the x-axis (of the 3D spherical coordiante system)
       // in the same unit as circle radius (assumed meters)
       float mp_ratio = radius / radius_pixel;
-      float circle_x_distance = circle_x_from_center * mp_ratio;
       float circle_y_distance = circle_y_from_center * mp_ratio;
+      float circle_z_distance = circle_z_from_center * mp_ratio;
       // Calcaulate phi
-      float phi = atan(circle_x_distance/circle_y_distance);
+      float phi = acos(distance/circle_z_distance);
       // Calculate theta
-      float opp_side = sqrt(circle_y_distance*circle_y_distance + circle_x_distance*circle_x_distance);
-      float theta = atan(opp_side / circle_y_distance);
+      float hypotenuse = sqrt(distance * distance - circle_z_distance * circle_z_distance);
+      float theta = asin(circle_y_distance / hypotenuse);
 
 
       position.push_back(distance);
@@ -143,6 +144,74 @@ vector<vector<float>> SphereDetector::circles_positions(Mat &src, float radius, 
 
     circle_pos = positions;
     return positions;
+}
+
+triton_interfaces::msg::SpherePosition SphereDetector::circles_positions_msg(Mat &src, float radius, int number, int hue) {
+
+    vector<Vec3f> circles = this->auto_find_circles(src, number, hue);
+    auto message = triton_interfaces::msg::SpherePosition();
+
+    // If no circles are found
+    if (circles.size() < 1)
+        return message;
+
+    // Calculate the distane based on perceived size, real size, focal length, (and tilted angles?)
+    for (size_t i = 0; i < circles.size(); i++) {
+      auto pt_msg = geometry_msgs::msg::Point();
+      int circle_x = circles[i][0]; // Coordinates of the circle
+      int circle_y = circles[i][1];
+      int radius_pixel = circles[i][2]; // Radius of the circle in pixels
+
+      // Distance = Real Radius * Focal length in pixels / Radius on image in pixels
+      float distance = radius * this->focal / radius_pixel;
+
+      // Calculate the angles based on given x,y coordinates from auto_find_circles
+
+      // Obtain the coordinates of the circle in the image if the origin is at the center of the image.
+      int center_x = src.cols / 2;
+      int center_y = src.rows / 2;
+      int circle_y_from_center = circle_x - center_x;
+      int circle_z_from_center = circle_y - center_y;
+      // Calculate the horizontal and vertical distances from the x-axis (of the 3D spherical coordiante system)
+      // in the same unit as circle radius (assumed meters)
+      float mp_ratio = radius / radius_pixel;
+      float circle_y_distance = circle_y_from_center * mp_ratio;
+      float circle_z_distance = circle_z_from_center * mp_ratio;
+      float hypotenuse = sqrt(distance * distance - circle_z_distance * circle_z_distance);
+      float circle_x_distance = sqrt(hypotenuse * hypotenuse - circle_y_distance * circle_y_distance);
+
+      pt_msg.x = circle_x_distance;
+      pt_msg.y = circle_y_distance;
+      pt_msg.z = circle_z_distance;
+
+      if (circle_pos.empty()) {
+        // We make the strong assumption that the first circles we find are accurate.
+        message.positions.push_back(pt_msg);
+        message.distances.push_back(distance);
+      }
+      else {
+        // We make sure the circles have not changed too much in position or distance to account for false circles
+        int ng = 0;
+        for (geometry_msgs::msg::Point v : circle_pos_pt) {
+          if (abs(distance - sqrt(v.x*v.x + v.y*v.y + v.z*v.z)) > 0.25 // assuming 20 fps, sphere speed should be < 5 m/s (20?)
+            || abs((circle_y_distance - v.y) * mp_ratio) > 0.25
+            || abs((circle_z_distance - v.z) * mp_ratio) > 0.25 ) {
+            //|| radius_pixel < v[5] * 0.5 || radius_pixel > v[5] * 1.5 ) {
+              ng++;
+            }
+          else {
+            break;
+          }
+        }
+        if (ng < number) {
+          message.positions.push_back(pt_msg);
+          message.distances.push_back(distance);
+        }
+      }
+    }
+
+    circle_pos_pt = message.positions;
+    return message;
 }
 
 int main(void)
@@ -234,7 +303,6 @@ int main(void)
           resizeWindow(window_detection_name, h, w);
           */
           //! [show]
-
 
         char key = (char) waitKey(30);
         if (key == 'q' || key == 27)
