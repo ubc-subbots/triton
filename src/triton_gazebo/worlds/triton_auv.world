@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <sdf version="1.7">
   <world name="default">
+    <gravity>0 0 -9.81</gravity>
+    <fluid_density>1000.00</fluid_density>
     <!-- A global light source -->
     <include>
       <uri>model://sun</uri>

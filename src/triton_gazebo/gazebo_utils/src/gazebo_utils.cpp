@@ -3,15 +3,19 @@
 namespace triton_gazebo
 {
     
-    Eigen::Vector6d GetSdfVector(bool* status, sdf::ElementPtr _sdf, std::string param)
+    Eigen::Vector6d GetSdfVector(bool* status, sdf::ElementPtr _sdf, std::string param, Eigen::Vector6d def)
     {
-        Eigen::Vector6d _vector;
+        Eigen::Vector6d _vector = def;
         int idx = 0;
         double val;
 
         std::string sdf_data = GetSdfElement<std::string>(status, _sdf, param, "");
 
-        if (*status == false) { return _vector; }
+        if (*status == false)
+        {
+            gzdbg << param << ": \n" << _vector << std::endl;
+            return _vector; 
+        }
 
         std::istringstream iss(sdf_data);
 
@@ -21,15 +25,16 @@ namespace triton_gazebo
         }
         if (idx != MAX_DIMENSION) 
         {
-            gzerr << "Vector did not fully populate, continuing...\n";
+            gzdbg << "Vector did not fully populate.\n";
         }
         *status = true;
+        gzdbg << param << ": \n" << _vector << std::endl;
 
         return _vector;
     }
 
 
-    Eigen::Matrix6d GetSdfMatrix(bool* status, sdf::ElementPtr _sdf, std::string param)
+    Eigen::Matrix6d GetSdfMatrix(bool* status, sdf::ElementPtr _sdf, std::string param, Eigen::Matrix6d def)
     {
         Eigen::Matrix6d _matrix;
         int r_idx = 0, c_idx = 0;
@@ -37,7 +42,11 @@ namespace triton_gazebo
 
         std::string sdf_data = GetSdfElement<std::string>(status, _sdf, param, "");
 
-        if (*status == false) { return _matrix; }
+        if (*status == false)
+        {
+            gzdbg << param << ": \n" << _matrix << std::endl;
+            return _matrix;
+        }
 
         std::istringstream iss(sdf_data);
 
@@ -55,6 +64,7 @@ namespace triton_gazebo
             gzerr << "Matrix did not fully populate, continuing...\n";
         }
         *status = true;
+        gzdbg << param << ": \n" << _matrix << std::endl;
 
         return _matrix;
     }

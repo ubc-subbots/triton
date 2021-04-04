@@ -15,7 +15,8 @@
         </inertia>
       </inertial>
 
-      <gravity>0</gravity>
+      <gravity>1</gravity>
+
       <!-- Visual Data -->
       <visual name='visual'>
         <pose>0 0 0 0 -0 0</pose>

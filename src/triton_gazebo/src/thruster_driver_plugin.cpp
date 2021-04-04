@@ -96,7 +96,7 @@ namespace triton_gazebo
 
     void ThrusterDriver::ApplyForce()
     {
-        RCLCPP_INFO(node->get_logger(), "Applying new thrust values.\n");
+        //RCLCPP_INFO(node->get_logger(), "Applying new thrust values.\n");
 
         for (unsigned int i = 0; i < thruster_count; i++)
         {

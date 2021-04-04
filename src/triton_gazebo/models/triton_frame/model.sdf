@@ -17,7 +17,6 @@
         <pose>-0.14826 -0.1687 0.19368 0 -0 0</pose>
       </inertial>
 
-      <gravity>0</gravity>
       <!-- Visual Data -->
       <visual name='visual'>
         <pose>0 0 0 0 0 0</pose>
@@ -34,6 +33,8 @@
         <transparency>0</transparency>
         <cast_shadows>1</cast_shadows>
       </visual>
+
+      <gravity>1</gravity>
 
       <!-- Collision Data-->
       <collision name='collision'>
