@@ -24,7 +24,7 @@ namespace triton_gazebo
         sdf::ElementPtr ros_namespace = _sdf->GetElement("ros");
         this->GetRosNamespace(ros_namespace);
 
-        this->thrust_values = std::vector<double>(thruster_count, 0);
+        this->thrust_values = std::vector<double>(this->thruster_count, 0);
         this->force_cmd = node->create_subscription<std_msgs::msg::Float64MultiArray>(
                             this->topic_name, 
                             10, 
@@ -37,9 +37,9 @@ namespace triton_gazebo
         for (unsigned int i = 1; i <= thruster_count; i++)
         {
             std::string thruster_name = model_name + "::thruster" + std::to_string(i) + "::thruster";
-            thruster.push_back(_model->GetLink(thruster_name));
+            this->thruster.push_back(_model->GetLink(thruster_name));
 
-            RCLCPP_INFO(node->get_logger(), thruster[i-1]->GetName());
+            RCLCPP_INFO(this->node->get_logger(), this->thruster[i-1]->GetName());
         }
     
         this->updateConnection_ = gazebo::event::Events::ConnectWorldUpdateBegin(
@@ -87,7 +87,7 @@ namespace triton_gazebo
 
         for (unsigned int i = 0; i < this->thruster_count; i++)
         {
-            thrust_values[i] = joint_cmd->data[i];
+            this->thrust_values[i] = joint_cmd->data[i];
         }
     }
 
@@ -96,7 +96,7 @@ namespace triton_gazebo
     {
         for (unsigned int i = 0; i < thruster_count; i++)
         {
-            thruster[i]->AddLinkForce(ignition::math::Vector3d(0, 0, thrust_values[i]));
+            this->thruster[i]->AddLinkForce(ignition::math::Vector3d(0, 0, this->thrust_values[i]));
         }
     }
 

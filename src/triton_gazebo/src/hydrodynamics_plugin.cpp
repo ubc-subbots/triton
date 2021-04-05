@@ -19,7 +19,13 @@ namespace triton_gazebo
         // Get params for model dynamics and hydro model
         GetModelParameters(this->model->GetSDF());
 
-        this->mass = frame->GetInertial()->Mass();
+        // Get model's total mass
+        this->mass = 0;
+        std::vector<gazebo::physics::LinkPtr> all_links = this->model->GetLinks();
+        for (int i = 0; i < (int)all_links.size(); i++)
+        {
+            this->mass += all_links[i]->GetInertial()->Mass();
+        }
 
         this->DLinForwardSpeed.setZero();
 
@@ -256,8 +262,7 @@ namespace triton_gazebo
             buoyancy_force = -this->mass * this->gravity;
         }
 
-        frame->AddForceAtRelativePosition(buoyancy_force, this->rel_CoB);
-
+        this->frame->AddForceAtRelativePosition(buoyancy_force, this->rel_CoB);
     }
 
 } // namespace triton_gazebo
