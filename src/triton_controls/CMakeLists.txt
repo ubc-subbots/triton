@@ -92,6 +92,14 @@ install(DIRECTORY
   DESTINATION share/${PROJECT_NAME}/test
 )
 
+# Install Python modules
+ament_python_install_package(${PROJECT_NAME})
+
+# Install Python executables
+install(PROGRAMS
+  triton_controls/auv_transform_publisher.py
+  DESTINATION lib/${PROJECT_NAME}
+)
 
 if(BUILD_TESTING)
   find_package(launch_testing_ament_cmake REQUIRED)
