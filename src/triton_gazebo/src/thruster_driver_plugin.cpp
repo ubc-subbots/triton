@@ -84,11 +84,9 @@ namespace triton_gazebo
             RCLCPP_WARN(node->get_logger(), "message size does not match thruster count, ignoring command.\n");
             return;
         }
-        RCLCPP_INFO(node->get_logger(), "received new command.\n");
 
         for (unsigned int i = 0; i < this->thruster_count; i++)
         {
-            RCLCPP_INFO(node->get_logger(), "%f Newtons", joint_cmd->data[i]);
             thrust_values[i] = joint_cmd->data[i];
         }
     }
@@ -96,8 +94,6 @@ namespace triton_gazebo
 
     void ThrusterDriver::ApplyForce()
     {
-        //RCLCPP_INFO(node->get_logger(), "Applying new thrust values.\n");
-
         for (unsigned int i = 0; i < thruster_count; i++)
         {
             thruster[i]->AddLinkForce(ignition::math::Vector3d(0, 0, thrust_values[i]));

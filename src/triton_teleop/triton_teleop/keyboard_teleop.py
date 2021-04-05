@@ -41,7 +41,6 @@ class KeyboardTeleop(Node):
 
         @param key: They character of the key pressed
         """
-        self.get_logger().info('KEY PRESSED: {}\n'.format(key))
         msg = Wrench()
         if key == keyboard.Key.up:
             msg.torque.x = -self.torque_mags[0]
@@ -72,7 +71,6 @@ class KeyboardTeleop(Node):
 
         @param key: They character of the key released
         """
-        self.get_logger().info("KEY RELEASED: {}\n".format(key))
         msg = Wrench()
         if key == keyboard.Key.up:
             msg.torque.x = 0.0
@@ -100,11 +98,11 @@ class KeyboardTeleop(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-
     keyboard_teleop = KeyboardTeleop()
-    rclpy.spin(keyboard_teleop)
-
-    keyboard_teleop.destroy_node()
+    try:
+        rclpy.spin(keyboard_teleop)
+    except KeyboardInterrupt:
+        pass # To force exit code 0
     rclpy.shutdown()
 
 
