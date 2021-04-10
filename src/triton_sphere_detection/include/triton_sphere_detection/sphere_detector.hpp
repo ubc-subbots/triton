@@ -145,4 +145,8 @@ namespace triton_sphere_detection
 	};
 
 }// triton_sphere_detection
+
+#include "rclcpp_components/register_node_macro.hpp"
+RCLCPP_COMPONENTS_REGISTER_NODE(triton_sphere_detection::SphereDetector)
+
 #endif  //TRITON_SPHERE_DETECTION__SPHERE_DETECTOR
