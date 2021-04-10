@@ -1,0 +1,17 @@
+version: "2"
+
+services:
+  micro-ros:
+    image: microros/micro-ros-agent:foxy
+    privileged: true
+    command: serial --dev /dev/ttyACM0
+    volumes:
+      - "/dev:/dev"
+    network_mode: "host"
+  ros: 
+    image: ubcsubbots/triton:latest
+    privileged: true
+    command: ros2 launch triton_pipeline pipeline_launch.py sequence:=example_sequence.yaml
+    volumes:
+      - "/dev:/dev"
+    network_mode: "host"

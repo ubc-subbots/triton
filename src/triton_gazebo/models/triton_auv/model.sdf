@@ -1,106 +1,241 @@
 <?xml version='1.0'?>
 <sdf version='1.7'>
   <model name='triton_auv'>
-    <link name='triton_auv'>
-      <inertial>
-        <mass>16.514</mass>
-        <inertia>
-          <ixx>0.44808</ixx>
-          <ixy>-0.0012796</ixy>
-          <ixz>0.00058731</ixz>
-          <iyy>0.41392</iyy>
-          <iyz>0.0074537</iyz>
-          <izz>0.46996</izz>
-        </inertia>
-        <pose>0.26270274 -0.2815934 0.213699 0 -0 0</pose>
-      </inertial>
-      <gravity>1</gravity>
-      <self_collide>0</self_collide>
-      <kinematic>0</kinematic>
-      <enable_wind>0</enable_wind>
-      <visual name='triton_auv_visual'>
-        <pose>0 0 0 1.5708 -0 0</pose>
-        <geometry>
-          <mesh>
-            <uri>model://triton_auv/meshes/triton_auv.dae</uri>
-            <scale>1 1 1</scale>
-          </mesh>
-        </geometry>
-        <material>
-          <lighting>1</lighting>
-          <script>
-            <uri>file://media/materials/scripts/gazebo.material</uri>
-            <name>Gazebo/White</name>
-          </script>
-          <shader type='pixel'>
-            <normal_map>__default__</normal_map>
-          </shader>
-          <ambient>0.3 0.3 0.3 1</ambient>
-          <diffuse>0.7 0.7 0.7 1</diffuse>
-          <specular>0.01 0.01 0.01 1</specular>
-          <emissive>0 0 0 1</emissive>
-        </material>
-        <transparency>0</transparency>
-        <cast_shadows>1</cast_shadows>
-      </visual>
-      <collision name='triton_auv_collision'>
-        <laser_retro>0</laser_retro>
-        <max_contacts>10</max_contacts>
-        <pose>0 0 0 1.5708 -0 0</pose>
-        <geometry>
-          <mesh>
-            <uri>model://triton_auv/meshes/triton_auv.dae</uri>
-            <scale>1 1 1</scale>
-          </mesh>
-        </geometry>
-        <surface>
-          <friction>
-            <ode>
-              <mu>1</mu>
-              <mu2>1</mu2>
-              <fdir1>0 0 0</fdir1>
-              <slip1>0</slip1>
-              <slip2>0</slip2>
-            </ode>
-            <torsional>
-              <coefficient>1</coefficient>
-              <patch_radius>0</patch_radius>
-              <surface_radius>0</surface_radius>
-              <use_patch_radius>1</use_patch_radius>
-              <ode>
-                <slip>0</slip>
-              </ode>
-            </torsional>
-          </friction>
-          <bounce>
-            <restitution_coefficient>0</restitution_coefficient>
-            <threshold>1e+06</threshold>
-          </bounce>
-          <contact>
-            <collide_without_contact>0</collide_without_contact>
-            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
-            <collide_bitmask>1</collide_bitmask>
-            <ode>
-              <soft_cfm>0</soft_cfm>
-              <soft_erp>0.2</soft_erp>
-              <kp>1e+13</kp>
-              <kd>1</kd>
-              <max_vel>0.01</max_vel>
-              <min_depth>0</min_depth>
-            </ode>
-            <bullet>
-              <split_impulse>1</split_impulse>
-              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
-              <soft_cfm>0</soft_cfm>
-              <soft_erp>0.2</soft_erp>
-              <kp>1e+13</kp>
-              <kd>1</kd>
-            </bullet>
-          </contact>
-        </surface>
-      </collision>
-    </link>
+    <!-- 
+
+      Triton AUV components
+
+      Thrusters will follow the following naming convention: 
+
+                             Thruster 6
+         Thruster 2 / /________|__|________\ \ Thruster 3
+                   / /|                    |\ \
+                      |        +y          |
+                      |       |            |_
+                      |       |___+x       |_) AUV front 
+                      |     +z             |
+                      |   (pointing up)    |
+                   \ \|____________________|/ /
+         Thruster 1 \ \        |  |        / / Thruster 4
+                             Thruster 5
+
+    -->
+
+    <!-- Frame -->
+    <include>
+      <uri>model://triton_frame</uri>
+      <pose>0 0 0 0 0 0</pose>
+      <name>frame</name>
+    </include>
+
+    <!-- Thrusters -->
+    <include>
+      <uri>model://triton_thruster</uri>
+      <pose>-0.3776091 -0.357124 0.2136902 0 1.5707 2.35619</pose>
+      <name>thruster1</name>
+    </include>
+
+    <include>
+      <uri>model://triton_thruster</uri>
+      <pose>-0.3776091 0.026924 0.2136902 0 -1.5707 0.785398</pose>
+      <name>thruster2</name>
+    </include>
+
+    <include>
+      <uri>model://triton_thruster</uri>
+      <pose>0.0474091 -0.357124 0.2136902 0 -1.5707 -2.35619</pose>
+      <name>thruster3</name>
+    </include>
+
+    <include>
+      <uri>model://triton_thruster</uri>
+      <pose>0.0474091 0.026924 0.2136902 0 1.5707 -0.785398</pose>
+      <name>thruster4</name>
+    </include>
+
+    <include>
+      <uri>model://triton_thruster</uri>
+      <pose>-0.14965425999999998 -0.38172644 0.33146492 3.1415 3.1415 0</pose>
+      <name>thruster5</name>
+    </include>
+
+    <include>
+      <uri>model://triton_thruster</uri>
+      <pose>-0.14965425999999998 0.05152644 0.33146492 3.1415 3.1415 3.1415</pose>
+      <name>thruster6</name>
+    </include>
+
+    <!--
+
+      Hydrodynamic model used to calculate restoring forces.
+
+      In the future this description should be specified in each link 
+      for a better approximation.
+
+    -->
+
+    <base_link>frame::frame</base_link>
+    <neutrally_buoyant>1</neutrally_buoyant>
+    <volume>0.0209673336007</volume>
+    <center_of_buoyancy>-0.1460	-0.1651	0.2339</center_of_buoyancy>
+    <hydrodynamic_model>
+        <!-- Useful params for controls simplifications-->
+        <scalingBuoyancy>0.93</scalingBuoyancy>
+        <scalingDamping>1.0</scalingDamping>
+        <scalingAddedMass>0.01</scalingAddedMass>
+
+        <!-- Added mass: see p.28 in Berg2012 -->
+        <added_mass>
+          5.579266667 0           0           0         0           0
+          0           15.09083333 0           0         0           0
+          0           0           30.55093333 0         0           0
+          0           0           0           7.2955698 0           0
+          0           0           0           0         15.51297973 0
+          0           0           0           0         0           16.14743877
+        </added_mass>
+        <!-- Linear damping: see p.31 in Berg2012 -->
+        <linear_damping>
+            -0.2229119791 -1.105547605 -0.2472084207 -0.02229119791 -0.1105547605 -0.02472084207
+        </linear_damping>
+        <!-- Non-linear damping: see p.30 in Berg2012 -->
+        <quadratic_damping>
+            -59.75066625 -71.13459739 -67.099009 -5.975066625 -7.113459739 -6.7099009
+        </quadratic_damping>
+    </hydrodynamic_model>
+
+    <!--
+
+      Fixed Joints within AUV
+
+    -->
+
+    <joint name='frame_thruster1' type='fixed'>
+      <parent>frame::frame</parent>
+      <child>thruster1::thruster</child>
+      <pose>0 0 0 0 0 0</pose>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+
+    <joint name='frame_thruster2' type='fixed'>
+      <parent>frame::frame</parent>
+      <child>thruster2::thruster</child>
+      <pose>0 0 0 0 0 0</pose>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+
+    <joint name='frame_thruster3' type='fixed'>
+      <parent>frame::frame</parent>
+      <child>thruster3::thruster</child>
+      <pose>0 0 0 0 0 0</pose>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+
+    <joint name='frame_thruster4' type='fixed'>
+      <parent>frame::frame</parent>
+      <child>thruster4::thruster</child>
+      <pose>0 0 0 0 0 0</pose>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+
+    <joint name='frame_thruster5' type='fixed'>
+      <parent>frame::frame</parent>
+      <child>thruster5::thruster</child>
+      <pose>0 0 0 0 0 0</pose>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+
+    <joint name='frame_thruster6' type='fixed'>
+      <parent>frame::frame</parent>
+      <child>thruster6::thruster</child>
+      <pose>0 0 0 0 0 0</pose>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+
+    <!-- 
+
+      Plugins
+
+    -->
+
+    <!-- Thrust Vectors -->
+    <plugin name="thruster_array" filename="libthruster_driver_plugin.so">
+      <thruster_count>6</thruster_count>
+      <ros>
+        <namespace>/triton/controls</namespace>
+        <remapping>output_forces</remapping>
+      </ros>
+    </plugin>
+
+    <plugin name="hydrodynamics" filename="libhydrodynamics_plugin.so"></plugin>
+
     <static>0</static>
     <allow_auto_disable>1</allow_auto_disable>
+
   </model>
 </sdf>

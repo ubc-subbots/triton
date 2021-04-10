@@ -15,24 +15,80 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-set(CMAKE_CXX_FLAGS "-O3 -DNDEBUG")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS} -O3 -DNDEBUG")
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
+find_package(ament_cmake_python REQUIRED)
 find_package(gazebo_ros_pkgs REQUIRED)
 find_package(gazebo REQUIRED)
 find_package(gazebo_dev REQUIRED)
 find_package(gazebo_ros REQUIRED)
 find_package(image_transport REQUIRED)
 find_package(sensor_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
 find_package(message_filters REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_components REQUIRED)
+find_package(rclpy REQUIRED)
 find_package(OpenCV 4.2 REQUIRED)
 find_package(cv_bridge REQUIRED)
+find_package(triton_interfaces REQUIRED)
 
 include_directories(include)
 include_directories(${OpenCV_INCLUDE_DIRS})
+include_directories(${GAZEBO_INCLUDE_DIRS})
+
+link_directories(${GAZEBO_LIBRARY_DIRS})
+
+link_directories(${gazebo_dev_LIBRARY_DIRS})
+
+add_library(ground_truth_sensor SHARED
+  src/ground_truth_sensor.cpp
+)
+target_include_directories(ground_truth_sensor PUBLIC
+  include
+)
+ament_target_dependencies(ground_truth_sensor
+  "gazebo_dev"
+  "gazebo_ros"
+)
+ament_export_libraries(ground_truth_sensor)
+target_link_libraries(
+  ground_truth_sensor
+  ${geometry_msgs_LIBRARIES} 
+  ${GAZEBO_LIBRARIES}
+)
+
+install(TARGETS
+  ground_truth_sensor
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+)
+
+add_library(thruster_driver_plugin SHARED
+  src/thruster_driver_plugin.cpp
+)
+target_include_directories(thruster_driver_plugin PUBLIC
+  include
+)
+ament_target_dependencies(thruster_driver_plugin
+  "gazebo_dev"
+  "gazebo_ros"
+)
+ament_export_libraries(thruster_driver_plugin)
+target_link_libraries(
+  thruster_driver_plugin 
+  ${GAZEBO_LIBRARIES}
+)
+
+install(TARGETS
+  thruster_driver_plugin
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+)
 
 add_executable(underwater_camera 
   src/underwater_camera.cpp
@@ -59,6 +115,18 @@ add_library(triton_gazebo SHARED
   src/underwater_camera.cpp
 )
 
+add_library(bounding_box_plugin SHARED src/bounding_box_plugin.cpp)
+target_include_directories(bounding_box_plugin PUBLIC
+  include
+)
+target_link_libraries(bounding_box_plugin ${GAZEBO_LIBRARIES})
+ament_target_dependencies(bounding_box_plugin
+  "triton_interfaces"
+)
+ament_export_libraries(bounding_box_plugin)
+target_link_libraries(bounding_box_plugin ${GAZEBO_LIBRARIES})
+
+
 rclcpp_components_register_nodes(triton_gazebo "triton_gazebo::UnderwaterCamera")
 
 target_compile_definitions(triton_gazebo
@@ -71,6 +139,33 @@ ament_target_dependencies(triton_gazebo
   "image_transport"
   "sensor_msgs"
   "message_filters"
+  "geometry_msgs"
+)
+
+link_directories(${gazebo_dev_LIBRARY_DIRS})
+
+add_library(hydrodynamics_plugin SHARED
+  src/hydrodynamics_plugin.cpp
+  gazebo_utils/src/gazebo_utils.cpp
+  math_utils/src/math_utils.cpp
+)
+target_include_directories(hydrodynamics_plugin PUBLIC
+  include
+  gazebo_utils
+  math_utils
+)
+ament_target_dependencies(hydrodynamics_plugin
+  "gazebo_dev"
+  "gazebo_ros"
+)
+ament_export_libraries(hydrodynamics_plugin)
+target_link_libraries(hydrodynamics_plugin ${GAZEBO_LIBRARIES})
+
+install(TARGETS
+  hydrodynamics_plugin
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
 )
 
 install(TARGETS
@@ -80,8 +175,12 @@ install(TARGETS
   RUNTIME DESTINATION bin
 )
 
-
-
+install(TARGETS
+  bounding_box_plugin
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+)
 
 install(DIRECTORY
   config
@@ -97,6 +196,15 @@ install(DIRECTORY
 install(DIRECTORY
   models
   DESTINATION share/${PROJECT_NAME}/gazebo
+)
+
+# Install Python modules
+ament_python_install_package(${PROJECT_NAME})
+
+# Install Python executables
+install(PROGRAMS
+  triton_gazebo/bounding_box_image_saver.py
+  DESTINATION lib/${PROJECT_NAME}
 )
 
 if(BUILD_TESTING)
