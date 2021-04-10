@@ -9,11 +9,42 @@
 using namespace std;
 using namespace cv;
 using namespace vision_utils;
+using std::placeholders::_1;
 
-SphereDetector::SphereDetector(float _im_resize, bool _debug, float _focal)
+SphereDetector::SphereDetector(const rclcpp::NodeOptions & options)
+: Node("sphere_detector", options) 
 {
+    publisher_ = this->create_publisher<triton_interfaces::msg::SpherePosition>(
+      "sphere_detector/out",
+      10
+    );
+
+    image_subscription_ = image_transport::create_subscription(this,
+        "sphere_detector/image_in",
+        bind(&SphereDetector::subscriberCallback, this, _1),
+        "raw"
+    );
+
+    subscription_ = this->create_subscription<std_msgs::msg::Float32MultiArray>(
+        "sphere_detector/in", 10, bind(&SphereDetector::updateJob, this, _1)
+    );
+
+
+    vector<string> args = options.arguments();
+    float _im_resize = 1;
+    float _focal = 400;
+    float _debug = false;
+    if (1 >= args.size())
+      _im_resize = stof(args[0]);
+    if (2 >= args.size())
+      _debug = stof(args[1]);
+    if (3 >= args.size())
+      _focal = stof(args[2]);
     ObjectDetector(_im_resize, _debug, _focal);
     focal = _focal;
+    radius = 10;
+    number = 0;
+    hue = 10;
 }
 
 vector<Vec3f> SphereDetector::find_circles(Mat src, double minDist, int method, double dp, double cannyThreshold, double accumulatorThreshold, int minRadius, int maxRadius)
@@ -214,8 +245,27 @@ triton_interfaces::msg::SpherePosition SphereDetector::circles_positions_msg(Mat
     return message;
 }
 
+void SphereDetector::subscriberCallback(const sensor_msgs::msg::Image::ConstSharedPtr & msg) {
+    cv_bridge::CvImagePtr cv_ptr;
+    try {
+        cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
+    } catch (cv_bridge::Exception& e) {
+        RCLCPP_ERROR(get_logger(),"cv_bridge exception: %s", e.what());
+        publisher_->publish(triton_interfaces::msg::SpherePosition());
+        return;
+    }
+    publisher_->publish(circles_positions_msg(cv_ptr->image, radius, number, hue));
+}
+
+void SphereDetector::updateJob(std_msgs::msg::Float32MultiArray::SharedPtr msg) {
+  radius = msg->data[0];
+  number = (int) msg->data[1];
+  hue = (int) msg->data[2];
+}
+
 int main(void)
 {
+  /*
     const String window_capture_name = "Video Capture";
     const String window_capture_name_filtered = "Video Capture: filtered";
     const String window_detection_name = "Object Detection";
@@ -301,7 +351,6 @@ int main(void)
           resizeWindow(window_capture_name, h, w);
           resizeWindow(window_capture_name_filtered, h, w);
           resizeWindow(window_detection_name, h, w);
-          */
           //! [show]
 
         char key = (char) waitKey(30);
@@ -311,4 +360,5 @@ int main(void)
         }
     }
     return 0;
+    */
 }

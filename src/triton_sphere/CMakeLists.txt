@@ -24,6 +24,9 @@ find_package(OpenCV 4 REQUIRED)
 find_package(triton_vision_utils REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(triton_interfaces REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(image_transport REQUIRED)
+find_package(std_msgs REQUIRED)
 
 include_directories(include ${catkin_INCLUDE_DIRS})
 include_directories(${OpenCV_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
@@ -45,6 +48,9 @@ ament_target_dependencies(sphere_detector
   "rclcpp_components"
   "geometry_msgs"
   "triton_interfaces"
+  "std_msgs"
+  "sensor_msgs"
+  "image_transport"
 )
 
 install(TARGETS sphere_detector
