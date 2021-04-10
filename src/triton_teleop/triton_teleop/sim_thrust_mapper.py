@@ -38,7 +38,7 @@ class SimThrustMapper(Node):
         else:
             for i in range(1,self.num_thrusters+1):
                 wrench_msg = Wrench()
-                wrench_msg.force.x = msg.data[i-1]
+                wrench_msg.force.z = msg.data[i-1]
                 self.thrust_pub_dict[i].publish(wrench_msg)
 
 def main(args=None):
