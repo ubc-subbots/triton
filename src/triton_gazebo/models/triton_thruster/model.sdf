@@ -15,7 +15,7 @@
         </inertia>
       </inertial>
 
-      <gravity>0</gravity>
+      <gravity>1</gravity>
 
       <!-- Visual Data -->
       <visual name='visual'>
@@ -92,6 +92,7 @@
           </contact>
         </surface>
       </collision>
+
     </link>
     <static>0</static>
     <allow_auto_disable>1</allow_auto_disable>

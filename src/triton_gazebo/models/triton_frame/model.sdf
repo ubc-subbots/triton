@@ -7,17 +7,16 @@
       <inertial>
         <mass>17.43388</mass>
         <inertia>
-          <ixx>0.42659179587</ixx>
-          <ixy>0.00091257391</ixy>
+          <ixx> 0.42659179587</ixx>
+          <ixy> 0.00091257391</ixy>
           <ixz>-0.00613671114</ixz>
-          <iyy>0.47862692534</iyy>
+          <iyy> 0.47862692534</iyy>
           <iyz>-0.00224649356</iyz>
-          <izz>0.42575057622</izz>
+          <izz> 0.42575057622</izz>
         </inertia>
         <pose>-0.14826 -0.1687 0.19368 0 -0 0</pose>
       </inertial>
 
-      <gravity>0</gravity>
       <!-- Visual Data -->
       <visual name='visual'>
         <pose>0 0 0 0 0 0</pose>
@@ -34,6 +33,8 @@
         <transparency>0</transparency>
         <cast_shadows>1</cast_shadows>
       </visual>
+
+      <gravity>1</gravity>
 
       <!-- Collision Data-->
       <collision name='collision'>

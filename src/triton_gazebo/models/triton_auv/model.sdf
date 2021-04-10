@@ -74,10 +74,16 @@
 
     -->
 
-    <neutrally_buoyant>0</neutrally_buoyant>
+    <base_link>frame::frame</base_link>
+    <neutrally_buoyant>1</neutrally_buoyant>
     <volume>0.0209673336007</volume>
     <center_of_buoyancy>-0.1460	-0.1651	0.2339</center_of_buoyancy>
     <hydrodynamic_model>
+        <!-- Useful params for controls simplifications-->
+        <scalingBuoyancy>0.93</scalingBuoyancy>
+        <scalingDamping>1.0</scalingDamping>
+        <scalingAddedMass>0.01</scalingAddedMass>
+
         <!-- Added mass: see p.28 in Berg2012 -->
         <added_mass>
           5.579266667 0           0           0         0           0
@@ -87,8 +93,6 @@
           0           0           0           0         15.51297973 0
           0           0           0           0         0           16.14743877
         </added_mass>
-        <!-- Added mass values calculated seem too large -->
-        <scalingAddedMass>0.01</scalingAddedMass>
         <!-- Linear damping: see p.31 in Berg2012 -->
         <linear_damping>
             -0.2229119791 -1.105547605 -0.2472084207 -0.02229119791 -0.1105547605 -0.02472084207
@@ -221,12 +225,14 @@
 
     <!-- Thrust Vectors -->
     <plugin name="thruster_array" filename="libthruster_driver_plugin.so">
-        <thruster_count>6</thruster_count>
-        <ros>
-            <namespace>/triton/controls</namespace>
-            <remapping>output_forces</remapping>
-        </ros>
+      <thruster_count>6</thruster_count>
+      <ros>
+        <namespace>/triton/controls</namespace>
+        <remapping>output_forces</remapping>
+      </ros>
     </plugin>
+
+    <plugin name="hydrodynamics" filename="libhydrodynamics_plugin.so"></plugin>
 
     <static>0</static>
     <allow_auto_disable>1</allow_auto_disable>
