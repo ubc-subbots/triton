@@ -29,7 +29,7 @@ find_package(image_transport REQUIRED)
 find_package(std_msgs REQUIRED)
 
 include_directories(include ${catkin_INCLUDE_DIRS})
-include_directories(${OpenCV_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+include_directories(${OpenCV_INCLUDE_DIRS} )
 
 #add_executable(triton_sphere_detection
 #  src/sphere_detector.cpp
@@ -39,10 +39,10 @@ add_library(triton_sphere_detection SHARED
   src/sphere_detector.cpp
 )
 
-target_include_directories(triton_sphere_detection PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>
-)
+#target_include_directories(triton_sphere_detection PUBLIC
+#  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+#  $<INSTALL_INTERFACE:include>
+#)
 
 target_link_libraries(triton_sphere_detection ${OpenCV_LIBRARIES} )
 
@@ -67,7 +67,8 @@ ament_target_dependencies(triton_sphere_detection
   "image_transport"
 )
 
-install(TARGETS triton_sphere_detection
+install(TARGETS 
+  triton_sphere_detection
   #EXPORT export_${PROJECT_NAME}
   #DESTINATION lib/${PROJECT_NAME}
   ARCHIVE DESTINATION lib
