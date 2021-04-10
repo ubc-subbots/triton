@@ -1,11 +1,13 @@
 #include <iostream>
 #include <cmath>
 #include <unistd.h>
+
 #include <opencv2/opencv.hpp>
+
 #include "triton_vision_utils/vision_utils.hpp"
 #include "featurize.cpp"
+
 using namespace std;
-//namespace fs = std::filesystem;
 using namespace cv;
 using namespace cv::ml;
 using namespace vision_utils;
@@ -16,22 +18,6 @@ using namespace vision_utils;
 
 class GateDetector : public ObjectDetector
 {
-private:
-    vector<Point> gate_cntr;
-    Size gate_dims; // in m
-    vector<tuple<float, float, float, float, float, float>> estimated_poses;
-    int frame_count;
-    tuple<float, float, float, float, float, float> gate_pose; // x, y, z, phi, theta, psi
-    PoleFeaturizer featurizer;
-    char directorybuf[64];
-    Mat pre;
-    Mat enh;
-    Mat seg;
-    //vector<Point> *hulls;
-    vector<vector<Point>> hulls;
-    Mat bound;
-    Mat bound_and_pose; 
-    bool debug;
 
 
 public:
@@ -196,6 +182,7 @@ public:
       return src;
     }
 
+
     /**
      * Creates the estimated gate contour from the given hull points, draws debug info on src if activated
      * @param hull_points: 2D array of points
@@ -257,6 +244,26 @@ public:
     {
       return tuple<float, float, float, float, float, float>();
     }
+
+private:
+
+
+    vector<Point> gate_cntr;
+    Size gate_dims; // in m
+    vector<tuple<float, float, float, float, float, float>> estimated_poses;
+    int frame_count;
+    tuple<float, float, float, float, float, float> gate_pose; // x, y, z, phi, theta, psi
+    PoleFeaturizer featurizer;
+    char directorybuf[64];
+    Mat pre;
+    Mat enh;
+    Mat seg;
+    //vector<Point> *hulls;
+    vector<vector<Point>> hulls;
+    Mat bound;
+    Mat bound_and_pose; 
+    bool debug;
+
 
    };
 /**

@@ -8,16 +8,15 @@ using namespace cv;
 
 namespace vision_utils
 {
+
+
 	class ObjectDetector
 	{
-	private:
-		float im_resize = 1.0;
-		bool debug = false;
-		float focal = 400.0;
-		Size im_dims;
-		Mat curr_image;
+
 
 	public:
+
+
 		/**
 		 *  Initializes an object detector
 		 * @param input_im_resize: The scale to resize the image to, default: 1.0
@@ -25,6 +24,7 @@ namespace vision_utils
 		 * @param input_focol: default: 400.0
 		 */
 		ObjectDetector(float _im_resize = 1, bool _debug = false, float _focal = 400.0);
+
 
 		/**
 		 * Detects an object from a raw image
@@ -34,12 +34,14 @@ namespace vision_utils
 		 */
 		//detect(src);
 
+
 		/**
 		 * Preprocess the source image by blurring and resizing
 		 * @param src: A raw unscaled image
 		 * @return: The preprocessed and scaled image
 		 */
 		Mat preprocess(Mat src);
+		
 
 		/**
          * Enhances a raw image to account for underwater artifacts affecting contrast, hue and saturation.
@@ -54,12 +56,14 @@ namespace vision_utils
          */
 		Mat enhance(Mat src, int clahe_clr_space_bgr = 1, int clahe_clr_space_hsv = 1, int clahe_clr_space_lab = 1, int clahe_clip_limit = 1);
 
+
 		/**
          * Computes the sobel gradient fo a source image
          * @param src: A grayscale image
          * @return The sobel gradient response of the image
          */
 		Mat gradient(Mat src);
+
 
 		/**
 		 * Smooths a binary image with morphological operations
@@ -69,6 +73,7 @@ namespace vision_utils
 		 */
 		Mat morphological(Mat src, Size open_kernel = Size(1, 1), Size close_kernel = Size(1, 1));
 
+
 		/**
 		 * Creates a set of convex hulls from the binary segmented image and which are of 
 		 * an appropriate size based on upper and lower area thresholds
@@ -77,6 +82,7 @@ namespace vision_utils
 		 * @param lower_area: Lower threshold of area filter
 		 */
 		vector<vector<Point>> convex_hulls(Mat src, float upper_area = 1.0 / 2, float lower_area = 1.0 / 1000);
+
 		
 		/**
 		 * Removes contours with small areas from source image. Helps remove noise.
@@ -85,6 +91,8 @@ namespace vision_utils
 		 * @return: A filtered image
 		 */
 		Mat filter_small_contours(Mat src, double area);
+
+
 		/**
 		 * Segment image using specified hue.
 		 * @param src: An image
@@ -93,6 +101,7 @@ namespace vision_utils
 		 */
 		Mat util_segment(Mat src, int hue);
 
+
 		/**
 		 * Calculate the eccentricity of an ellipse.
 		 * @param contour: contour of source ellipse
@@ -100,6 +109,15 @@ namespace vision_utils
 		 * 				   0: circle; 1: straight line
 		 */
 		double eccentricity(vector<Point> contour);
+
+
+	private:
+
+		float im_resize = 1.0;
+		bool debug = false;
+		float focal = 400.0;
+		Size im_dims;
+		Mat curr_image;
 
 	};
 

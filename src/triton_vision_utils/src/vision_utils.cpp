@@ -1,12 +1,13 @@
-#include "triton_vision_utils/vision_utils.hpp"
-//#include <opencv2/core/mat.hpp>
-
-#include <opencv2/opencv.hpp>
 #include <iostream>
 #include <string>
+
+#include <opencv2/opencv.hpp>
+#include "triton_vision_utils/vision_utils.hpp"
+
 using namespace std;
 using namespace cv;
 using namespace vision_utils;
+
 
 ObjectDetector::ObjectDetector(float _im_resize, bool _debug, float _focal)
 {
@@ -15,7 +16,9 @@ ObjectDetector::ObjectDetector(float _im_resize, bool _debug, float _focal)
     focal = _focal;
 }
 
+
 //detect(src);
+
 
 Mat ObjectDetector::preprocess(Mat src)
 {
@@ -35,6 +38,7 @@ Mat ObjectDetector::preprocess(Mat src)
     }
     return src;
 }
+
 
 Mat ObjectDetector::enhance(Mat src, int clahe_clr_space_bgr, int clahe_clr_space_hsv, int clahe_clr_space_lab, int clahe_clip_limit)
 {
@@ -101,6 +105,7 @@ Mat ObjectDetector::enhance(Mat src, int clahe_clr_space_bgr, int clahe_clr_spac
 
 }
 
+
 Mat ObjectDetector::gradient(Mat src)
 {
     int scale = 1;
@@ -117,6 +122,7 @@ Mat ObjectDetector::gradient(Mat src)
     // Note: original python version uses np expand_dims(..., axis=2)
 }
 
+
 Mat ObjectDetector::morphological(Mat src, Size open_kernel, Size close_kernel)
 {
     Mat open_k = getStructuringElement(MORPH_RECT, open_kernel);
@@ -127,6 +133,7 @@ Mat ObjectDetector::morphological(Mat src, Size open_kernel, Size close_kernel)
     return closing;
     //return opening;
 }
+
 
 vector<vector<Point>> ObjectDetector::convex_hulls(Mat src, float upper_area, float lower_area)
 {
@@ -169,6 +176,7 @@ vector<vector<Point>> ObjectDetector::convex_hulls(Mat src, float upper_area, fl
     return right_size_vector_of_hulls;
 }
 
+
 Mat ObjectDetector::filter_small_contours(Mat src, double area) {
 
     Mat filtered = src.clone();
@@ -186,6 +194,7 @@ Mat ObjectDetector::filter_small_contours(Mat src, double area) {
 
     return filtered;
 }
+
 
 Mat ObjectDetector::util_segment(Mat src, int hue) {
     

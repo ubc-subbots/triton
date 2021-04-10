@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(triton_sphere)
+project(triton_sphere_detection)
 
 # Default to C99
 if(NOT CMAKE_C_STANDARD)
@@ -31,19 +31,33 @@ find_package(std_msgs REQUIRED)
 include_directories(include ${catkin_INCLUDE_DIRS})
 include_directories(${OpenCV_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
-add_executable(sphere_detector
+#add_executable(triton_sphere_detection
+#  src/sphere_detector.cpp
+#)
+
+add_library(triton_sphere_detection SHARED
   src/sphere_detector.cpp
 )
 
-target_include_directories(sphere_detector PUBLIC
+target_include_directories(triton_sphere_detection PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
 )
+
+target_link_libraries(triton_sphere_detection ${OpenCV_LIBRARIES} )
+
+rclcpp_components_register_nodes(triton_sphere_detection
+  "triton_sphere_detection::SphereDetector"
+)
+
+target_compile_definitions(triton_sphere_detection
+  PRIVATE "triton_sphere_detection_CPP_BUILDING_DLL"
+)
   
-ament_target_dependencies(sphere_detector
-  cv_bridge
-  OpenCV
-  triton_vision_utils
+ament_target_dependencies(triton_sphere_detection
+  "cv_bridge"
+  "OpenCV"
+  "triton_vision_utils"
   "rclcpp"
   "rclcpp_components"
   "geometry_msgs"
@@ -53,12 +67,24 @@ ament_target_dependencies(sphere_detector
   "image_transport"
 )
 
-install(TARGETS sphere_detector
-  EXPORT export_${PROJECT_NAME}
-  DESTINATION lib/${PROJECT_NAME}
+install(TARGETS triton_sphere_detection
+  #EXPORT export_${PROJECT_NAME}
+  #DESTINATION lib/${PROJECT_NAME}
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+)
+
+install(DIRECTORY
+  launch
+  DESTINATION share/${PROJECT_NAME}/
 )
 
 if(BUILD_TESTING)
+  find_package(launch_testing_ament_cmake REQUIRED)
+  add_launch_test(
+    test/test_sphere_detection_launch.py
+  )
 endif()
 
 ament_package()
