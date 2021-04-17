@@ -22,6 +22,8 @@ find_package(rclcpp_components REQUIRED)
 find_package(cv_bridge REQUIRED)
 find_package(OpenCV 4 REQUIRED)
 find_package(triton_vision_utils REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(image_transport REQUIRED)
 
 include_directories(include)
 
@@ -41,6 +43,8 @@ ament_target_dependencies(triton_gate
   "cv_bridge"
   "OpenCV"
   "triton_vision_utils"
+  "sensor_msgs"
+  "image_transport"
 )
 
 install(TARGETS
@@ -52,33 +56,8 @@ install(TARGETS
 
 install(DIRECTORY
   launch
-  DESTINATION share/${PROJECT_NAME}/
-)
-
-add_executable(gate_detector
-  src/gate_detector1.cpp
-)
-
-target_include_directories(gate_detector PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>
-)
-  
-ament_target_dependencies(gate_detector
-  cv_bridge
-  OpenCV
-  triton_vision_utils
-)
-
-install(DIRECTORY
-  launch
   config
   DESTINATION share/${PROJECT_NAME}/
-)
-
-install(TARGETS gate_detector
-  EXPORT export_${PROJECT_NAME}
-  DESTINATION lib/${PROJECT_NAME}
 )
 
 if(BUILD_TESTING)

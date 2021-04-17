@@ -4,6 +4,9 @@
 #include <opencv2/opencv.hpp>
 
 #include "rclcpp/rclcpp.hpp"
+#include "image_transport/image_transport.hpp"
+#include "cv_bridge/cv_bridge.h"
+#include "sensor_msgs/image_encodings.hpp"
 #include "triton_gate/pole_featurizer.hpp"
 #include "triton_vision_utils/object_detector.hpp"
 
@@ -21,16 +24,21 @@ public:
    * @param src Raw underwater image containing the gate
    * @return Image associated to bounding and posing.
    */
-  cv::Mat detect(cv::Mat src);
+  void detect(const sensor_msgs::msg::Image & msg);
 
 private:
+
+  /** Callback used by subscriber to process and publish results
+   */
+  void subscriberCallback(const sensor_msgs::msg::Image::ConstSharedPtr & msg);
+
   /**
    * Segment the image using thresholded saturation gradient and orange/red color mask
    *
    * @param src A preprocessed image
    * @return A segmented grayscale image
    */
-  cv::Mat segment(cv::Mat src);
+  cv::Mat segment(cv::Mat& src);
 
   /**
    * Finds the convex hulls associated to the poles and uses this to draw a bounding box around the poles
@@ -40,7 +48,7 @@ private:
    * @param src The raw unscaled image
    * @return The raw scaled image with the bounding box around the gate location drawn on
    */
-  cv::Mat bound_gate_using_poles(std::vector<std::vector<cv::Point>> hulls, cv::Mat src);
+  void boundGateUsingPoles(std::vector<std::vector<cv::Point>> hulls, cv::Mat& src);
 
   /**
    * Creates the estimated gate contour from the given hull points, draws debug info on src if activated
@@ -49,22 +57,21 @@ private:
    * @param src The raw image
    * @return The gate contour drawn on the src image with debug info if activated
    */
-  std::vector<cv::Point> create_gate_contour(std::vector<cv::Point> hull_points, cv::Mat src);
+  std::vector<cv::Point> createGateContour(std::vector<cv::Point> hull_points, cv::Mat& src);
 
-  std::vector<cv::Point> gate_cntr;
-  cv::Size gate_dims;  // in m
-  std::vector<std::tuple<float, float, float, float, float, float>> estimated_poses;
-  int frame_count;
-  std::tuple<float, float, float, float, float, float> gate_pose;  // x, y, z, phi, theta, psi
-  triton_gate::PoleFeaturizer featurizer;
-  char directorybuf[64];
-  cv::Mat pre;
-  cv::Mat enh;
-  cv::Mat seg;
-  std::vector<std::vector<cv::Point>> hulls;
-  cv::Mat bound;
-  cv::Mat bound_and_pose;
-  bool debug;
+  /** Helper for publishing debug message
+   * 
+   * @param src The debug image to publish
+   * @param publisher The publisher to use to publish the image
+   */
+  void debugPublish(cv::Mat& src, image_transport::Publisher& publisher);
+
+  bool debug_;
+  std::vector<cv::Point> gate_cntr_;
+  image_transport::Subscriber subscription_; 
+  image_transport::Publisher debug_segment_publisher_;
+  image_transport::Publisher debug_detection_publisher_;
+  triton_gate::PoleFeaturizer featurizer_;
 };
 
 }  // namespace triton_gate

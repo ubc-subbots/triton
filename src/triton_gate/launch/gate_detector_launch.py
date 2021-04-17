@@ -8,15 +8,15 @@ def generate_launch_description():
     ld = LaunchDescription()
 
     gate_detector = ComposableNode(
-        name='component_one',
-        namespace='/triton',
+        name='detector',
+        namespace='/triton/gate',
         package='triton_gate',
-        plugin='triton_gate::GateDetector'
+        plugin='triton_gate::GateDetector',
     )
 
     gate_container = ComposableNodeContainer(
         name='gate_container',
-        namespace='/triton',
+        namespace='/',
         package='rclcpp_components',
         executable='component_container',
         composable_node_descriptions=[

@@ -14,7 +14,7 @@ vector<float> ContourFeatures::ellispe_features(vector<Point> cnt)
   float angle = 0;
   int MA = 1;
   int ma = 1;
-  if (cnt.size() >= 3)
+  if (cnt.size() >= 5)
   {
     RotatedRect rr = fitEllipse(cnt);
     angle = rr.angle;

@@ -119,10 +119,9 @@ Mat ObjectDetector::morphological(Mat src, Size open_kernel, Size close_kernel)
   morphologyEx(src, opening, MORPH_OPEN, open_k);
   morphologyEx(opening, closing, MORPH_CLOSE, close_k);
   return closing;
-  // return opening;
 }
 
-vector<vector<Point>> ObjectDetector::convex_hulls(Mat src, float upper_area, float lower_area)
+vector<vector<Point>> ObjectDetector::convexHulls(Mat& src, float upper_area, float lower_area)
 {
   vector<vector<Point>> hulls;
   int hullIndex = 0;

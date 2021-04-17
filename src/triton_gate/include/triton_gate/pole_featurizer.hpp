@@ -31,7 +31,7 @@ public:
    * @param hulls The convex hulls to be featurized
    * @return The feature matrix X_hat
    */
-  Mat featurize_for_classification(vector<vector<Point>> hulls)
+  Mat featurizeForClassification(vector<vector<Point>> hulls)
   {
     int vecNum = 0;
     int cols = 10;
@@ -39,8 +39,7 @@ public:
     float x_array[rows][10];
     for (vector<Point> hull : hulls)
     {
-      // X_hat.push_back(Mat(form_feature_vector(hull)).reshape(0,1)); // so each feature vector is a row
-      vector<float> feat = form_feature_vector(hull);
+      vector<float> feat = formFeatureVector(hull);
       for (int feature = 0; feature < 10; feature++)
       {
         x_array[vecNum][feature] = feat.at(feature);
@@ -48,7 +47,6 @@ public:
       vecNum++;
     }
     Mat X_hat = Mat(rows, 10, CV_32F, &x_array);
-    // cout << X_hat << endl;
     return X_hat;
   }
 
@@ -57,29 +55,25 @@ public:
    * @param hulls The convex hulls to be featurized
    * @return The feature vector of the hull
    */
-  vector<float> form_feature_vector(vector<Point> hull)
+  vector<float> formFeatureVector(vector<Point> hull)
   {
     vector<float> features;
 
-    // cout << "before ellipse" << endl ;
     vector<float> ellipse_feat = cnt_features.ellispe_features(hull);
     float MA = ellipse_feat.at(0);
     float ma = ellipse_feat.at(1);
     float angle = ellipse_feat.at(2);
 
-    // cout << "before area" << endl ;
     vector<float> area_feat = cnt_features.area_features(hull);
     float hull_area = area_feat.at(0);
     float rect_area = area_feat.at(1);
     float aspect_ratio = area_feat.at(2);
 
-    // cout << "before min area" << endl ;
     vector<vector<Point>> min_area_feat = cnt_features.min_area_features(hull);
     vector<Point> min_rect = min_area_feat.at(0);
     vector<Point> min_tri = min_area_feat.at(1);
     float min_circ_rad = cnt_features.min_area_feature_circ(hull);
 
-    // cout << "before hu moment" << endl ;
     vector<float> hu_moments = cnt_features.hu_moments_featurize(hull);
 
     float axis_ratio = MA / ma;
@@ -95,6 +89,7 @@ public:
     return features;
   }
 };
+
 }  // namespace triton_gate
 
 #endif  // TRITON_GATE__POLE_FEATURIZER

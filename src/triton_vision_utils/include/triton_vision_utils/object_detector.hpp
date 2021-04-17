@@ -26,7 +26,7 @@ public:
    * @return Three images representing the algorithms at various stages. The last
    *          image must always be the final output fo the algorithm.
    */
-  virtual cv::Mat detect(cv::Mat src){};
+  // virtual cv::Mat detect(cv::Mat src)=0;
 
   /**
    * Preprocess the source image by blurring and resizing
@@ -76,7 +76,7 @@ public:
    * @param upper_area Upper threshold of area filter
    * @param lower_area Lower threshold of area filter
    */
-  std::vector<std::vector<cv::Point>> convex_hulls(cv::Mat src, float upper_area = 1.0 / 2,
+  std::vector<std::vector<cv::Point>> convexHulls(cv::Mat& src, float upper_area = 1.0 / 2,
                                                    float lower_area = 1.0 / 1000);
 
 private:

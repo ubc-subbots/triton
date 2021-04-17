@@ -1,54 +1,76 @@
 #include "triton_gate/gate_detector.hpp"
 #include "triton_gate/pole_featurizer.hpp"
+#include <string> 
 
 using namespace std;
 using namespace cv;
 using namespace cv::ml;
 using namespace triton_vision_utils;
+using std::placeholders::_1;
 
 namespace triton_gate
 {
 GateDetector::GateDetector(const rclcpp::NodeOptions& options) : Node("gate_detector", options)
 {
-  float im_resize = 1.0;
-  bool _debug = true;
-  float focal = 400.0;
-  // TODO: parameterize img_resize, debug, focal
-  ObjectDetector(im_resize, _debug, focal);
-  debug = _debug;
-  gate_cntr = {};
-  gate_dims = Size(1.2192, 3.2004);
-  estimated_poses = {};
-  frame_count = 0;
-  gate_pose = tuple<float, float, float, float, float, float>(0, 0, 0, 0, 0, 0);
-  featurizer = PoleFeaturizer();
-  getcwd(directorybuf, 64);
-  string directory(directorybuf);
-  RCLCPP_INFO(this->get_logger(), "Gate Detector succesfully started!");
+  debug_ = true;
+  ObjectDetector(1.0, debug_, 400.0);
+  gate_cntr_ = {};
+  featurizer_ = PoleFeaturizer();
+  
+  rmw_qos_profile_t sensor_qos_profile = rmw_qos_profile_sensor_data;
+
+  subscription_ = image_transport::create_subscription(this,
+      "/triton/drivers/front_camera/image_raw",
+      bind(&GateDetector::subscriberCallback, this, _1),
+      "raw",
+      sensor_qos_profile
+  );
+
+  debug_detection_publisher_ = image_transport::create_publisher(this, "detector/debug/detection");
+  debug_segment_publisher_ = image_transport::create_publisher(this, "detector/debug/segment");
+
+  RCLCPP_INFO(this->get_logger(), "GateDetector succesfully started!");
 }
 
-cv::Mat GateDetector::detect(cv::Mat src)
+void GateDetector::subscriberCallback(const sensor_msgs::msg::Image::ConstSharedPtr & msg)
 {
-  pre = preprocess(src);
-  enh = enhance(pre, 0, 0, 0, 1);
-  seg = morphological(segment(enh), Size(1, 1), Size(1, 1));
-  hulls = convex_hulls(seg, 1.0 / 4, 1.0 / 800);
-  bound = bound_gate_using_poles(hulls, src);
-  return bound;
+  detect(*msg);
 }
 
-cv::Mat GateDetector::segment(cv::Mat src)
+void GateDetector::detect(const sensor_msgs::msg::Image & msg)
+{
+  //Get image from message
+  cv_bridge::CvImagePtr cv_ptr;
+  try {
+      cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
+  } catch (cv_bridge::Exception& e) {
+      RCLCPP_ERROR(get_logger(),"cv_bridge exception: %s", e.what());
+      return;
+  }
+
+  cv::Mat detection = cv_ptr->image;
+  cv::Mat segmented = morphological(segment(detection), Size(3, 3), Size(3, 3));
+  std::vector<std::vector<cv::Point>> hulls = convexHulls(segmented, detection.rows*detection.cols, 0);
+  boundGateUsingPoles(hulls, detection);
+
+  if (debug_)
+  {
+    debugPublish(detection, debug_detection_publisher_);
+    debugPublish(segmented, debug_segment_publisher_);
+  }
+}
+
+cv::Mat GateDetector::segment(cv::Mat& src)
 {
   // Convert to HSV color space
   Mat hsv;
   cvtColor(src, hsv, COLOR_BGR2HSV);
 
-  // Compute gradient threshold on saturation channel of HSV image
-  // (seems to have best response)
-  ObjectDetector objdtr = ObjectDetector(0.5, true, 400);
+  // Compute gradient threshold on saturation channel of HSV image (seems to have best response)
   Mat hsvChannels[3];
   split(hsv, hsvChannels);
-  Mat grad = objdtr.gradient(hsvChannels[1]);
+  Mat grad = gradient(hsvChannels[1]);
+  return grad;
   Scalar grad_mean, grad_std;
   meanStdDev(grad, grad_mean, grad_std);
   Mat grad_thres;
@@ -66,34 +88,47 @@ cv::Mat GateDetector::segment(cv::Mat src)
   // a great response to the poles at all distances to them
   Mat segmented;
   bitwise_or(grad_thres, color_mask, segmented);
+  vector<int> compression_params;
   return segmented;
 }
 
-cv::Mat GateDetector::bound_gate_using_poles(std::vector<std::vector<Point>> hulls, cv::Mat src)
+void GateDetector::boundGateUsingPoles(std::vector<std::vector<Point>> hulls, cv::Mat& src)
 {
-  // ignore featurize first, let all hulls be pole hulls
-  // Resize src to match the image the hulls were found on
-  // resize(src, src, seg.size(), 0,0,INTER_CUBIC);
-
   // We can't do anything if we aren't given any hulls
   if (hulls.size() == 0)
   {
-    return src;
+    return;
   }
 
   // Featurize hulls, predict using model and get classified pole hulls
   vector<vector<Point>> pole_hulls;
-  Ptr<SVM> svm = SVM::load("/home/jared/subbot/triton/accuracy_opencv_model.xml");
-  vector<float> y_hat;
-  Mat X_hat = featurizer.featurize_for_classification(hulls);
-  svm->predict(X_hat, y_hat);
-  for (int i = 0; i < hulls.size(); i++)
+  for (int i=0; i< (int) hulls.size(); i++)
   {
-    if (y_hat.at(i) == 1)
+    vector<Point> hull = hulls.at(i);
+    float aspect_ratio = 1.0;
+    if (hull.size() >= 3)
     {
-      pole_hulls.push_back(hulls.at(i));
+      Rect boundingR = boundingRect(hull);
+      aspect_ratio = (float) boundingR.width / boundingR.height ;
+    }
+    float thresh = 0.03;
+    float desired_ratio = 0.11;
+    if (aspect_ratio > desired_ratio - thresh && aspect_ratio < desired_ratio + thresh)
+    {
+      pole_hulls.push_back(hull);
     }
   }
+  // Ptr<SVM> svm = SVM::load("/home/logan/Projects/triton/src/triton_gate/config/accuracy_opencv_model.xml");
+  // vector<float> y_hat;
+  // Mat X_hat = featurizer_.featurizeForClassification(hulls);
+  // svm->predict(X_hat, y_hat);
+  // for (int i = 0; i < hulls.size(); i++)
+  // {
+  //   if (y_hat.at(i) == 1)
+  //   {
+  //     pole_hulls.push_back(hulls.at(i));
+  //   }
+  // }
 
   // Get 2D array of all the points of the pole hulls (to determine extrema)
   vector<Point> hull_points;
@@ -108,51 +143,36 @@ cv::Mat GateDetector::bound_gate_using_poles(std::vector<std::vector<Point>> hul
   // If we have detected a hull associated to a pole
   if (hull_points.size() > 0)
   {
-    vector<Point> _gate_cntr = create_gate_contour(hull_points, src);
+    vector<Point> gate_cntr = createGateContour(hull_points, src);
 
     // Get bounding box of contour to get it's approximate width/height
-    Rect box = boundingRect(_gate_cntr);
-    // Rect box = boundingRect(hull_points);
+    Rect box = boundingRect(gate_cntr);
+
     int w = box.width;
     int h = box.height;
 
     // If the bounding rectangle is more wide than high, most likely we have detected both poles
     if ((float)w / h >= 1)
     {
-      if (gate_cntr.size() == 0)
-      {
-        // We make the strong assumption that the first time we detect the gate, it is accurate
-        gate_cntr = _gate_cntr;
-      }
-      else
-      {
-        // we make sure the area hasn't changed too much (50%) between frames to account for outliers
-        vector<Point> prev_cntr = gate_cntr;
-        double prev_area = contourArea(prev_cntr);
-        double curr_area = contourArea(_gate_cntr);
-        if (curr_area <= 1.5 * prev_area && curr_area >= 0.5 * prev_area)
-        {
-          gate_cntr = _gate_cntr;
-        }
-      }
+      gate_cntr_ = gate_cntr;
     }
   }
   // Draw the gate if we have detected it
-  if (gate_cntr.size() != 0)
+  if (gate_cntr_.size() != 0)
   {
-    polylines(src, gate_cntr, true, Scalar(0, 0, 255), 2);
+    polylines(src, gate_cntr_, true, Scalar(0, 0, 255), 2);
   }
 
   // Draw all non pole hulls and pole hulls on src for debug purposes
-  if (debug)
+  if (debug_)
   {
-    polylines(src, hulls, true, Scalar(0, 0, 255), 2);
-    polylines(src, pole_hulls, true, Scalar(255, 255, 255), 2);
+    polylines(src, hulls, true, Scalar(255, 255, 255), 1);
+    polylines(src, pole_hulls, true, Scalar(0, 128, 256), 1);
   }
-  return src;
+  return;
 }
 
-std::vector<Point> GateDetector::create_gate_contour(std::vector<Point> hull_points, cv::Mat src)
+std::vector<Point> GateDetector::createGateContour(std::vector<Point> hull_points, cv::Mat& src)
 {
   int width = src.cols;
 
@@ -171,18 +191,34 @@ std::vector<Point> GateDetector::create_gate_contour(std::vector<Point> hull_poi
     return (sqrt(pow(a.x, 2) + pow(a.y, 2)) < sqrt(pow(b.x, 2) + pow(b.y, 2)));
   });
 
-  if (debug)
+  if (debug_)
   {
     circle(src, top_left, 8, Scalar(0, 128, 0), 4);
     circle(src, top_right, 8, Scalar(0, 128, 0), 4);
     circle(src, bot_left, 8, Scalar(0, 128, 0), 4);
     circle(src, bot_right, 8, Scalar(0, 128, 0), 4);
   }
+  std::vector<cv::Point> gate_cntr;
   gate_cntr.push_back(top_left);
   gate_cntr.push_back(top_right);
   gate_cntr.push_back(bot_right);
   gate_cntr.push_back(bot_left);
   return gate_cntr;
+}
+
+void GateDetector::debugPublish(cv::Mat& src, image_transport::Publisher& publisher)
+{
+    sensor_msgs::msg::Image debug_msg;
+    cv_bridge::CvImage debug_image;
+    cv::Size sz = src.size();
+    debug_image.image = src;
+    debug_image.toImageMsg(debug_msg);
+    debug_msg.width = sz.width;
+    debug_msg.height = sz.height;
+    debug_msg.encoding = src.channels() == 1 ? sensor_msgs::image_encodings::MONO8 : sensor_msgs::image_encodings::BGR8;
+    debug_msg.step = sz.width*(src.channels());
+    debug_msg.header.frame_id = "base_link";
+    publisher.publish(debug_msg);
 }
 
 }  // namespace triton_gate
