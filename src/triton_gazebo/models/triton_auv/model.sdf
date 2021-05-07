@@ -24,44 +24,44 @@
     <!-- Frame -->
     <include>
       <uri>model://triton_frame</uri>
-      <pose>0 0 0 0 -0 0</pose>
+      <pose>0 0 0 0 0 0</pose>
       <name>frame</name>
     </include>
 
     <!-- Thrusters -->
     <include>
       <uri>model://triton_thruster</uri>
-      <pose>-0.235 -0.189 0 0 1.5707 2.35619</pose>
+      <pose>-0.3776091 -0.357124 0.2136902 0 1.5707 2.35619</pose>
       <name>thruster1</name>
     </include>
 
     <include>
       <uri>model://triton_thruster</uri>
-      <pose>-0.235 0.189 0 0 -1.5707 0.785398</pose>
+      <pose>-0.3776091 0.026924 0.2136902 0 -1.5707 0.785398</pose>
       <name>thruster2</name>
     </include>
 
     <include>
       <uri>model://triton_thruster</uri>
-      <pose>0.2035 0.189 0 0 1.5707 -0.785398</pose>
+      <pose>0.0474091 -0.357124 0.2136902 0 -1.5707 -2.35619</pose>
       <name>thruster3</name>
     </include>
 
     <include>
       <uri>model://triton_thruster</uri>
-      <pose>0.2035 -0.189 0 0 -1.5707 -2.35619</pose>
+      <pose>0.0474091 0.026924 0.2136902 0 1.5707 -0.785398</pose>
       <name>thruster4</name>
     </include>
 
     <include>
       <uri>model://triton_thruster</uri>
-      <pose>0 -0.22 0.13 3.1415 3.1415 0</pose>
+      <pose>-0.14965425999999998 -0.38172644 0.33146492 3.1415 3.1415 0</pose>
       <name>thruster5</name>
     </include>
 
     <include>
       <uri>model://triton_thruster</uri>
-      <pose>0 0.22 0.13 3.1415 3.1415 3.1415</pose>
+      <pose>-0.14965425999999998 0.05152644 0.33146492 3.1415 3.1415 3.1415</pose>
       <name>thruster6</name>
     </include>
 
@@ -112,7 +112,7 @@
     <joint name='frame_thruster1' type='fixed'>
       <parent>frame::frame</parent>
       <child>thruster1::thruster</child>
-      <pose>0 0 0 0 -0 0</pose>
+      <pose>0 0 0 0 0 0</pose>
       <physics>
         <ode>
           <limit>
@@ -130,7 +130,7 @@
     <joint name='frame_thruster2' type='fixed'>
       <parent>frame::frame</parent>
       <child>thruster2::thruster</child>
-      <pose>0 0 0 0 -0 0</pose>
+      <pose>0 0 0 0 0 0</pose>
       <physics>
         <ode>
           <limit>
@@ -148,7 +148,7 @@
     <joint name='frame_thruster3' type='fixed'>
       <parent>frame::frame</parent>
       <child>thruster3::thruster</child>
-      <pose>0 0 0 0 -0 0</pose>
+      <pose>0 0 0 0 0 0</pose>
       <physics>
         <ode>
           <limit>
@@ -166,7 +166,7 @@
     <joint name='frame_thruster4' type='fixed'>
       <parent>frame::frame</parent>
       <child>thruster4::thruster</child>
-      <pose>0 0 0 0 -0 0</pose>
+      <pose>0 0 0 0 0 0</pose>
       <physics>
         <ode>
           <limit>
@@ -184,7 +184,7 @@
     <joint name='frame_thruster5' type='fixed'>
       <parent>frame::frame</parent>
       <child>thruster5::thruster</child>
-      <pose>0 0 0 0 -0 0</pose>
+      <pose>0 0 0 0 0 0</pose>
       <physics>
         <ode>
           <limit>
@@ -202,7 +202,7 @@
     <joint name='frame_thruster6' type='fixed'>
       <parent>frame::frame</parent>
       <child>thruster6::thruster</child>
-      <pose>0 0 0 0 -0 0</pose>
+      <pose>0 0 0 0 0 0</pose>
       <physics>
         <ode>
           <limit>
