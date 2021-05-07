@@ -28,8 +28,7 @@ namespace triton_gazebo
     protected:
 
         /** 
-         * @brief Load function called by Gazebo to initialize the plugin. 
-         * 
+         * @brief Load function called by Gazebo to initialize the plugin.
          * 
          */
         void Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf) override;
@@ -39,9 +38,10 @@ namespace triton_gazebo
          * on each iteration. This can be done by gathering velocity and acceleration data
          * and using SDF parameters to approximate the hydrodynamic and hydrostatic forces
          */ 
-        virtual void Update(const gazebo::common::UpdateInfo &_info);
+        virtual void Update();
 
     private:
+
         /**  
          * @brief Method to bind the Update function to the Gazebo Simulation update
          */
@@ -57,7 +57,7 @@ namespace triton_gazebo
         /**  
          * @brief Collect parameters specified in the robot model description
          */
-        bool GetLinkParameters(sdf::ElementPtr link_sdf);
+        bool GetModelParameters(sdf::ElementPtr model_sdf);
 
         /**
          * @brief Get the current 6-dimensional velocity vector from gazebo. 
@@ -80,18 +80,28 @@ namespace triton_gazebo
         void SetWrenchVector(Eigen::Vector6d wrench);
 
         /**
-         * Computed matrices to satisfy dynamics equations
+         * @brief Compute Coriolis Matrix
          */
         void ComputeAddedCoriolisMatrix(const Eigen::Vector6d& _vel, const Eigen::Matrix6d& _Ma, Eigen::Matrix6d &_Ca) const;
-        void ComputeDampingMatrix(const Eigen::Vector6d& _vel, Eigen::Matrix6d &_D) const;
-        Eigen::Matrix6d GetAddedMass() const;
-        double ComputeScalerDrag(double);
-        
 
-        gazebo::physics::ModelPtr model;
+        /**
+         * @brief Compute drag matrix using fluid dynamics of AUV model
+         */
+        void ComputeDampingMatrix(const Eigen::Vector6d& _vel, Eigen::Matrix6d &_D) const;
+
+        /**
+         * @brief Compute Added mass wrench contributions
+         */
+        Eigen::Matrix6d GetAddedMass() const;
+
+        /**
+         * Calculate buoyancy forces 
+         */
+        void ApplyBuoyancyForce(void);
+
         gazebo::event::ConnectionPtr updateConnection_;
-        // For now, apply to frame but we should Apply hydrodynamics to all links 
         gazebo::physics::LinkPtr frame;
+        gazebo::physics::ModelPtr model;
 
         Eigen::Matrix6d added_mass;
         Eigen::Matrix6d coriolis_matrix;
@@ -103,23 +113,23 @@ namespace triton_gazebo
         Eigen::Matrix6d non_linear_damping;
         Eigen::Vector6d quadratic_damping;
 
-        double mass;
-        double fluid_density;
-        double gravity;
+        ignition::math::Vector3d rel_CoB;
+        ignition::math::Vector3d gravity;
 
-        // Params pulled from Plankton, likely these will be negligable
+        double fluid_density;
+
         double scalingAddedMass; 
         double offsetAddedMass; 
         double scalingDamping;
         double offsetLinearDamping;
         double offsetLinForwardSpeedDamping;
         double offsetNonLinDamping;
+        double scalingBuoyancy;
 
-        double length;
-        double width;
-        double height;
+        double mass;
+        double volume;
+        bool is_neutrally_buoyant;
 
-        double Cd;
     };
 
 } //namespace triton_gazebo

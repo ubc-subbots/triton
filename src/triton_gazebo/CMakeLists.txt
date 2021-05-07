@@ -142,6 +142,32 @@ ament_target_dependencies(triton_gazebo
   "geometry_msgs"
 )
 
+link_directories(${gazebo_dev_LIBRARY_DIRS})
+
+add_library(hydrodynamics_plugin SHARED
+  src/hydrodynamics_plugin.cpp
+  gazebo_utils/src/gazebo_utils.cpp
+  math_utils/src/math_utils.cpp
+)
+target_include_directories(hydrodynamics_plugin PUBLIC
+  include
+  gazebo_utils
+  math_utils
+)
+ament_target_dependencies(hydrodynamics_plugin
+  "gazebo_dev"
+  "gazebo_ros"
+)
+ament_export_libraries(hydrodynamics_plugin)
+target_link_libraries(hydrodynamics_plugin ${GAZEBO_LIBRARIES})
+
+install(TARGETS
+  hydrodynamics_plugin
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+)
+
 install(TARGETS
   triton_gazebo
   ARCHIVE DESTINATION lib

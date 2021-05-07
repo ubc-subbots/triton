@@ -12,8 +12,8 @@ class KeyboardTeleop(Node):
     def __init__(self):
         super().__init__('keyboard_teleop')
 
-        self.force_mags = [1.0, 1.0, 1.0]  # [x,y,z]
-        self.torque_mags = [1.0, 0.0, 1.0]  # [x,y,z]
+        self.force_mags = [15.0, 15.0, 15.0]  # [x,y,z]
+        self.torque_mags = [15.0, 0.0, 15.0]  # [x,y,z]
 
         self.force_pub = self.create_publisher(
             Wrench,
@@ -98,11 +98,11 @@ class KeyboardTeleop(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-
     keyboard_teleop = KeyboardTeleop()
-    rclpy.spin(keyboard_teleop)
-
-    keyboard_teleop.destroy_node()
+    try:
+        rclpy.spin(keyboard_teleop)
+    except KeyboardInterrupt:
+        pass # To force exit code 0
     rclpy.shutdown()
 
 

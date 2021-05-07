@@ -11,13 +11,21 @@ namespace triton_gazebo
 
     void HydrodynamicsPlugin::Load(gazebo::physics::ModelPtr _model, sdf::ElementPtr _sdf)
     {
-        model = _model;
-        frame = model->GetLink("frame::frame");
-        this->mass = frame->GetInertial()->Mass();
+        this->model = _model;
 
-        GetWorldParameters(_model->GetWorld()->SDF());
+        // Get params that apply to the simulation world
+        GetWorldParameters(this->model->GetWorld()->SDF());
 
-        GetLinkParameters(model->GetSDF());
+        // Get params for model dynamics and hydro model
+        GetModelParameters(this->model->GetSDF());
+
+        // Get model's total mass
+        this->mass = 0;
+        std::vector<gazebo::physics::LinkPtr> all_links = this->model->GetLinks();
+        for (int i = 0; i < (int)all_links.size(); i++)
+        {
+            this->mass += all_links[i]->GetInertial()->Mass();
+        }
 
         this->DLinForwardSpeed.setZero();
 
@@ -27,56 +35,77 @@ namespace triton_gazebo
     // Return a status flag if needed later on
     bool HydrodynamicsPlugin::GetWorldParameters(sdf::ElementPtr world_sdf)
     {
-        bool status = true; // Not checked as we have default values in place for all params
+        bool status = true;
+        Eigen::Vector6d gravity_eig;
     
         this->fluid_density = GetSdfElement<double>(&status, world_sdf, "fluid_density", 1028.00);
 
-        this->gravity = GetSdfElement<double>(&status, world_sdf, "gravity", 9.81);
+        gravity_eig << 0.00, 0.00, -9.81, 0.00, 0.00, 0.00;
+        gravity_eig = GetSdfVector(&status, world_sdf, "gravity", gravity_eig);
+
+        this->gravity = ignition::math::Vector3d(gravity_eig[0], gravity_eig[1], gravity_eig[2]);
 
         return status;
     }
 
 
-    bool HydrodynamicsPlugin::GetLinkParameters(sdf::ElementPtr link_sdf)
+    bool HydrodynamicsPlugin::GetModelParameters(sdf::ElementPtr model_sdf)
     {
-        sdf::ElementPtr hydro_model = link_sdf->GetElement("hydrodynamic_model");
+        sdf::ElementPtr hydro_model = model_sdf->GetElement("hydrodynamic_model");
         bool status = true;
 
+        std::string base_link = GetSdfElement<std::string>(&status, model_sdf, "base_link", "");
+        if (!status)
+        {
+            gzerr << "Base link not specified! Exiting.\n";
+            exit(1);
+        }
+        this->frame = model->GetLink(base_link);
+
+        // Added mass manipulators
         this->scalingAddedMass = GetSdfElement<double>(&status, hydro_model, "scalingAddedMass", 1.00);
         this->offsetAddedMass = GetSdfElement<double>(&status, hydro_model, "offsetAddedMass", 0.00);
 
+        // Added mass parameters, assume zero if not specified 
+        this->added_mass = GetSdfMatrix(&status, hydro_model, "added_mass");
+
+        // Linear damping manipulators 
         this->scalingDamping = GetSdfElement<double>(&status, hydro_model, "scalingDamping", 1.00);
         this->offsetLinearDamping = GetSdfElement<double>(&status, hydro_model, "offetLineaDamping", 0.00);
         this->offsetLinForwardSpeedDamping = GetSdfElement<double>(&status, hydro_model, "offsetLinForwardSpeedDamping", 0.00);
 
+        // Non-linear damping manipulators 
         this->offsetNonLinDamping = GetSdfElement<double>(&status, hydro_model, "offsetNonLinDamping", 0.00);
 
-        this->added_mass = GetSdfMatrix(&status, hydro_model, "added_mass");
-
+        this->volume = GetSdfElement<double>(&status, model_sdf, "volume");
         if (!status)
         {
-            gzerr << "Added mass matrix not specified.\n";
+            gzerr << "Model volume not specified.\n";
             exit(1);
         }
+
+        // Make no assumptions for CoB
+        Eigen::Vector6d CoB_eig = GetSdfVector(&status, model_sdf, "center_of_buoyancy");
+        if (!status)
+        {
+            gzerr << "Center of Buoyancy not specified.\n";
+            exit(1);
+        }
+        // Calculate CoB relative to CoM rather than model origin
+        ignition::math::Vector3d CoM = frame->GetInertial()->Pose().Pos();
+        this->rel_CoB = ignition::math::Vector3d(CoB_eig[0], CoB_eig[1], CoB_eig[2]) - CoM;
 
         // For now we will approximate linear damping as a diagnol matrix
         Eigen::Vector6d linear_damping_vec = GetSdfVector(&status, hydro_model, "linear_damping");
-        if (!status)
-        {
-            gzerr << "Linear damping not specified.\n";
-            exit(1);
-        }
         this->linear_damping = ToDiagonalMatrix(linear_damping_vec);
 
         // For now we will approximate non-linear damping as a diagnol matrix
         this->quadratic_damping = GetSdfVector(&status, hydro_model, "quadratic_damping");
-        if (!status)
-        {
-            gzerr << "Quadratic damping not specified.\n";
-            exit(1);
-        }
         this->non_linear_damping = ToDiagonalMatrix(quadratic_damping);
-    
+
+        this->scalingBuoyancy = GetSdfElement<double>(&status, hydro_model, "scalingBuoyancy", 1.00);
+        this->is_neutrally_buoyant = GetSdfElement<bool>(&status, model_sdf, "neutrally_buoyant", false);
+
         return status;
     }
 
@@ -84,15 +113,14 @@ namespace triton_gazebo
     void HydrodynamicsPlugin::Connect()
     {
         updateConnection_ = gazebo::event::Events::ConnectWorldUpdateBegin(
-            std::bind(&HydrodynamicsPlugin::Update, this, std::placeholders::_1));
+            std::bind(&HydrodynamicsPlugin::Update, this));
     }
 
 
-    void HydrodynamicsPlugin::Update(const gazebo::common::UpdateInfo &_info)
+    void HydrodynamicsPlugin::Update()
     {
         Eigen::Vector6d velocity = this->GetVelocityVector();
-        Eigen::Vector6d acceleration = this->GetAccelerationVector(); // should we compute this??
-
+        Eigen::Vector6d acceleration = this->GetAccelerationVector();
         Eigen::Vector6d velRel = ToNED(velocity);
 
         // Update added Coriolis matrix
@@ -110,7 +138,7 @@ namespace triton_gazebo
         Eigen::Vector6d damping = -this->damping_matrix * velRel;
 
         // Added-mass forces and torques
-        Eigen::Vector6d added = -Ma * acceleration;//this->filteredAcc;
+        Eigen::Vector6d added = -Ma * acceleration;
 
         // Added Coriolis term
         Eigen::Vector6d cor = -this->coriolis_matrix * velRel;
@@ -124,7 +152,8 @@ namespace triton_gazebo
         {
             this->SetWrenchVector(FromNED(tau));
         }
-        //this->ApplyBuoyancyForce();
+
+        this->ApplyBuoyancyForce();
     }
 
 
@@ -169,7 +198,6 @@ namespace triton_gazebo
         ignition::math::Vector3d force(wrench(0), wrench(1), wrench(2));
         ignition::math::Vector3d torque(wrench(3), wrench(4), wrench(5));
 
-
         frame->AddRelativeForce(force);
         frame->AddRelativeTorque(torque);
     }
@@ -204,7 +232,6 @@ namespace triton_gazebo
         // Nonlinear damping matrix is considered as a diagonal matrix
         for (int i = 0; i < MAX_DIMENSION; i++)
         {
-            /// @todo _vel is causing this to grow exponentially 
             _D(i, i) += -1 * (this->non_linear_damping(i, i) + this->offsetNonLinDamping) * std::fabs(_vel[i]);
         }
         _D *= this->scalingDamping;
@@ -218,10 +245,24 @@ namespace triton_gazebo
         return this->scalingAddedMass * M_d;
     }
 
-    // Specific to cube object
-    double HydrodynamicsPlugin::ComputeScalerDrag(double cross_section_area)
+    // Constant vertical force on center of mass. 
+    void HydrodynamicsPlugin::ApplyBuoyancyForce()
     {
-        return -0.5 * this->Cd * cross_section_area * this->fluid_density;
+        double vol = this->volume;
+        double rho = this->fluid_density;
+        ignition::math::Vector3d buoyancy_force;
+
+        if (!this->is_neutrally_buoyant)
+        {
+            // the buoyant force: Fb = fluid_density * gravity * volume of fluid displaced
+            buoyancy_force = -rho * vol * this->gravity * this->scalingBuoyancy;
+        }
+        else
+        {
+            buoyancy_force = -this->mass * this->gravity;
+        }
+
+        this->frame->AddForceAtRelativePosition(buoyancy_force, this->rel_CoB);
     }
 
 } // namespace triton_gazebo
