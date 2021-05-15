@@ -24,31 +24,63 @@ To run the data generation node, use the following
 
         ros2 launch triton_gazebo gendata_launch.py
 
-This runs the Gazebo world `uc_gendata.world`, runs the underwater camera node with a random water type, and saves the output images along with label files containing the bounding box of the tracked model defined in `uc_gendata.world` under `bounding_box_controller/model_name`.
+This runs the Gazebo world `uc_gendata.world`, runs the underwater camera node with a random water type, and saves the output images along with label files containing the bounding box of the tracked model defined in `uc_gendata.world` under `bounding_box_controller/model_name`. The images and label files are saved in a folder called `data` in the triton_gazebo shared folder.
 
-## Nodes
+Currently, the generated images are not always well-suited for training, and may not be rendered properly due to timing mismatches between the Gazebo render, the underwater camera node, and the bounding box node. Some manual cleaning (removing incorrect images) will need to be done to obtain a good dataset.
+
+### Training Yolo v3 Model
+The triton_gazebo shared folder should contain a folder called `data` with images with `.png` extensions (this can be changed in `train_yolo.py`). Each image should have a corresponding `.txt` file with the same name (other than extension) containing labels in standard Yolo format describing the bounding boxes (each line should be `<object class (integer)> <x centre> <y centre> <box width> <box height`, with x/y/width/height normalized between 0 and 1 using the image's dimensions).
+
+The `yolov3_custom.cfg` file should be modified based on the requirements of the model. See `AlexeyAB/darknet` on GitHub for a guide. 
+
+Run `train_yolo.py` to start training the model. By default, as training progresses backups will be saved in a folder called `backup` in the shared folder.
+
+## Nodes/Plugins
 
 - `underwater_camera`: A node which produces synthesized underwater images from a RGB/depth image pair
 
     ### Subscribed Topics
-     - `front_camera/image_raw` (`sensor_msgs/msg/Image.msg`) : Input RGB image
-     - `front_camera/depth/image_raw` (`sensor_msgs/msg/Image.msg`) : Input depth image
+    - `front_camera/image_raw` (`sensor_msgs/msg/Image.msg`) : Input RGB image
+    - `front_camera/depth/image_raw` (`sensor_msgs/msg/Image.msg`) : Input depth image
+    - `front_camera/bounding_box` (`triton_interfaces/msg/DetectionBoxArray`) : Bounding box (only republishes to avoid data generation timing issues)
 
     ### Published Topics
     - `front_camera/underwater/image_raw` (`sensor_msgs/msg/Image.msg`) : Synthesized underwater image
     - `repub/image_raw` (`sensor_msgs/msg/Image.msg`) : Republished RGB image
     - `repub/depth/image_raw` (`sensor_msgs/msg/Image.msg`) : Republished depth image
+    - `repub/bounding_box` (`triton_interfaces/msg/DetectionBoxArray`) : Republished bounding box
+
+- `bounding_box_plugin`: A Gazebo plugin which produces the bounding box of a specified object in camera image coordinates
+
+    ### Published Topics
+    - `front_camera/bounding_box` (`triton_interfaces/msg/DetectionBoxArray`) : Bounding box
+
+- `bounding_box_image_saver`: A node which saves images and bounding boxes for training.
+
+    ### Subscribed Topics
+    - `front_camera/underwater/image_raw` (`sensor_msgs/msg/Image.msg`) : Synthesized underwater image
+    - `repub/bounding_box` (`triton_interfaces/msg/DetectionBoxArray`) : Bounding box
+
+- `camera_orbit_plugin`: A Gazebo plugin which rotates the camera around a specified object for data collection (not recommended as training data)
+
+- `random_camera_plugin`: A Gazebo plugin which randomly moves the camera around for data collection (currently no guarantee the object is in view)
      
 ## Worlds
 
 `cube.world` 
 - A simple world with the `cube` model.
 
+`uc_gendata.world` 
+- A world used for generating synthetic data for training.
+
 ## Models
 `cube`
 - A simple cube which uses a ROS2 force plugin to accept `geometry_msgs/msg/Wrench` messages on the topic `/triton/gazebo_drivers/force`. Here is an example command to apply forces to the cube
 
         ros2 topic pub /triton/gazebo_drivers/force geometry_msgs/msg/Wrench "{force: {x: 1}}"
+
+`lenabox`
+- A cube with the Lena test image as its texture.
 
 ##  Importing Models From SolidWorks 
 

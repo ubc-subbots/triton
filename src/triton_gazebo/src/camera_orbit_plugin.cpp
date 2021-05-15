@@ -4,6 +4,7 @@
 #include <gazebo/physics/World.hh>
 #include "triton_gazebo/camera_orbit_plugin.hpp"
 #include <random>
+#include <time.h>
 
 using namespace gazebo;
 
@@ -59,7 +60,7 @@ namespace triton_gazebo
     {
         // Random number generator
         std::uniform_real_distribution<double> unif(0,1);
-        std::default_random_engine re;
+        std::default_random_engine re(time(NULL));
 
         // Set random height and radius offset from tracked model's position
         double radius  = unif(re) * (radius_range_.Y()-radius_range_.X()) + radius_range_.X();

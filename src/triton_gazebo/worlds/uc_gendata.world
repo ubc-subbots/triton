@@ -9,9 +9,69 @@
         <!-- Bounding box with sea surface -->
         <include>
             <uri>model://ocean_box</uri>
-            <pose>0 0 10 0 0 0</pose>
+            <pose>0 0 20 0 0 0</pose>
+        </include>
+
+        <include>
+            <uri>model://sea_bottom</uri>
+            <name>wall1</name>
+            <pose>0 -20 0 1.57 0 0</pose>
+        </include>
+
+        <include>
+            <uri>model://sea_bottom</uri>
+            <name>wall2</name>
+            <pose>0 20 0 1.57 0 0</pose>
+        </include>
+
+        <include>
+            <uri>model://sea_bottom</uri>
+            <name>wall3</name>
+            <pose>20 0 0 1.57 0</pose>
         </include>
         
+        <include>
+            <uri>model://sea_bottom</uri>
+            <name>wall4</name>
+            <pose>-20 0 0 1.57 0</pose>
+        </include>
+
+        <include>
+            <uri>model://tree</uri>
+            <name>tree1</name>
+            <pose>0 -3 0 0 0</pose>
+        </include>
+
+        <include>
+            <uri>model://tree</uri>
+            <name>tree2</name>
+            <pose>3 -3 -3 0 0</pose>
+        </include>
+
+        <include>
+            <uri>model://tree</uri>
+            <name>tree3</name>
+            <pose>-3 0 -1 0 0</pose>
+        </include>
+
+        <include>
+            <uri>model://tree</uri>
+            <name>tree4</name>
+            <pose>-3 3 -2 0 0</pose>
+        </include>
+
+        <include>
+            <uri>model://herkules_ship_wreck</uri>
+            <name>ship1</name>
+            <pose>10 0 1.57 0 0</pose>
+        </include>
+
+        <include>
+            <uri>model://herkules_ship_wreck</uri>
+            <name>ship2</name>
+            <pose>0 -10 0 0 0</pose>
+        </include>
+
         <model name="cube1">
             <static>false</static>
             <include>
@@ -23,13 +83,22 @@
                 <angular>0 0 0</angular>
             </plugin>
         </model>
+
         <model name="camera_model">
             <pose>2 0 0 0 0 3.14159</pose>
             <static>false</static>
-            <plugin name="track_orbit" filename="librandom_camera_plugin.so">
-                <radius_range>2 5</radius_range>
+            <plugin name="random_camera" filename="librandom_camera_plugin.so">
+                <radius_range>1 5</radius_range>
                 <track_model>cube1</track_model>
             </plugin>
+            <!-- <plugin name="track_orbit" filename="libcamera_orbit_plugin.so">
+                <radius_range>1 5</radius_range>
+                <track_model>cube1</track_model>
+                <orbit_angle_range>0.1 0.5</orbit_angle_range>
+                <camera_angle_range>0.1 0.5</camera_angle_range>
+                <height_range>-1 1</height_range>
+                <period>1</period>
+            </plugin> -->
             <link name="camera_link">
                 <gravity>0</gravity>
                 <sensor type="depth" name="camera1">

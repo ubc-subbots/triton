@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <sdf version="1.7">
-    <model name="lenabox">
+    <model name="cameramanbox">
         <link name="base_link">
             <pose>0 0 0 0 0 0</pose>
             <gravity>0</gravity>
@@ -15,9 +15,9 @@
                 </geometry>
                 <material>
                     <script>
-                        <uri>model://lenabox/materials/scripts</uri>
-                        <uri>model://lenabox/materials/textures</uri>
-                        <name>lenaMat/Diffuse</name>
+                        <uri>model://cameramanbox/materials/scripts</uri>
+                        <uri>model://cameramanbox/materials/textures</uri>
+                        <name>cameramanMat/Diffuse</name>
                     </script>
                 </material>
             </visual>

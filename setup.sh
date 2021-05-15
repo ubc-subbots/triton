@@ -3,10 +3,11 @@ install_darknet(){
     then
         echo "Darknet repo already cloned"
     else
-        git clone https://github.com/AlexeyAB/darknet/
+        git clone https://github.com/AlexeyAB/darknet
     fi
     cd darknet
-    make -B OPENCV=1
+    git checkout darknet_yolo_v4_pre
+    make -B OPENCV=1 GPU=1
     rm CMakeLists.txt
     cd ..
 }

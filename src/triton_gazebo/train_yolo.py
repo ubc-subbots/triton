@@ -46,6 +46,6 @@ file_obj_data.close()
 
 gdown.download("https://drive.google.com/uc?id=18v36esoXCh-PsOKwyP2GWrpYDptDY8Zf", os.path.join(shared_dir,'yolov3-tiny.conv.11'))
 
-os.system(f"{darknet_exec} detector train {os.path.join(data_dir,'obj.data')} {os.path.join(shared_dir,'config','yolov3-custom.cfg')} {os.path.join(shared_dir,'yolov3-tiny.conv.11')}")
+os.system(f"{darknet_exec} detector train {os.path.join(data_dir,'obj.data')} {os.path.join(shared_dir,'config','yolov3-custom.cfg')} {os.path.join(shared_dir,'yolov3-tiny.conv.11')} -map")
 os.system(f"cp {os.path.join(backup_dir,'yolov3-custom_final.weights')} {get_package_share_directory('triton_object_recognition')}")
 os.system(f"cp {os.path.join(shared_dir,'config','yolov3-custom.cfg')} {get_package_share_directory('triton_object_recognition')}")
