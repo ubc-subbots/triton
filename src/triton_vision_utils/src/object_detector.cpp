@@ -124,9 +124,7 @@ Mat ObjectDetector::morphological(Mat src, Size open_kernel, Size close_kernel)
 vector<vector<Point>> ObjectDetector::convexHulls(Mat& src, float upper_area, float lower_area)
 {
   vector<vector<Point>> hulls;
-  int hullIndex = 0;
   vector<vector<Point>> right_size_hulls;
-  int right_s_h_index = 0;
 
   // Find contours in the image
   vector<vector<Point>> contours;
@@ -154,7 +152,7 @@ vector<vector<Point>> ObjectDetector::convexHulls(Mat& src, float upper_area, fl
     }
   }
   vector<vector<Point>> right_size_vector_of_hulls;
-  for (int i = 0; i < right_size_hulls.size(); i++)
+  for (int i = 0; i < (int) right_size_hulls.size(); i++)
   {
     right_size_vector_of_hulls.push_back(right_size_hulls.at(i));
   }

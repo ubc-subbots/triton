@@ -66,6 +66,11 @@ private:
    */
   void debugPublish(cv::Mat& src, image_transport::Publisher& publisher);
 
+  /** Function to store code for using OpenCV SVM 
+   * 
+   */
+  void svmHullPredict(std::vector<std::vector<Point>> hulls);
+
   bool debug_;
   std::vector<cv::Point> gate_cntr_;
   image_transport::Subscriber subscription_; 

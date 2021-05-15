@@ -118,17 +118,6 @@ void GateDetector::boundGateUsingPoles(std::vector<std::vector<Point>> hulls, cv
       pole_hulls.push_back(hull);
     }
   }
-  // Ptr<SVM> svm = SVM::load("/home/logan/Projects/triton/src/triton_gate/config/accuracy_opencv_model.xml");
-  // vector<float> y_hat;
-  // Mat X_hat = featurizer_.featurizeForClassification(hulls);
-  // svm->predict(X_hat, y_hat);
-  // for (int i = 0; i < hulls.size(); i++)
-  // {
-  //   if (y_hat.at(i) == 1)
-  //   {
-  //     pole_hulls.push_back(hulls.at(i));
-  //   }
-  // }
 
   // Get 2D array of all the points of the pole hulls (to determine extrema)
   vector<Point> hull_points;
@@ -219,6 +208,23 @@ void GateDetector::debugPublish(cv::Mat& src, image_transport::Publisher& publis
     debug_msg.step = sz.width*(src.channels());
     debug_msg.header.frame_id = "base_link";
     publisher.publish(debug_msg);
+}
+
+void GateDetector::svmHullPredict(std::vector<std::vector<Point>> hulls)
+{
+  // NOTE: this function isn't complete, just a placeholder for OpenCV SVM code, don't use it
+  vector<vector<Point>> pole_hulls;
+  Ptr<SVM> svm = SVM::load("/home/logan/Projects/triton/src/triton_gate/config/accuracy_opencv_model.xml");
+  vector<float> y_hat;
+  Mat X_hat = featurizer_.featurizeForClassification(hulls);
+  svm->predict(X_hat, y_hat);
+  for (int i = 0; i < (int) hulls.size(); i++)
+  {
+    if (y_hat.at(i) == 1)
+    {
+      pole_hulls.push_back(hulls.at(i));
+    }
+  }
 }
 
 }  // namespace triton_gate

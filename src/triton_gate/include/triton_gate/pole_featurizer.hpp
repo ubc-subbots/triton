@@ -34,7 +34,6 @@ public:
   Mat featurizeForClassification(vector<vector<Point>> hulls)
   {
     int vecNum = 0;
-    int cols = 10;
     int rows = hulls.size();
     float x_array[rows][10];
     for (vector<Point> hull : hulls)
@@ -66,13 +65,13 @@ public:
 
     vector<float> area_feat = cnt_features.area_features(hull);
     float hull_area = area_feat.at(0);
-    float rect_area = area_feat.at(1);
+    // float rect_area = area_feat.at(1);
     float aspect_ratio = area_feat.at(2);
 
     vector<vector<Point>> min_area_feat = cnt_features.min_area_features(hull);
     vector<Point> min_rect = min_area_feat.at(0);
     vector<Point> min_tri = min_area_feat.at(1);
-    float min_circ_rad = cnt_features.min_area_feature_circ(hull);
+    // float min_circ_rad = cnt_features.min_area_feature_circ(hull);
 
     vector<float> hu_moments = cnt_features.hu_moments_featurize(hull);
 

@@ -36,6 +36,9 @@ rclcpp_components_register_nodes(triton_gate "triton_gate::GateDetector")
 target_compile_definitions(triton_gate
   PRIVATE "triton_gate_CPP_BUILDING_DLL"
 )
+target_compile_options(triton_gate
+  PRIVATE -Wno-vla
+)
 
 ament_target_dependencies(triton_gate
   "rclcpp"
