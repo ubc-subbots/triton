@@ -1,24 +1,17 @@
 # triton_pipeline
 ## Description
 
-This package is for creating a pipeline which is able to dynamically load and unload
-a set of nodes, defined by a pipeline type, which aim to perform an action. The pipeline can be configured based on a set of possible pipeline types, then it can be run with an input value parameter. Running the pipeline loads the nodes given in the type's configuration file into the pipeline and supplies the input value parameter if necessary. The nodes in the pipeline can then publish feedback and the pipeline manager waits until the feedback states that the nodes have completed their action then the nodes are unloaded and an ouptut value is returned.
+This package is for creating a pipeline which can autonomously manage the states and actions of the AUV. The pipeline can be configured to run a defined sequence of actions, given as pipeline types, moving to the next action in a sequence when a stopping condition is reached. The nodes in the current running pipeline type can publish feedback which is able to trigger the stopping condition and ultimatley the transition to the next action.
 
 ## Usage
 
-To define a pipeline type, follow the syntax given in `example.yaml` in the `config` folder. After defining your pipeline type, you have to add it to `PipelineType.msg` in `triton_interfaces` for you to be able to configure and run it. To launch the pipeline (along with the required pipeline manager) use the `pipeline_launch.py` launch file as such
+To define a pipeline type, follow the syntax given in `example.yaml` in the `config` folder which contains the parameters for the `pipeline_manager`. After defining your pipeline type, you have to add it to `PipelineType.msg` in `triton_interfaces` for you to be able to configure and run it. When naming a pipeline config file, you must have the name of the pipeline type match the name of the yaml (i.e after defining `example.yaml`, you have to add `string TYPE_EXAMPLE = "example"` to `PipelineType.msg`). To define a pipeline sequence, follow the syntax given in `example_sequence.yaml` in the `config` folder. The values for the sequences should all be pipeline types defined in `PipelineType.msg`. Next you can launch the pipeline as follows
 
-    ros2 launch triton_pipeline pipeline_launch.py
+    ros2 launch triton_pipeline pipeline_launch.py sequence:=<SEQUENCE_CONFIG_FILE>
 
-To configure the pipeline use the `ConfigurePipeline.srv` service from `triton_interfaces` as such
+Where `<SEQUENCE_CONFIG_FILE>` is the name of a yaml file in the `config` folder of `triton_pipeline` which contains the `pipeline_sequence_manager` parameters (e.g see `triton_example` for a concrete example of using the pipeline).
 
-    ros2 service call /triton/configure_pipeline triton_interfaces/srv/ConfigurePipeline '{pipeline_type: {type:  "<PIPELINE_TYPE>"}}'
 
-Make sure that the `type` field is one of the enumerated strings in `PipelineType.msg` in `triton_interfaces`. To run the pipeline use the `RunPipeline.action` action from `triton_interfaces` as such
-
-    ros2 action send_goal /triton/run_pipeline triton_interfaces/action/RunPipeline '{input: <PIPELINE_INPUT>}'
-
-Make sure that the `input` field is one of the accepted types given in `RunPipeline.action` (currently can only be an int and is never used, so can be ignored for now).
 
 ## Nodes
 
@@ -36,8 +29,13 @@ Make sure that the `input` field is one of the accepted types given in `RunPipel
     ### Parameters
     - `components` (`string[]`): Declares the components to be launched in the pipeline when it is run.
     - `pkg_names` (`string[]`): The packages to which the components belong. There should be a one-to-one correspondence with each component.
+    - `param_files` (`string[]`): The param files to load for each component. There should be a one-to-one correspondence with each component. If there is no param file needed for a component, you must put the empty string ('') as the param file value. Note that the param file MUST exist in the config folder of the corresponding package name.
     - `namespace` (`string`): The namespace in which the components will be launched.
     - `remap_rules` (`string[]`): Declares the topic remapping rules for the pipeline components.
+
+- `pipeline_sequence_manager`: A standalone node used to autonomously manage the sequence of pipeline types that are run in the pipeline
+    ### Parameters
+    - `pipeline_sequence` (`string[]`): The sequence of pipeline types to manage. The list is ordered so that the first pipeline type ran is the first in the list and the last pipeline type ran is the last in the list
 
 ## Contributors
 

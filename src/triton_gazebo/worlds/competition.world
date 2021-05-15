@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<sdf version="1.7">
+  <world name="default">
+    <include>
+        <pose>0 0 -2 0 0 0</pose> 
+        <uri>model://cube_auv</uri>
+    </include>
+    <include>
+        <pose>10 0 -2 0 0 0</pose>
+        <uri>model://gate</uri>
+    </include>
+    <grid>0</grid>
+  </world>
+</sdf>
