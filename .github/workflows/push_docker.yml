@@ -2,10 +2,10 @@ name: Build and push triton Docker image
 
 on:
   push: 
-    branches: [ logan/2/issue3 ]
+    branches: [ master ]
 
 jobs:
-  build:
+  docker:
     runs-on: ubuntu-20.04
     steps: 
 
