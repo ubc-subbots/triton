@@ -20,12 +20,12 @@ public:
    * @return A vector containing the major asix (MA), minor axis (ma) and angle of
    *           contour in that order
    */
-  std::vector<float> ellispe_features(std::vector<cv::Point> cnt);
+  std::vector<float> ellipse_features(std::vector<cv::Point> cnt);
 
   /**
    * Produces area features of the contour
    * @param cnt A convex hull contour
-   * @return A vecotr containing the contour area, bounding rect area, aspect ratio.
+   * @return A vector containing the contour area, bounding rect area, aspect ratio.
    */
   std::vector<float> area_features(std::vector<cv::Point> cnt);
 

@@ -9,7 +9,7 @@ ContourFeatures::ContourFeatures()
 {
 }
 
-vector<float> ContourFeatures::ellispe_features(vector<Point> cnt)
+vector<float> ContourFeatures::ellipse_features(vector<Point> cnt)
 {
   float angle = 0;
   int MA = 1;

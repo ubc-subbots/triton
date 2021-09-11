@@ -100,17 +100,23 @@ void GateDetector::boundGateUsingPoles(std::vector<std::vector<Point>> hulls, cv
     return;
   }
 
-  // Featurize hulls, predict using model and get classified pole hulls
+  // Determine pole hulls
   vector<vector<Point>> pole_hulls;
   for (int i=0; i< (int) hulls.size(); i++)
   {
     vector<Point> hull = hulls.at(i);
     float aspect_ratio = 1.0;
+    // We can only create a bounding rectangle if a hull has at least 3 points
     if (hull.size() >= 3)
     {
       Rect boundingR = boundingRect(hull);
       aspect_ratio = (float) boundingR.width / boundingR.height ;
     }
+    // To determine if a hull is associated to a pole, we check that it's aspect ratio
+    // is within a threshold of a desired aspect ratio. This is quite elementary, and
+    // a more robust way to categorize hulls would be a model that can classify hulls
+    // as poles or not based on features other than just the aspect ratio. In testing
+    // this however, the model method did not perform as well as this method and needs works
     float thresh = 0.03;
     float desired_ratio = 0.11;
     if (aspect_ratio > desired_ratio - thresh && aspect_ratio < desired_ratio + thresh)
@@ -210,9 +216,9 @@ void GateDetector::debugPublish(cv::Mat& src, image_transport::Publisher& publis
     publisher.publish(debug_msg);
 }
 
+// NOTE: this function isn't complete, just a placeholder for OpenCV SVM code, don't use it
 void GateDetector::svmHullPredict(std::vector<std::vector<Point>> hulls)
 {
-  // NOTE: this function isn't complete, just a placeholder for OpenCV SVM code, don't use it
   vector<vector<Point>> pole_hulls;
   Ptr<SVM> svm = SVM::load("/home/logan/Projects/triton/src/triton_gate/config/accuracy_opencv_model.xml");
   vector<float> y_hat;

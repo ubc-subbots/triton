@@ -58,7 +58,7 @@ public:
   {
     vector<float> features;
 
-    vector<float> ellipse_feat = cnt_features.ellispe_features(hull);
+    vector<float> ellipse_feat = cnt_features.ellipse_features(hull);
     float MA = ellipse_feat.at(0);
     float ma = ellipse_feat.at(1);
     float angle = ellipse_feat.at(2);
