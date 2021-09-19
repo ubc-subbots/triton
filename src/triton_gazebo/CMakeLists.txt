@@ -238,12 +238,13 @@ install(DIRECTORY
 
 # Install Python modules
 ament_python_install_package(${PROJECT_NAME})
-
 # Install Python executables
 install(PROGRAMS
   triton_gazebo/bounding_box_image_saver.py
+  triton_gazebo/train_yolo.py
   DESTINATION lib/${PROJECT_NAME}
 )
+ament_export_dependencies(ament_cmake_python)
 
 if(BUILD_TESTING)
   find_package(launch_testing_ament_cmake REQUIRED)

@@ -7,7 +7,7 @@
         </include>
 
         <!-- Bounding box with sea surface -->
-        <include>
+        <!-- <include>
             <uri>model://ocean_box</uri>
             <pose>0 0 20 0 0 0</pose>
         </include>
@@ -70,7 +70,7 @@
             <uri>model://herkules_ship_wreck</uri>
             <name>ship2</name>
             <pose>0 -10 0 0 0</pose>
-        </include>
+        </include> -->
 
         <model name="cube1">
             <static>false</static>

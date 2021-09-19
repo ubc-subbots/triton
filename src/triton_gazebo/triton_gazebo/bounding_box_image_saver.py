@@ -5,8 +5,8 @@ import os
 from std_msgs.msg import String
 from sensor_msgs.msg import Image
 from triton_interfaces.msg import DetectionBoxArray
-import cv_bridge
 from cv2 import cv2
+import cv_bridge
 import numpy as np
 import random
 from ament_index_python.packages import get_package_share_directory

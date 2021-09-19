@@ -6,7 +6,7 @@ This package contains the Gazebo models, worlds, and plugins needed to create a 
 ## Usage
 
 ### Gazebo
-To run a Gazebo simulation with a world file given in the `worlds` directory, use the `gazebo_lanch.py` file as follows
+To run a Gazebo simulation with a world file given in the `worlds` directory, use the `gazebo_launch.py` file as follows
 
     ros2 launch triton_gazebo gazebo_launch.py world:=<WORLD_FILE_NAME> headless:=<IS_HEADLESS>
 
@@ -28,12 +28,16 @@ This runs the Gazebo world `uc_gendata.world`, runs the underwater camera node w
 
 Currently, the generated images are not always well-suited for training, and may not be rendered properly due to timing mismatches between the Gazebo render, the underwater camera node, and the bounding box node. Some manual cleaning (removing incorrect images) will need to be done to obtain a good dataset.
 
+Data is saved to a folder in the share directory, ie. `<PATH_TO_TRITON>/install/triton_gazebo/share/triton_gazebo/data`.
+If you get an error that the executable cannot be found, make sure `triton_gazebo/bounding_box_image_saver.py` has executable permissions (ie. `chmod +x bounding_box_image_saver.py`).
+
 ### Training Yolo v3 Model
 The triton_gazebo shared folder should contain a folder called `data` with images with `.png` extensions (this can be changed in `train_yolo.py`). Each image should have a corresponding `.txt` file with the same name (other than extension) containing labels in standard Yolo format describing the bounding boxes (each line should be `<object class (integer)> <x centre> <y centre> <box width> <box height`, with x/y/width/height normalized between 0 and 1 using the image's dimensions).
 
 The `yolov3_custom.cfg` file should be modified based on the requirements of the model. See `AlexeyAB/darknet` on GitHub for a guide. 
 
-Run `train_yolo.py` to start training the model. By default, as training progresses backups will be saved in a folder called `backup` in the shared folder.
+Run `ros2 launch triton_gazebo train_yolo_launch.py` to start training the model. By default, as training progresses backups will be saved in a folder called `backup` in the shared folder. If you get an error that the executable cannot be found, make sure `triton_gazebo/train_yolo.py` has executable permissions (ie. `chmod +x train_yolo.py`).
+
 
 ## Nodes/Plugins
 
@@ -61,9 +65,9 @@ Run `train_yolo.py` to start training the model. By default, as training progres
     - `front_camera/underwater/image_raw` (`sensor_msgs/msg/Image.msg`) : Synthesized underwater image
     - `repub/bounding_box` (`triton_interfaces/msg/DetectionBoxArray`) : Bounding box
 
-- `camera_orbit_plugin`: A Gazebo plugin which rotates the camera around a specified object for data collection (not recommended as training data)
+- `camera_orbit_plugin`: A Gazebo plugin which rotates the camera around a specified object for data collection (not recommended as training data). Attach this to a camera in a .world file to use.
 
-- `random_camera_plugin`: A Gazebo plugin which randomly moves the camera around for data collection (currently no guarantee the object is in view)
+- `random_camera_plugin`: A Gazebo plugin which randomly moves the camera around for data collection (currently no guarantee the object is in view). Attach this to a camera in a .world file to use.
      
 ## Worlds
 
@@ -71,7 +75,7 @@ Run `train_yolo.py` to start training the model. By default, as training progres
 - A simple world with the `cube` model.
 
 `uc_gendata.world` 
-- A world used for generating synthetic data for training.
+- A world used for generating synthetic data for training. A depth camera is defined with additional plugins for moving the camera (`random_camera_plugin`) and generating bounding boxes (`bounding_box_controller`). 
 
 ## Models
 `cube`
