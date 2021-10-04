@@ -25,6 +25,13 @@ jobs:
           rosdep update
           rosdep install -i --from-path src --rosdistro foxy -y
 
+      - name: Install OpenCV 4.5.3
+        uses: actions/checkout@v2
+        uses: Dovyski/setup-opencv-action@v1
+        with:
+          opencv-version: 4.5.3
+          CMAKE_BUILD_TYPE: RELEASE          
+
       - name: Source setup and build then test using colcon
         run: |
           source /opt/ros/foxy/setup.bash
