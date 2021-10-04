@@ -24,7 +24,7 @@ find_package(triton_interfaces REQUIRED)
 find_package(cv_bridge REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(image_transport REQUIRED)
-find_package(OpenCV 4.2 REQUIRED)
+find_package(OpenCV 4.5.3 REQUIRED)
 find_package(Boost REQUIRED COMPONENTS filesystem) 
 
 include_directories(include ${catkin_INCLUDE_DIRS})
