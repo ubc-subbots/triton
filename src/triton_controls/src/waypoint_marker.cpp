@@ -9,19 +9,19 @@ namespace triton_controls
     pose_offset_value_ (6, 0),
     has_pose_ (false)
   {
-    this->declare_parameter("pos.x", pose_offset_value_[0]);
-    this->declare_parameter("pos.y", pose_offset_value_[1]);
-    this->declare_parameter("pos.z", pose_offset_value_[2]);
-    this->declare_parameter("ang.r", pose_offset_value_[3]);
-    this->declare_parameter("ang.p", pose_offset_value_[4]);
-    this->declare_parameter("ang.y", pose_offset_value_[5]);
+    this->declare_parameter<double>("pos.x", pose_offset_value_[0]);
+    this->declare_parameter<double>("pos.y", pose_offset_value_[1]);
+    this->declare_parameter<double>("pos.z", pose_offset_value_[2]);
+    this->declare_parameter<double>("ang.r", pose_offset_value_[3]);
+    this->declare_parameter<double>("ang.p", pose_offset_value_[4]);
+    this->declare_parameter<double>("ang.y", pose_offset_value_[5]);
 
-    this->get_parameter("pos.x", pose_offset_value_[0]);
-    this->get_parameter("pos.y", pose_offset_value_[1]);
-    this->get_parameter("pos.z", pose_offset_value_[2]);
-    this->get_parameter("ang.r", pose_offset_value_[3]);
-    this->get_parameter("ang.p", pose_offset_value_[4]);
-    this->get_parameter("ang.y", pose_offset_value_[5]);
+    this->get_parameter<double>("pos.x", pose_offset_value_[0]);
+    this->get_parameter<double>("pos.y", pose_offset_value_[1]);
+    this->get_parameter<double>("pos.z", pose_offset_value_[2]);
+    this->get_parameter<double>("ang.r", pose_offset_value_[3]);
+    this->get_parameter<double>("ang.p", pose_offset_value_[4]);
+    this->get_parameter<double>("ang.y", pose_offset_value_[5]);
 
     publisher_ = this->create_publisher<geometry_msgs::msg::Pose>("/triton/controls/input_pose", 10);
 
