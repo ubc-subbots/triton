@@ -36,37 +36,37 @@ namespace triton_object_recognition
             debug_publisher_ = image_transport::create_publisher(this, "object_recognizer/debug");
         #endif
         //Populate parameters (values are not modified if parameters have not been declared)
-        this->declare_parameter("weights_filename", weights_filename_);
-        this->declare_parameter("cfg_filename", cfg_filename_);
-        this->declare_parameter("weights_url", weights_url_);
-        this->declare_parameter("cfg_url", cfg_url_);
-        this->declare_parameter("classes", classes_);
-        this->declare_parameter("conf_threshold", conf_threshold_);
-        this->declare_parameter("nms_threshold", nms_threshold_);
-        this->declare_parameter("scale", scale_);
-        this->declare_parameter("inp_width", inp_width_);
-        this->declare_parameter("inp_height", inp_height_);
-        this->declare_parameter("swap_rb", swap_rb_);
-        this->declare_parameter("mean", mean_);
-        this->declare_parameter("backend", (int) backend_);
-        this->declare_parameter("target", (int) target_);
+        this->declare_parameter<std::string>("weights_filename", weights_filename_);
+        this->declare_parameter<std::string>("cfg_filename", cfg_filename_);
+        this->declare_parameter<std::string>("weights_url", weights_url_);
+        this->declare_parameter<std::string>("cfg_url", cfg_url_);
+        this->declare_parameter<std::vector<std::string>>("classes", classes_);
+        this->declare_parameter<float>("conf_threshold", conf_threshold_);
+        this->declare_parameter<float>("nms_threshold", nms_threshold_);
+        this->declare_parameter<float>("scale", scale_);
+        this->declare_parameter<int>("inp_width", inp_width_);
+        this->declare_parameter<int>("inp_height", inp_height_);
+        this->declare_parameter<bool>("swap_rb", swap_rb_);
+        this->declare_parameter<float>("mean", mean_);
+        this->declare_parameter<int>("backend", (int) backend_);
+        this->declare_parameter<int>("target", (int) target_);
 
-        this->get_parameter("weights_filename", weights_filename_);
-        this->get_parameter("cfg_filename", cfg_filename_);
-        this->get_parameter("weights_url", weights_url_);
-        this->get_parameter("cfg_url", cfg_url_);
-        this->get_parameter("classes", classes_);
-        this->get_parameter("conf_threshold", conf_threshold_);
-        this->get_parameter("nms_threshold", nms_threshold_);
-        this->get_parameter("scale", scale_);
-        this->get_parameter("inp_width", inp_width_);
-        this->get_parameter("inp_height", inp_height_);
-        this->get_parameter("swap_rb", swap_rb_);
-        this->get_parameter("mean", mean_);
+        this->get_parameter<std::string>("weights_filename", weights_filename_);
+        this->get_parameter<std::string>("cfg_filename", cfg_filename_);
+        this->get_parameter<std::string>("weights_url", weights_url_);
+        this->get_parameter<std::string>("cfg_url", cfg_url_);
+        this->get_parameter<std::vector<std::string>>("classes", classes_);
+        this->get_parameter<float>("conf_threshold", conf_threshold_);
+        this->get_parameter<float>("nms_threshold", nms_threshold_);
+        this->get_parameter<float>("scale", scale_);
+        this->get_parameter<int>("inp_width", inp_width_);
+        this->get_parameter<int>("inp_height", inp_height_);
+        this->get_parameter<bool>("swap_rb", swap_rb_);
+        this->get_parameter<float>("mean", mean_);
         int backend, target;
-        if (this->get_parameter("backend", backend))
+        if (this->get_parameter<int>("backend", backend))
             backend_ = (Backend) backend;
-        if (this->get_parameter("target", target))
+        if (this->get_parameter<int>("target", target))
             target_ = (Target) target;
 
         //Get model folder as the install directory of this package
@@ -76,7 +76,7 @@ namespace triton_object_recognition
         //Check cfg file exists and downloads if it doesn't
         boost::filesystem::path model_config = model_folder / cfg_filename_;
         if (!boost::filesystem::exists(model_config)){
-            RCLCPP_WARN(get_logger(),"Model config not found. Downloading from " + cfg_url_);
+            RCLCPP_WARN(get_logger(),"Model config not found. Downloading from %s", cfg_url_.c_str());
             //Warning: This command is not portable
             string command = "wget -O " + model_config.string() + " " + cfg_url_;
             if (system(command.c_str())){
@@ -87,7 +87,7 @@ namespace triton_object_recognition
         //Check weights file exists and download if it doesn't
         boost::filesystem::path model_weights = model_folder / weights_filename_;
         if (!boost::filesystem::exists(model_weights)){
-            RCLCPP_WARN(get_logger(),"Model weights not found. Downloading from " + weights_url_);
+            RCLCPP_WARN(get_logger(),"Model weights not found. Downloading from %s", weights_url_.c_str());
             //Warning: This command is not portable
             string command = "wget -O " + model_weights.string() + " " + weights_url_;
             if (system(command.c_str())){
