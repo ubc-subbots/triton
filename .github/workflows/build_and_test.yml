@@ -24,7 +24,7 @@ jobs:
         run: |
           rosdep update
           rosdep install -i --from-path src --rosdistro foxy -y
-          
+
       - name: Cache OpenCV
         id: opencv-cache
         uses: actions/cache@v2
@@ -39,6 +39,7 @@ jobs:
           cached: ${{ steps.opencv-cache.outputs.cache-hit }}
           opencv-version: '4.5.3'
           CMAKE_BUILD_TYPE: RELEASE   
+          ENABLE_PRECOMPILED_HEADERS: OFF
 
       - name: Source setup and build then test using colcon
         run: |
