@@ -47,12 +47,12 @@ namespace triton_gazebo
         approx_sync_->registerCallback(
             std::bind(&UnderwaterCamera::syncCallback, this, _1, _2));
 
-        this->declare_parameter("rho");
-        this->declare_parameter("irradiance_transmission");
-        this->declare_parameter("spectral_sensitivity_blue");
-        this->declare_parameter("spectral_sensitivity_red");
-        this->declare_parameter("spectral_sensitivity_green");
-        this->declare_parameter("illumination_irradiance");
+        this->declare_parameter<std::vector<double>>("rho");
+        this->declare_parameter<std::vector<double>>("irradiance_transmission");
+        this->declare_parameter<std::vector<double>>("spectral_sensitivity_blue");
+        this->declare_parameter<std::vector<double>>("spectral_sensitivity_red");
+        this->declare_parameter<std::vector<double>>("spectral_sensitivity_green");
+        this->declare_parameter<std::vector<double>>("illumination_irradiance");
 
         std::vector<double> rho_vals;
         std::vector<double> Beta_vals;
@@ -61,12 +61,12 @@ namespace triton_gazebo
         std::vector<double> S_r_vals;
         std::vector<double> E_0_vals;
 
-        this->get_parameter("rho", rho_vals);
-        this->get_parameter("irradiance_transmission", Beta_vals);
-        this->get_parameter("spectral_sensitivity_blue", S_b_vals);
-        this->get_parameter("spectral_sensitivity_red", S_g_vals);
-        this->get_parameter("spectral_sensitivity_green", S_r_vals);
-        this->get_parameter("illumination_irradiance", E_0_vals);
+        this->get_parameter<std::vector<double>>("rho", rho_vals);
+        this->get_parameter<std::vector<double>>("irradiance_transmission", Beta_vals);
+        this->get_parameter<std::vector<double>>("spectral_sensitivity_blue", S_b_vals);
+        this->get_parameter<std::vector<double>>("spectral_sensitivity_red", S_g_vals);
+        this->get_parameter<std::vector<double>>("spectral_sensitivity_green", S_r_vals);
+        this->get_parameter<std::vector<double>>("illumination_irradiance", E_0_vals);
 
         if (rho_vals.size() != 13||
             Beta_vals.size() != 13||
@@ -211,7 +211,7 @@ namespace triton_gazebo
         underwater_image_pub_.publish(message);
 
         auto runtime = this->get_clock()->now() - timer;
-        RCLCPP_INFO(this->get_logger(),"Processing took: "+ std::to_string(runtime.seconds()) + "s");
+        RCLCPP_INFO(this->get_logger(),"Processing took: %ss", std::to_string(runtime.seconds()).c_str());
     }
 
 } // namespace triton_gazebo
