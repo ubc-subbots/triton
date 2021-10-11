@@ -5,4 +5,4 @@ bool abort false
 bool success false
 
 # Message giving updates on pipeline, or final success/abort message
-string message 
+string message
