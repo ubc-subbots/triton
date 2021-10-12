@@ -175,6 +175,8 @@ namespace triton_object_recognition
             debug_image.image = frame;
             debug_image.toImageMsg(debug_msg);
             debug_publisher_.publish(debug_msg);
+            // cv::imshow("test", frame);
+            // cv::waitKey(1);
         #endif
 
         //Publish message with detected boxes

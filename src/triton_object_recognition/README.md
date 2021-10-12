@@ -1,13 +1,13 @@
 # triton_object_recognition
 ## Description
 
-This package contains a ROS2 node that can use a YOLOv3 network to detect and classify objects within an image. Note that based on the config file passed to the object recognition node, it might take a while for the node to start for the first time because it will download the appropriate config and weight files to the path `<PATH_TO_TRITON>/triton/install/triton_object_recognition/share/triton_object_recognition`. These files tend to be quite large but they should only have to be downloaded once provided you do not delete the `install` folder.
+This package contains a ROS2 node that can use a YOLOv3 or YOLOv4 network to detect and classify objects within an image. Note that based on the config file passed to the object recognition node, it might take a while for the node to start for the first time because it will download the appropriate config and weight files to the path `<PATH_TO_TRITON>/triton/install/triton_object_recognition/share/triton_object_recognition`. These files tend to be quite large but they should only have to be downloaded once provided you do not delete the `install` folder.
 
 ## Usage
 
-You can use the following command to run the `object_recognizer` node using the yolov3 tiny model:
+You can use the following command to run the `object_recognizer` node using the yolov4-tiny model:
 
-    ros2 launch triton_object_recognition tiny_yolov3_launch.py
+    ros2 launch triton_object_recognition tiny_yolov4_launch.py
 
 You should see `Object Recognizer successfully started!` if successful.
 
