@@ -40,8 +40,14 @@ jobs:
           opencv-version: '4.5.3'
           CMAKE_BUILD_TYPE: RELEASE   
           ENABLE_PRECOMPILED_HEADERS: OFF
-
+          
+      - name: Ignore with colcon build
+        run: |
+          touch ./opencv-install/COLCON_IGNORE
+          
       - name: Source setup and build then test using colcon
+        env:
+          LD_LIBRARY_PATH: /usr/local/lib/
         run: |
           source /opt/ros/foxy/setup.bash
           source /usr/share/gazebo/setup.sh
