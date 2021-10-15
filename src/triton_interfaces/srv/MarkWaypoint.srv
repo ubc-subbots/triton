@@ -1,0 +1,7 @@
+# Import pose from geometry_msgs
+geometry_msgs/Pose pose
+int64 type
+float64 displacement_tolerance
+float64 angular_tolerance
+---
+bool success
