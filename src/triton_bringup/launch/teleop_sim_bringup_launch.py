@@ -59,11 +59,18 @@ def generate_launch_description():
             os.path.join(get_package_share_directory('triton_teleop'), 'launch', 'keyboard_teleop_launch.py')
         )
     )
+
+    gate_detector = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(get_package_share_directory('triton_gate'), 'launch', 'gate_detector_launch.py')
+        )
+    )
     
     ld.add_action(gazebo)
     ld.add_action(rviz_timer)
     ld.add_action(thrust_allocator)
     ld.add_action(keyboard_teleop)
+    ld.add_action(gate_detector)
     ld.add_action(state_publisher)
     ld.add_action(transform_publisher)
 

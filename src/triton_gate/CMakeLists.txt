@@ -17,32 +17,50 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(rclcpp_components REQUIRED)
 find_package(cv_bridge REQUIRED)
 find_package(OpenCV 4 REQUIRED)
 find_package(triton_vision_utils REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(image_transport REQUIRED)
 
-include_directories(
-  include
-)
+include_directories(include)
 
-add_executable(gate_detector
+add_library(triton_gate SHARED
   src/gate_detector.cpp
 )
 
-target_include_directories(gate_detector PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>
+rclcpp_components_register_nodes(triton_gate "triton_gate::GateDetector")
+
+target_compile_definitions(triton_gate
+  PRIVATE "triton_gate_CPP_BUILDING_DLL"
 )
-  
-ament_target_dependencies(gate_detector
-  cv_bridge
-  OpenCV
-  triton_vision_utils
+target_compile_options(triton_gate
+  PRIVATE -Wno-vla
 )
 
-install(TARGETS gate_detector
-  EXPORT export_${PROJECT_NAME}
-  DESTINATION lib/${PROJECT_NAME}
+ament_target_dependencies(triton_gate
+  "rclcpp"
+  "rclcpp_components"
+  "cv_bridge"
+  "OpenCV"
+  "triton_vision_utils"
+  "sensor_msgs"
+  "image_transport"
+)
+
+install(TARGETS
+  triton_gate
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+)
+
+install(DIRECTORY
+  launch
+  config
+  DESTINATION share/${PROJECT_NAME}/
 )
 
 if(BUILD_TESTING)
