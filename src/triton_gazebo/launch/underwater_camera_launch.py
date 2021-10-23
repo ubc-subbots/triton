@@ -27,6 +27,8 @@ def generate_launch_description():
         package='triton_gazebo',
         executable='underwater_camera',
         output='screen',
+        remappings=[('/triton/gazebo_drivers/front_camera/underwater/image_raw',
+                     '/triton/drivers/front_camera/image_raw')],
         parameters=[
             {"rho": params["rho"]["default"]},
             {"irradiance_transmission": params["irradiance_transmission"][water_type]},
