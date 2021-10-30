@@ -1,6 +1,5 @@
-
-#ifndef TRITON_GAZEBO__RANDOM_CAMERA_PLUGIN
-#define TRITON_GAZEBO__RANDOM_CAMERA_PLUGIN
+#ifndef TRITON_GAZEBO__SMOOTH_CAMERA_PLUGIN
+#define TRITON_GAZEBO__SMOOTH_CAMERA_PLUGIN
 
 #include <sdf/sdf.hh>
 #include <gazebo/common/UpdateInfo.hh>
@@ -8,11 +7,11 @@
 
 namespace triton_gazebo
 {
-  class GAZEBO_VISIBLE RandomCameraPlugin : public gazebo::ModelPlugin
+  class GAZEBO_VISIBLE SmoothCameraPlugin : public gazebo::ModelPlugin
   {
     public:
-    RandomCameraPlugin();
-    ~RandomCameraPlugin();
+    SmoothCameraPlugin();
+    ~SmoothCameraPlugin();
 
     virtual void Load(gazebo::physics::ModelPtr _model, sdf::ElementPtr _sdf);
     virtual void Reset();
@@ -30,6 +29,19 @@ namespace triton_gazebo
     gazebo::common::Time prev_update_;
 
     ignition::math::Vector2d radius_range_;
+
+
+    double rotw, rotx, roty, rotz;
+    // For positioning the camera
+    double theta, phi;
+    int incr_phi;
+    // For adjusting rotational axis
+    double axis_theta;
+    // For keeping track of rotation and movement
+    int spinned_one_cycle;
+    int change_pos;
+    // For adjusting distance from object
+    double radius;
   };
 }
 #endif
