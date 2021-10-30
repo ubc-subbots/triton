@@ -29,6 +29,19 @@ namespace triton_gazebo
     gazebo::common::Time prev_update_;
 
     ignition::math::Vector2d radius_range_;
+
+
+    double rotw, rotx, roty, rotz;
+    // For positioning the camera
+    double theta, phi;
+    int incr_phi;
+    // For adjusting rotational axis
+    double axis_theta;
+    // For keeping track of rotation and movement
+    int spinned_one_cycle;
+    int change_pos;
+    // For adjusting distance from object
+    double radius;
   };
 }
 #endif
