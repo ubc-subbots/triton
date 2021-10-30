@@ -1,0 +1,14 @@
+material peppersMat/Diffuse
+{
+    receive_shadows on 
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture peppers.png
+            }
+        }
+    }
+}

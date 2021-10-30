@@ -1,0 +1,18 @@
+#There is an issue with ComposableNode where it doesn't understand the typical nested YAML structure
+#https://github.com/ros2/rclcpp/issues/715
+
+weights_filename: "yolov3-custom_final.weights"
+cfg_filename: "yolov3-custom.cfg"
+weights_url: "https://pjreddie.com/media/files/tiny.weights"
+cfg_url: "https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/yolov3-tiny.cfg"
+backend: 3 # cv::dnn::DNN_BACKEND_OPENCV
+target: 0 # cv::dnn::DNN_TARGET_CPU
+conf_threshold: 0.2
+nms_threshold: 0.2
+scale: 0.00392
+inp_width: 416
+inp_height: 416
+swap_rb: true
+mean: 0.5
+classes:
+  - "Lena"

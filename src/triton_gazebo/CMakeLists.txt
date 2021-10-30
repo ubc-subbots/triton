@@ -104,6 +104,7 @@ ament_target_dependencies(underwater_camera
   "rclcpp"
   "OpenCV"
   "cv_bridge"
+  "triton_interfaces"
 )
 
 install(TARGETS 
@@ -127,6 +128,28 @@ ament_export_libraries(bounding_box_plugin)
 target_link_libraries(bounding_box_plugin ${GAZEBO_LIBRARIES})
 
 
+add_library(camera_orbit_plugin SHARED src/camera_orbit_plugin.cpp)
+target_include_directories(camera_orbit_plugin PUBLIC
+  include
+)
+target_link_libraries(camera_orbit_plugin ${GAZEBO_LIBRARIES})
+ament_target_dependencies(camera_orbit_plugin
+  "triton_interfaces"
+)
+ament_export_libraries(camera_orbit_plugin)
+target_link_libraries(camera_orbit_plugin ${GAZEBO_LIBRARIES})
+
+add_library(random_camera_plugin SHARED src/random_camera_plugin.cpp)
+target_include_directories(random_camera_plugin PUBLIC
+  include
+)
+target_link_libraries(random_camera_plugin ${GAZEBO_LIBRARIES})
+ament_target_dependencies(random_camera_plugin
+  "triton_interfaces"
+)
+ament_export_libraries(random_camera_plugin)
+target_link_libraries(random_camera_plugin ${GAZEBO_LIBRARIES})
+
 rclcpp_components_register_nodes(triton_gazebo "triton_gazebo::UnderwaterCamera")
 
 target_compile_definitions(triton_gazebo
@@ -139,6 +162,7 @@ ament_target_dependencies(triton_gazebo
   "image_transport"
   "sensor_msgs"
   "message_filters"
+  "triton_interfaces"
   "geometry_msgs"
 )
 
@@ -182,6 +206,20 @@ install(TARGETS
   RUNTIME DESTINATION bin
 )
 
+install(TARGETS
+  camera_orbit_plugin
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+)
+
+install(TARGETS
+  random_camera_plugin
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+)
+
 install(DIRECTORY
   config
   launch
@@ -200,12 +238,13 @@ install(DIRECTORY
 
 # Install Python modules
 ament_python_install_package(${PROJECT_NAME})
-
 # Install Python executables
 install(PROGRAMS
   triton_gazebo/bounding_box_image_saver.py
+  triton_gazebo/train_yolo.py
   DESTINATION lib/${PROJECT_NAME}
 )
+ament_export_dependencies(ament_cmake_python)
 
 if(BUILD_TESTING)
   find_package(launch_testing_ament_cmake REQUIRED)

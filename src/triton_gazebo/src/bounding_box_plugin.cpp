@@ -7,15 +7,11 @@ namespace triton_gazebo
 {
     BoundingBoxPlugin::BoundingBoxPlugin() : SensorPlugin()
     {
-        //Create publisher
-        node_ = new rclcpp::Node(this->handleName+"bounding_box");
     }
 
-    BoundingBoxPlugin::~BoundingBoxPlugin ()
+    BoundingBoxPlugin::~BoundingBoxPlugin()
     {
-        delete node_;
     }
-
 
     void BoundingBoxPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf)
     {
@@ -48,13 +44,18 @@ namespace triton_gazebo
         else
             gzwarn << "[bounding_box] camera_name not set." << std::endl;
 
-        publisher_ = node_->create_publisher<triton_interfaces::msg::DetectionBox>(
-            ros_namespace+"/"+camera_name+"/bounding_box", 
-            10
+        //Create publisher
+        node_ = gazebo_ros::Node::Get(_sdf); //Make sure to use gazebo_ros::Node instead of rclcpp::Node, otherwise sim time doesn't work
+        const gazebo_ros::QoS & qos = node_->get_qos();
+
+        publisher_ = node_->create_publisher<triton_interfaces::msg::DetectionBoxArray>(
+            camera_name+"/bounding_box", 
+            qos.get_publisher_qos(camera_name+"/bounding_box")
         );
-        // Connect to the sensor update event.
+
+        //Connect to the sensor update event.
         this->updateConnection = this->parentSensor->ConnectUpdated(
-            std::bind(&BoundingBoxPlugin::OnUpdate, this));
+           std::bind(&BoundingBoxPlugin::OnUpdate, this));
 
         // Make sure the parent sensor is active.
         this->parentSensor->SetActive(true);
@@ -133,13 +134,24 @@ namespace triton_gazebo
             }
         }
 
+        triton_interfaces::msg::DetectionBoxArray bbox_arr;
         triton_interfaces::msg::DetectionBox bbox;
         bbox.x = x_min;
         bbox.y = y_min;
         bbox.width = x_max-x_min;
         bbox.height = y_max-y_min;
 
-        publisher_->publish(bbox);
+        double dist_from_camera = (visual->WorldPose().Pos() - this->parentSensor->Camera()->WorldPosition()).Dot(this->parentSensor->Camera()->Direction());
+        //Publish empty array if bounding box has 0 size or takes up entire image or model is behind the camera
+        if (bbox.width > 0 && bbox.width < this->parentSensor->Camera()->ViewportWidth() - 1 &&
+            bbox.height > 0 && bbox.height < this->parentSensor->Camera()->ViewportHeight() - 1 &&
+            dist_from_camera > this->parentSensor->Camera()->NearClip() &&
+            dist_from_camera < this->parentSensor->Camera()->FarClip() &&
+            this->parentSensor->Camera()->IsVisible(visual))
+            bbox_arr.boxes.push_back(bbox);
+
+        bbox_arr.header.stamp = node_->get_clock()->now();
+        publisher_->publish(bbox_arr);
     }
     
 } // namespace triton_gazebo

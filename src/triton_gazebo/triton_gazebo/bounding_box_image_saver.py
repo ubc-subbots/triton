@@ -4,9 +4,9 @@ from rclpy.node import Node
 import os
 from std_msgs.msg import String
 from sensor_msgs.msg import Image
-from triton_interfaces.msg import DetectionBox
-import cv_bridge
+from triton_interfaces.msg import DetectionBoxArray
 from cv2 import cv2
+import cv_bridge
 import numpy as np
 import random
 from ament_index_python.packages import get_package_share_directory
@@ -16,7 +16,8 @@ class BoundingBoxImageSaver(Node):
     def __init__(self):
         super().__init__('bounding_box_image_saver')
         self.subscribe_image = self.create_subscription(Image, "/triton/gazebo_drivers/front_camera/underwater/image_raw", self.save_image, 10)
-        self.subscriber_bbox = self.create_subscription(DetectionBox, "/triton/gazebo_drivers/front_camera/bounding_box", self.save_bbox, 10)
+        self.subscriber_bbox = self.create_subscription(DetectionBoxArray, "/triton/gazebo_drivers/repub/bounding_box", self.save_bbox, 10)
+        self.lastmsg = None
 
     def save_image(self, msg: Image):
         self.get_logger().info("Getting image...")
@@ -24,12 +25,18 @@ class BoundingBoxImageSaver(Node):
         im = br.imgmsg_to_cv2(msg, "passthrough")
         self.current_image = im
 
-    def save_bbox(self, msg: DetectionBox):
+    def save_bbox(self, msg: DetectionBoxArray):
+        if len(msg.boxes)==0:
+            return
+        msg = msg.boxes[0]
         if (msg.width <= 0 or msg.height <= 0):
             self.get_logger().info("Bounding box has zero size.")
             return
 
         try:
+            if (self.lastmsg and msg.x == self.lastmsg.x and msg.y == self.lastmsg.y): #avoid duplicate images/bounding boxes
+                return
+            self.lastmsg = msg
             rows,cols,channels = self.current_image.shape
            
             centre_x = (msg.x + msg.width/2)/cols
