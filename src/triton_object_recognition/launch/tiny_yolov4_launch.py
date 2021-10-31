@@ -24,7 +24,7 @@ def generate_launch_description():
 
     object_recognizer_container = ComposableNodeContainer(
         name='object_recognizer_container',
-        namespace='/tritonimage_underwater',
+        namespace='/triton',
         package='rclcpp_components',
         executable='component_container',
         composable_node_descriptions=[
@@ -33,6 +33,26 @@ def generate_launch_description():
         output='screen'
     )
 
+    pose_estimation = ComposableNode(
+        name='bbox_pose',
+        namespace='/triton',
+        package='triton_object_recognition',
+        parameters=[config], 
+        plugin='triton_object_recognition::BoundingBoxPoseEstimation'
+    )
+
+    pose_estimation_container = ComposableNodeContainer(
+        name='bbox_pose_container',
+        namespace='/triton',
+        package='rclcpp_components',
+        executable='component_container',
+        composable_node_descriptions=[
+            pose_estimation
+        ],
+        output='screen'
+    )
+
     ld.add_action(object_recognizer_container)
+    ld.add_action(pose_estimation_container)
 
     return ld

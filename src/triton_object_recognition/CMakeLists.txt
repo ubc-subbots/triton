@@ -20,6 +20,7 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_components REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
 find_package(triton_interfaces REQUIRED)
 find_package(cv_bridge REQUIRED)
 find_package(sensor_msgs REQUIRED)
@@ -32,12 +33,14 @@ include_directories(${OpenCV_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
 add_library(triton_object_recognition SHARED
   src/object_recognizer.cpp
+  src/bounding_box_pose_estimation.cpp
 )
 
 target_link_libraries(triton_object_recognition ${OpenCV_LIBRARIES} ${Boost_LIBRARIES})
 
 rclcpp_components_register_nodes(triton_object_recognition 
   "triton_object_recognition::ObjectRecognizer"
+  "triton_object_recognition::BoundingBoxPoseEstimation"
 )
 
 target_compile_definitions(triton_object_recognition
@@ -48,6 +51,7 @@ ament_target_dependencies(triton_object_recognition
   "rclcpp"
   "rclcpp_components"
   "std_msgs"
+  "geometry_msgs"
   "triton_interfaces"
   "cv_bridge"
   "sensor_msgs"
