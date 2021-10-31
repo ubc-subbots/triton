@@ -1,5 +1,6 @@
 #include "triton_controls/waypoint_marker.hpp"
 using std::placeholders::_1;
+using std::placeholders::_2;
 
 namespace triton_controls
 {
@@ -35,7 +36,8 @@ namespace triton_controls
 
     service_ = this->create_service<triton_interfaces::srv::MarkWaypoint>(
       "/triton/waypoint/waypoint_service",
-      std::bind(&WaypointMarker::MarkWaypoint, this, _1,_2)
+      std::bind(&WaypointMarker::serviceCallback, this, _1, _2)
+    );
 
     RCLCPP_INFO(this->get_logger(), "Waypoint Marker successfully started!");
   }
@@ -56,7 +58,7 @@ namespace triton_controls
 
     auto success_msg = triton_interfaces::msg::Success();
 
-    if (!has_waypoint) {
+    if (!has_waypoint_) {
       // no waypoint obtained yet?
       // do nothing and send nothing?
       return;
@@ -72,7 +74,7 @@ namespace triton_controls
     reply_msg.orientation.z = waypoint_pose_values_[5];
     reply_msg.orientation.w = waypoint_pose_values_[6];
 
-    tf2::Quaternion quat = Quaternion(&waypoint_pose_values_[3], &waypoint_pose_values_[4], &waypoint_pose_values_[5], &waypoint_pose_values_[6]);
+    tf2::Quaternion quat = tf2::Quaternion(waypoint_pose_values_[3], waypoint_pose_values_[4], waypoint_pose_values_[5], waypoint_pose_values_[6]);
 
     if (threshold_type_ == "passthrough") {
       // Euclidean distance by Pythagoreas
@@ -98,7 +100,7 @@ namespace triton_controls
         if (threshold_counter_ >= threshold_consect_) {
           trigger_thresh = true;
         } else {
-          rclcpp::sleep_for(wait_time_);
+          rclcpp::sleep_for(std::chrono::duration_cast<std::chrono::nanoseconds>(wait_time_));
         }
       } else {
         threshold_counter_ = 0;
@@ -109,14 +111,16 @@ namespace triton_controls
     }
 
     if (trigger_thresh) {
-      sucess_msg.success = true;
+      success_msg.success = true;
       success_publisher_->publish(success_msg);
       RCLCPP_INFO(this->get_logger(), "New waypoint at: x:%f, y:%f, z:%f; x:%f, y:%f, z:%f, w:%f",
                   waypoint_pose_values_[0], waypoint_pose_values_[1], waypoint_pose_values_[2], waypoint_pose_values_[3], waypoint_pose_values_[4], waypoint_pose_values_[5], waypoint_pose_values_[6]);
     }
   }
-  void serviceCallback(const triton_interfaces::srv::MarkWaypoint::Request::SharedPtr request,
-                       const triton_interfaces::srv::MarkWaypoint::Response::SharedPtr response) const
+
+
+  void WaypointMarker::serviceCallback(const triton_interfaces::srv::MarkWaypoint::Request::SharedPtr request,
+                                       const triton_interfaces::srv::MarkWaypoint::Response::SharedPtr response)
   {
     waypoint_pose_values_[0] = request->pose.position.x;
     waypoint_pose_values_[1] = request->pose.position.y;

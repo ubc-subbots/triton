@@ -36,7 +36,8 @@ namespace triton_controls
     }
 
     feedback_pub_ = this->create_publisher<triton_interfaces::msg::PipelineFeedback>(
-        "/triton/pipeline_feedback", 10
+      "/triton/pipeline_feedback",
+      10
     );
 
     subscription_ = this->create_subscription<triton_interfaces::msg::Success>(
@@ -52,7 +53,9 @@ namespace triton_controls
     // put the service here? Following from the tutorial.
     // set quaternion something like this:
     //To be continued
-  client_ = this->create_client<triton_interfaces::srv::MarkWaypoint>("/triton/waypoint/waypoint_service");
+    client_ = this->create_client<triton_interfaces::srv::MarkWaypoint>(
+      "/triton/waypoint/waypoint_service"
+    );
 
   // I can't just start sending requests here since parameters might not be getted?
     //If complete we can send the pipeline success
@@ -127,7 +130,7 @@ namespace triton_controls
   }
 
 
-  void WaypointMarker::subscriberCallback(const geometry_msgs::msg::Pose::SharedPtr msg)
+  void WaypointSequenceManager::subscriberCallback(const geometry_msgs::msg::Pose::SharedPtr msg)
   {
     if (msg->success) {
       if (num_waypoints_ > 0) {

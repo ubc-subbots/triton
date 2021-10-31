@@ -1,12 +1,16 @@
 #ifndef TRITON_CONTROL__WAYPOINT_MARKER
 #define TRITON_CONTROL__WAYPOINT_MARKER
 
+#include <chrono>
+
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
 #include "geometry_msgs/msg/pose.hpp"
 #include "tf2/LinearMath/Quaternion.h"
 #include "tf2/LinearMath/Matrix3x3.h"
 #include "triton_interfaces/msg/pipeline_feedback.hpp"
+#include "triton_interfaces/msg/success.hpp"
+#include "triton_interfaces/srv/mark_waypoint.hpp"
 //#include "triton_control/waypoint_sequence_manager.hpp" // Where enum is currently stored
 
 namespace triton_controls
@@ -36,7 +40,7 @@ namespace triton_controls
          */
         void subscriberCallback(const geometry_msgs::msg::Pose::SharedPtr msg);
         void serviceCallback(const triton_interfaces::srv::MarkWaypoint::Request::SharedPtr request,
-                             const triton_interfaces::srv::MarkWaypoint::Response::SharedPtr response) const;
+                             const triton_interfaces::srv::MarkWaypoint::Response::SharedPtr response);
 
         rcl_interfaces::msg::SetParametersResult parameter_callback(const std::vector<rclcpp::Parameter> & parameters);
 
@@ -68,7 +72,7 @@ namespace triton_controls
 //        double threshold_dist_;
 //        double threshold_ang_diff_;
         const int threshold_consect_ = 10;
-        const int wait_time_ = 500 000 000; // 500 million or 0.5 seconds
+        const std::chrono::milliseconds wait_time_ = std::chrono::milliseconds(500); // 0.5 seconds
 
         int threshold_counter_;
 
