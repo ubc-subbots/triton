@@ -3,6 +3,8 @@
 import glob
 import os
 import gdown
+import requests
+
 from ament_index_python.packages import get_package_share_directory
 
 def main(args=None):
@@ -47,11 +49,16 @@ def main(args=None):
     backup = {backup_dir}\n")
     file_obj_data.close()
 
-    gdown.download("https://drive.google.com/uc?id=18v36esoXCh-PsOKwyP2GWrpYDptDY8Zf", os.path.join(shared_dir,'yolov3-tiny.conv.11'))
 
-    os.system(f"{darknet_exec} detector train {os.path.join(data_dir,'obj.data')} {os.path.join(shared_dir,'config','yolov3-custom.cfg')} {os.path.join(shared_dir,'yolov3-tiny.conv.11')} -map")
-    os.system(f"cp {os.path.join(backup_dir,'yolov3-custom_final.weights')} {get_package_share_directory('triton_object_recognition')}")
-    os.system(f"cp {os.path.join(shared_dir,'config','yolov3-custom.cfg')} {get_package_share_directory('triton_object_recognition')}")
+    #gdown.download("https://drive.google.com/uc?id=18v36esoXCh-PsOKwyP2GWrpYDptDY8Zf", os.path.join(shared_dir,'yolov3-tiny.conv.11'))
+    if not os.path.exists(os.path.join(shared_dir,'yolov4-tiny.conv.29')):
+        with open(os.path.join(shared_dir,'yolov4-tiny.conv.29'),'wb') as f:
+            f.write(requests.get('https://github.com/AlexeyAB/darknet/releases/download/darknet_yolo_v4_pre/yolov4-tiny.conv.29').content)
+
+    os.system(f"{darknet_exec} detector train {os.path.join(data_dir,'obj.data')} {os.path.join(shared_dir,'config','yolov4-custom.cfg')} {os.path.join(shared_dir,'yolov4-tiny.conv.29')} -map")
+    os.system(f"cp {os.path.join(backup_dir,'yolov4-custom_final.weights')} {get_package_share_directory('triton_object_recognition')}")
+    os.system(f"cp {os.path.join(shared_dir,'config','yolov4-custom.cfg')} {get_package_share_directory('triton_object_recognition')}")
+
 
 if __name__ == '__main__':
     main()

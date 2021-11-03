@@ -231,12 +231,14 @@ install(TARGETS
   RUNTIME DESTINATION bin
 )
 
+
 install(TARGETS
   smooth_camera_plugin
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
 )
+
 
 install(DIRECTORY
   config
