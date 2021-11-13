@@ -87,18 +87,24 @@
         <model name="camera_model">
             <pose>2 0 0 0 0 3.14159</pose>
             <static>false</static>
-            <plugin name="random_camera" filename="librandom_camera_plugin.so">
+            <!-- <plugin name="random_camera" filename="librandom_camera_plugin.so">
+                <radius_range>1 5</radius_range>
+                <track_model>cube1</track_model>
+            </plugin> -->
+            <plugin name="smooth_camera" filename="libsmooth_camera_plugin.so">
                 <radius_range>1 5</radius_range>
                 <track_model>cube1</track_model>
             </plugin>
-            <!-- <plugin name="track_orbit" filename="libcamera_orbit_plugin.so">
+            <!--
+            <plugin name="track_orbit" filename="libcamera_orbit_plugin.so">
                 <radius_range>1 5</radius_range>
                 <track_model>cube1</track_model>
                 <orbit_angle_range>0.1 0.5</orbit_angle_range>
                 <camera_angle_range>0.1 0.5</camera_angle_range>
                 <height_range>-1 1</height_range>
                 <period>1</period>
-            </plugin> -->
+            </plugin>
+            -->
             <link name="camera_link">
                 <gravity>0</gravity>
                 <sensor type="depth" name="camera1">

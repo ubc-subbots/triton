@@ -150,6 +150,17 @@ ament_target_dependencies(random_camera_plugin
 ament_export_libraries(random_camera_plugin)
 target_link_libraries(random_camera_plugin ${GAZEBO_LIBRARIES})
 
+add_library(smooth_camera_plugin SHARED src/smooth_camera_plugin.cpp)
+target_include_directories(smooth_camera_plugin PUBLIC
+  include
+)
+target_link_libraries(smooth_camera_plugin ${GAZEBO_LIBRARIES})
+ament_target_dependencies(smooth_camera_plugin
+  "triton_interfaces"
+)
+ament_export_libraries(smooth_camera_plugin)
+target_link_libraries(smooth_camera_plugin ${GAZEBO_LIBRARIES})
+
 rclcpp_components_register_nodes(triton_gazebo "triton_gazebo::UnderwaterCamera")
 
 target_compile_definitions(triton_gazebo
@@ -219,6 +230,15 @@ install(TARGETS
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
 )
+
+
+install(TARGETS
+  smooth_camera_plugin
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+)
+
 
 install(DIRECTORY
   config
