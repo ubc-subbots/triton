@@ -79,8 +79,8 @@ namespace triton_object_recognition
             auto centre_x = (box.x + (box.width / 2.));
             auto centre_y = (box.y + (box.height / 2.));
             point.class_id = box.class_id;
-            point.x = z_avg * centre_x / intr_[0];
-            point.y = z_avg * centre_y / intr_[1];
+            point.x = z_avg * (centre_x-intr_[2]) / intr_[0];
+            point.y = z_avg * (centre_y-intr_[3]) / intr_[1];
             point.z = z_avg;
             out.points.push_back(point);
 

@@ -11,7 +11,7 @@ def generate_launch_description():
     config = os.path.join(
         get_package_share_directory('triton_object_recognition'),
         'config',
-        'tiny_yolov3.yaml'
+        'custom_yolov3.yaml'
     )
 
     object_recognizer = ComposableNode(
@@ -19,6 +19,7 @@ def generate_launch_description():
         namespace='/triton',
         package='triton_object_recognition',
         parameters=[config], 
+        remappings=[('object_recognizer/out','bbox_pose/in')],
         plugin='triton_object_recognition::ObjectRecognizer'
     )
 
@@ -33,6 +34,27 @@ def generate_launch_description():
         output='screen'
     )
 
+    pose_estimation = ComposableNode(
+        name='bbox_pose',
+        namespace='/triton',
+        package='triton_object_recognition',
+        parameters=[{'classes': [1.,1.,1.,1.,1.],'intrinsics': [224.,168.,320.,240.],'camera_height': 480, 'camera_width': 640 }], 
+        remappings=[('object_recognizer/out','bbox_pose/in')],
+        plugin='triton_object_recognition::BoundingBoxPoseEstimation'
+    )
+
+    pose_estimation_container = ComposableNodeContainer(
+        name='bbox_pose_container',
+        namespace='/triton',
+        package='rclcpp_components',
+        executable='component_container',
+        composable_node_descriptions=[
+            pose_estimation
+        ],
+        output='screen'
+    )
+
     ld.add_action(object_recognizer_container)
+    ld.add_action(pose_estimation_container)
 
     return ld
