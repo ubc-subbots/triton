@@ -19,6 +19,7 @@ def generate_launch_description():
         namespace='/triton',
         package='triton_object_recognition',
         parameters=[config], 
+        remappings=[('object_recognizer/out','bbox_pose/in')],
         plugin='triton_object_recognition::ObjectRecognizer'
     )
 
@@ -37,7 +38,8 @@ def generate_launch_description():
         name='bbox_pose',
         namespace='/triton',
         package='triton_object_recognition',
-        parameters=[config], 
+        parameters=[{'classes': [1.,1.,1.,1.,1.],'intrinsics': [358.,267.,384.,288.],'camera_height': 576, 'camera_width': 768 }], 
+        remappings=[('object_recognizer/out','bbox_pose/in')],
         plugin='triton_object_recognition::BoundingBoxPoseEstimation'
     )
 

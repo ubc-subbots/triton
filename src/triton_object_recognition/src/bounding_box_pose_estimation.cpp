@@ -46,6 +46,8 @@ namespace triton_object_recognition
         triton_interfaces::msg::PointArray out;
         out.header = msg.header;
 
+        RCLCPP_INFO(get_logger(), "Finding pose");
+
 #if DEBUG_VISUALIZE
         cv::Mat frame = cv::Mat::zeros(cv::Size2i(camera_width_, camera_height_), CV_8UC1);
 #endif
