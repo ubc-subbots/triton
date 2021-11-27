@@ -4,7 +4,7 @@ services:
   micro-ros:
     image: microros/micro-ros-agent:foxy
     privileged: true
-    command: serial --dev /dev/ttyACM0
+    command: serial --dev /dev/ttyACM0 # /dev/ttyACM0 is the expected location of the teensy, if this is not the case, this values must be changed
     volumes:
       - "/dev:/dev"
     network_mode: "host"
