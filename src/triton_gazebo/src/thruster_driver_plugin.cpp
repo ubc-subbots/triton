@@ -29,8 +29,7 @@ namespace triton_gazebo
                             this->topic_name, 
                             10, 
                             std::bind(&ThrusterDriver::GetForceCmd, this, _1));
-
-        RCLCPP_INFO(node->get_logger(), "Listening on %s\n", this->topic_name.c_str());
+        RCLCPP_INFO(node->get_logger(), "Listening on %s", this->topic_name.c_str());
 
         std::string model_name = _model->GetName();
 
