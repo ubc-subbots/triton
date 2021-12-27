@@ -36,37 +36,37 @@ namespace triton_object_recognition
             debug_publisher_ = image_transport::create_publisher(this, "object_recognizer/debug");
         #endif
         //Populate parameters (values are not modified if parameters have not been declared)
-        this->declare_parameter<std::string>("weights_filename", weights_filename_);
-        this->declare_parameter<std::string>("cfg_filename", cfg_filename_);
-        this->declare_parameter<std::string>("weights_url", weights_url_);
-        this->declare_parameter<std::string>("cfg_url", cfg_url_);
-        this->declare_parameter<std::vector<std::string>>("classes", classes_);
-        this->declare_parameter<float>("conf_threshold", conf_threshold_);
-        this->declare_parameter<float>("nms_threshold", nms_threshold_);
-        this->declare_parameter<float>("scale", scale_);
-        this->declare_parameter<int>("inp_width", inp_width_);
-        this->declare_parameter<int>("inp_height", inp_height_);
-        this->declare_parameter<bool>("swap_rb", swap_rb_);
-        this->declare_parameter<float>("mean", mean_);
-        this->declare_parameter<int>("backend", (int) backend_);
-        this->declare_parameter<int>("target", (int) target_);
+        this->declare_parameter("weights_filename", weights_filename_);
+        this->declare_parameter("cfg_filename", cfg_filename_);
+        this->declare_parameter("weights_url", weights_url_);
+        this->declare_parameter("cfg_url", cfg_url_);
+        this->declare_parameter("classes", classes_);
+        this->declare_parameter("conf_threshold", conf_threshold_);
+        this->declare_parameter("nms_threshold", nms_threshold_);
+        this->declare_parameter("scale", scale_);
+        this->declare_parameter("inp_width", inp_width_);
+        this->declare_parameter("inp_height", inp_height_);
+        this->declare_parameter("swap_rb", swap_rb_);
+        this->declare_parameter("mean", mean_);
+        this->declare_parameter("backend", (int) backend_);
+        this->declare_parameter("target", (int) target_);
 
-        this->get_parameter<std::string>("weights_filename", weights_filename_);
-        this->get_parameter<std::string>("cfg_filename", cfg_filename_);
-        this->get_parameter<std::string>("weights_url", weights_url_);
-        this->get_parameter<std::string>("cfg_url", cfg_url_);
-        this->get_parameter<std::vector<std::string>>("classes", classes_);
-        this->get_parameter<float>("conf_threshold", conf_threshold_);
-        this->get_parameter<float>("nms_threshold", nms_threshold_);
-        this->get_parameter<float>("scale", scale_);
-        this->get_parameter<int>("inp_width", inp_width_);
-        this->get_parameter<int>("inp_height", inp_height_);
-        this->get_parameter<bool>("swap_rb", swap_rb_);
-        this->get_parameter<float>("mean", mean_);
+        this->get_parameter("weights_filename", weights_filename_);
+        this->get_parameter("cfg_filename", cfg_filename_);
+        this->get_parameter("weights_url", weights_url_);
+        this->get_parameter("cfg_url", cfg_url_);
+        this->get_parameter("classes", classes_);
+        this->get_parameter("conf_threshold", conf_threshold_);
+        this->get_parameter("nms_threshold", nms_threshold_);
+        this->get_parameter("scale", scale_);
+        this->get_parameter("inp_width", inp_width_);
+        this->get_parameter("inp_height", inp_height_);
+        this->get_parameter("swap_rb", swap_rb_);
+        this->get_parameter("mean", mean_);
         int backend, target;
-        if (this->get_parameter<int>("backend", backend))
+        if (this->get_parameter("backend", backend))
             backend_ = (Backend) backend;
-        if (this->get_parameter<int>("target", target))
+        if (this->get_parameter("target", target))
             target_ = (Target) target;
 
         //Get model folder as the install directory of this package

@@ -24,19 +24,19 @@ namespace triton_controls
     
       for (int i = 0; i < MAX_THRUSTERS; i++)
       {
-        this->declare_parameter<double>(names[i]+".contrib.x", x_contribs_[i]);
-        this->declare_parameter<double>(names[i]+".contrib.y", y_contribs_[i]);
-        this->declare_parameter<double>(names[i]+".contrib.z", z_contribs_[i]);
-        this->declare_parameter<double>(names[i]+".lx", x_lens_[i]);
-        this->declare_parameter<double>(names[i]+".ly", y_lens_[i]);
-        this->declare_parameter<double>(names[i]+".lz", z_lens_[i]);
+        this->declare_parameter(names[i]+".contrib.x", x_contribs_[i]);
+        this->declare_parameter(names[i]+".contrib.y", y_contribs_[i]);
+        this->declare_parameter(names[i]+".contrib.z", z_contribs_[i]);
+        this->declare_parameter(names[i]+".lx", x_lens_[i]);
+        this->declare_parameter(names[i]+".ly", y_lens_[i]);
+        this->declare_parameter(names[i]+".lz", z_lens_[i]);
 
-        this->get_parameter<double>(names[i]+".contrib.x", x_contribs_[i]);
-        this->get_parameter<double>(names[i]+".contrib.y", y_contribs_[i]);
-        this->get_parameter<double>(names[i]+".contrib.z", z_contribs_[i]);
-        this->get_parameter<double>(names[i]+".lx", x_lens_[i]);
-        this->get_parameter<double>(names[i]+".ly", y_lens_[i]);
-        this->get_parameter<double>(names[i]+".lz", z_lens_[i]);
+        this->get_parameter(names[i]+".contrib.x", x_contribs_[i]);
+        this->get_parameter(names[i]+".contrib.y", y_contribs_[i]);
+        this->get_parameter(names[i]+".contrib.z", z_contribs_[i]);
+        this->get_parameter(names[i]+".lx", x_lens_[i]);
+        this->get_parameter(names[i]+".ly", y_lens_[i]);
+        this->get_parameter(names[i]+".lz", z_lens_[i]);
       } 
 
       std::vector<std::vector<double>> alloc_vec =  createAllocMat();
