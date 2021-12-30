@@ -37,6 +37,7 @@ namespace triton_gazebo
     int incr_phi;
     // For adjusting rotational axis
     double axis_theta;
+    double spin_speed;
     // For keeping track of rotation and movement
     int spinned_one_cycle;
     int change_pos;

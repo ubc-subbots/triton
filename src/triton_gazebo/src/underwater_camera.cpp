@@ -233,6 +233,7 @@ namespace triton_gazebo
         cv::merge(channels,pub_image.image);
         pub_image.encoding = sensor_msgs::image_encodings::BGR8;
         pub_image.toImageMsg(message);
+        message.header = image_msg->header;
         underwater_image_pub_.publish(message);
 
         auto runtime = this->get_clock()->now() - timer;

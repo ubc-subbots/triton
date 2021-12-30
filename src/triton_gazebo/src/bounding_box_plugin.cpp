@@ -30,6 +30,12 @@ namespace triton_gazebo
             model_name_ = _sdf->GetElement("model_name")->Get<std::string>();
         else 
             gzwarn << "[bounding_box] model_name not set." << std::endl;
+
+        // Load parameters for class ID
+        if (_sdf->HasElement("class_id"))
+            class_id_ = _sdf->GetElement("class_id")->Get<int>();
+        else 
+            gzwarn << "[bounding_box] class_id not set." << std::endl;
             
         // Create ROS publisher
         std::string ros_namespace;
@@ -63,6 +69,9 @@ namespace triton_gazebo
 
     void BoundingBoxPlugin::OnUpdate()
     {
+        triton_interfaces::msg::DetectionBoxArray bbox_arr;
+        bbox_arr.header.stamp = node_->get_clock()->now();
+        
         rendering::ScenePtr scene = rendering::get_scene();
         
         rendering::VisualPtr visual = scene->GetVisual(model_name_);
@@ -134,12 +143,12 @@ namespace triton_gazebo
             }
         }
 
-        triton_interfaces::msg::DetectionBoxArray bbox_arr;
         triton_interfaces::msg::DetectionBox bbox;
         bbox.x = x_min;
         bbox.y = y_min;
         bbox.width = x_max-x_min;
         bbox.height = y_max-y_min;
+        bbox.class_id = class_id_;
 
         double dist_from_camera = (visual->WorldPose().Pos() - this->parentSensor->Camera()->WorldPosition()).Dot(this->parentSensor->Camera()->Direction());
         //Publish empty array if bounding box has 0 size or takes up entire image or model is behind the camera
@@ -149,8 +158,7 @@ namespace triton_gazebo
             dist_from_camera < this->parentSensor->Camera()->FarClip() &&
             this->parentSensor->Camera()->IsVisible(visual))
             bbox_arr.boxes.push_back(bbox);
-
-        bbox_arr.header.stamp = node_->get_clock()->now();
+        
         publisher_->publish(bbox_arr);
     }
     
