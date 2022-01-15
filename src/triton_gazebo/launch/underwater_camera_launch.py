@@ -19,6 +19,7 @@ def generate_launch_description():
 
     camera_type = "SONY_IMX322"
     water_type = random.choice(["I","IA","IB","II",'III',"1C","3C","5C","7C","9C"])
+    water_type = "IA"
     irradiance_type = "ASTM_G173_03"
 
     underwater_camera = Node(

@@ -15,9 +15,7 @@
 
 typedef sensor_msgs::msg::Image Image;
 typedef sensor_msgs::msg::Image::ConstSharedPtr ImageMsg;
-typedef triton_interfaces::msg::DetectionBoxArray DetectionBoxArray;
-typedef triton_interfaces::msg::DetectionBoxArray::ConstSharedPtr DetectionBoxArrayMsg;
-typedef message_filters::sync_policies::ApproximateTime<Image, Image, DetectionBoxArray> ApproxPolicy;
+typedef message_filters::sync_policies::ApproximateTime<Image, Image> ApproxPolicy;
 typedef message_filters::Synchronizer<ApproxPolicy> ApproxSync;
 
 
@@ -51,7 +49,7 @@ namespace triton_gazebo
          * @param depth_msg depth message 
          * @param bbox_msg bounding box array message (TODO: Make this optional?)
          */
-        void syncCallback(const ImageMsg & image_msg, const ImageMsg & depth_msg, const DetectionBoxArrayMsg & bbox_msg);
+        void syncCallback(const ImageMsg & image_msg, const ImageMsg & depth_msg);
 
         /** Performs underwater synthesis on a image/depth pair, publishes result
          * 
@@ -65,11 +63,9 @@ namespace triton_gazebo
         image_transport::Publisher underwater_image_pub_;
         image_transport::Publisher image_pub_;
         image_transport::Publisher depth_pub_;
-        rclcpp::Publisher<DetectionBoxArray>::SharedPtr bbox_pub_;
 
         image_transport::SubscriberFilter image_sub_;
         image_transport::SubscriberFilter depth_sub_; 
-        message_filters::Subscriber<DetectionBoxArray> bbox_sub_;
 
         std::shared_ptr<ApproxSync> approx_sync_; 
 

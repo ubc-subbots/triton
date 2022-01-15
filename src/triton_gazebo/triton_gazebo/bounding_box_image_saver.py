@@ -16,55 +16,64 @@ class BoundingBoxImageSaver(Node):
     def __init__(self):
         super().__init__('bounding_box_image_saver')
         self.subscribe_image = self.create_subscription(Image, "/triton/drivers/front_camera/image_raw", self.save_image, 10)
-        self.subscriber_bbox = self.create_subscription(DetectionBoxArray, "/triton/gazebo_drivers/repub/bounding_box", self.save_bbox, 10)
+        self.subscriber_bbox = self.create_subscription(DetectionBoxArray, "/triton/gazebo_drivers/front_camera/bounding_box", self.save_bbox, 10)
         self.lastmsg = None
-        self.image_queue = [] #List of past images 
-
-    def save_image(self, msg: Image):
-        self.get_logger().info("Getting image...")
-        if len(self.image_queue)>20: #Keep last 20 iamges
-            self.image_queue.pop(0)
-        self.image_queue.append(msg) #Add timestamp and image to queue
+        self.bbox_queue = [] #List of past images 
 
     def save_bbox(self, msg: DetectionBoxArray):
         if len(msg.boxes)==0:
             return
+        if len(self.bbox_queue)>100: #Keep last 100 bounding box msgs (bounding box is published at render time, image is published after modified)
+            self.bbox_queue.pop(0)
+        self.bbox_queue.append(msg) #Add timestamp and msg to queue
+    
+    # def save_image(self, msg: Image):
+    #     self.get_logger().info("Getting image...")
+    #     if len(self.image_queue)>20: #Keep last 20 iamges
+    #         self.image_queue.pop(0)
+    #     self.image_queue.append(msg) #Add timestamp and image to queue
 
-        #Look through image queue for corresponding image
-        #Update rate of sensor is set to 50, so we want the bounding box timestamp to be <20ms more than image timestamp 
+    def compare_time(self, bbox_queue, image_time):
+        #assumes timestamp of image msg is before timestamp of bbox msg
         selected = None
+        for msg in bbox_queue:
+            time_msg = msg.header.stamp.sec*1e9+msg.header.stamp.nanosec
+            if (time_msg - image_time)<9e6 and (time_msg - image_time)>=0:
+                selected = msg
+        return selected
+
+    def save_image(self, msg: Image):
+        #Look through bbox queue for corresponding bbox
+        #Update rate of sensor is set to 50, so we want the bounding box timestamp to be <20ms more than image timestamp 
         time_bbox = msg.header.stamp.sec*1e9+msg.header.stamp.nanosec
-        for im_msg in self.image_queue:
-            time_im = im_msg.header.stamp.sec*1e9+im_msg.header.stamp.nanosec
-            if (time_bbox - time_im)<9e6 and (time_bbox - time_im)>=0:
-                selected = im_msg
-        if selected is None:
-            self.get_logger().info("Corresponding image not found.")
+        selected_bbox = self.compare_time(self.bbox_queue,time_bbox)
+        if selected_bbox is None:
+            self.get_logger().info("Corresponding bbox not found.")
             return
-        self.get_logger().info("Corresponding image found!")
+        self.get_logger().info("Corresponding bbox found!")
         
-        msg = msg.boxes[0]
-        if (msg.width <= 0 or msg.height <= 0):
+        bbox = selected_bbox.boxes[0]
+        if (bbox.width <= 0 or bbox.height <= 0):
             self.get_logger().info("Bounding box has zero size.")
             return
         
         try:
-            if (self.lastmsg and msg.x == self.lastmsg.x and msg.y == self.lastmsg.y): #avoid duplicate images/bounding boxes
+            if (self.lastmsg and bbox.x == self.lastmsg.x and bbox.y == self.lastmsg.y): #avoid duplicate images/bounding boxes
                 return
-            self.lastmsg = msg
+            self.lastmsg = bbox
 
             br = cv_bridge.CvBridge()
-            selected_im = br.imgmsg_to_cv2(selected, "passthrough")
+            selected_im = br.imgmsg_to_cv2(msg, "passthrough")
             rows,cols,channels = selected_im.shape
            
-            centre_x = (msg.x + msg.width/2)/cols
-            centre_y = (msg.y + msg.height/2)/rows
-            width = msg.width/cols
-            height = msg.height/rows
+            centre_x = (bbox.x + bbox.width/2)/cols
+            centre_y = (bbox.y + bbox.height/2)/rows
+            width = bbox.width/cols
+            height = bbox.height/rows
 
             name = "image"+str(random.randint(0,2**16-1))
             self.get_logger().info("Saving..."+name)
-            txt_string = f"{msg.class_id} {centre_x} {centre_y} {width} {height}"
+            txt_string = f"{bbox.class_id} {centre_x} {centre_y} {width} {height}"
 
             data_dir = os.path.join(get_package_share_directory("triton_gazebo"),"data")
             if not os.path.exists(data_dir):
@@ -76,7 +85,7 @@ class BoundingBoxImageSaver(Node):
             cv2.imwrite(os.path.join(data_dir, name + ".png"), selected_im)
 
             image_with_box = selected_im.copy()
-            image_with_box = cv2.rectangle(image_with_box,(int(msg.x),int(msg.y)),(int(msg.x+msg.width),int(msg.y+msg.height)),(0,0,255),1)
+            image_with_box = cv2.rectangle(image_with_box,(int(bbox.x),int(bbox.y)),(int(bbox.x+bbox.width),int(bbox.y+bbox.height)),(0,0,255),1)
             cv2.imwrite(os.path.join(data_dir, name + "_box" + ".png"), image_with_box)
         except AttributeError as e:
             self.get_logger().info("No image yet.")

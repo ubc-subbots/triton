@@ -4,7 +4,6 @@
 
 using std::placeholders::_1;
 using std::placeholders::_2;
-using std::placeholders::_3;
 
 namespace triton_gazebo
 {
@@ -28,10 +27,6 @@ namespace triton_gazebo
             "repub/depth/image_raw", 
             publisher_qos_profile);
 
-        bbox_pub_ = this->create_publisher<DetectionBoxArray>( 
-            "repub/bounding_box", 
-            10);
-
         image_sub_.subscribe(this,
             "front_camera/image_raw", 
             "raw",
@@ -42,18 +37,13 @@ namespace triton_gazebo
              "raw",
              subscriber_qos_profile);
 
-        bbox_sub_.subscribe(this,
-            "front_camera/bounding_box",
-            subscriber_qos_profile);
-
         approx_sync_ = std::make_shared<ApproxSync>(
             ApproxPolicy(5),
             image_sub_, 
-            depth_sub_,
-            bbox_sub_);
+            depth_sub_);
 
         approx_sync_->registerCallback(
-            std::bind(&UnderwaterCamera::syncCallback, this, _1, _2, _3));
+            std::bind(&UnderwaterCamera::syncCallback, this, _1, _2));
 
         this->declare_parameter("rho");
         this->declare_parameter("irradiance_transmission");
@@ -151,7 +141,7 @@ namespace triton_gazebo
     //     underwaterImageSynthesis(image_msg, depth_msg);
     // }
 
-    void UnderwaterCamera::syncCallback(const ImageMsg & image_msg, const ImageMsg & depth_msg, const DetectionBoxArrayMsg & bbox_msg)
+    void UnderwaterCamera::syncCallback(const ImageMsg & image_msg, const ImageMsg & depth_msg)
     {   
         float image_stamp = image_msg->header.stamp.sec+image_msg->header.stamp.nanosec*1e-9;
         float depth_stamp = depth_msg->header.stamp.sec+depth_msg->header.stamp.nanosec*1e-9;
@@ -163,7 +153,6 @@ namespace triton_gazebo
         }
 
         underwaterImageSynthesis(image_msg, depth_msg);
-        bbox_pub_->publish(*bbox_msg);
         image_pub_.publish(image_msg);
         depth_pub_.publish(depth_msg);
     }
