@@ -4,7 +4,6 @@
 #include <memory>
 #include <eigen3/Eigen/Core>
 
-#include "message_filters/subscriber.h"
 #include "message_filters/sync_policies/approximate_time.h"
 #include "message_filters/synchronizer.h"
 #include "image_transport/image_transport.hpp"
