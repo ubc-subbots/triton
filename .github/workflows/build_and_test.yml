@@ -48,6 +48,7 @@ jobs:
       - name: Source setup and build then test using colcon
         env:
           LD_LIBRARY_PATH: /usr/local/lib/
+          CMAKE_CXX_STANDARD: 14
         run: |
           source /opt/ros/foxy/setup.bash
           source /usr/share/gazebo/setup.sh
