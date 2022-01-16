@@ -35,6 +35,17 @@ def main(args=None):
             file_train.write(file + "\n")
             counter = counter + 1
 
+    for file in glob.iglob(os.path.join(data_dir, '**/*.jpg'), recursive=True):  
+        if "_box" in file:
+            continue
+        title, ext = os.path.splitext(os.path.basename(file))
+        if counter == index_test:
+            counter = 1
+            file_test.write(file + "\n")
+        else:
+            file_train.write(file + "\n")
+            counter = counter + 1
+
     file_train.close()
     file_test.close()
 
