@@ -110,10 +110,10 @@ def create_image(type):
 
 start_time = time.time()
 
-# shape, number of vertices, circularity, contour size, eccentricity
+# shape, number of vertices, circularity, contour size, eccentricity, extent, solidity, convexity
 data = []
 
-sample_size = 10000
+sample_size = 2000
 
 print(f'Generating ~{2.5*sample_size} samples...')
 
@@ -160,6 +160,10 @@ for iter in range(sample_size):
         rect = cv.minAreaRect(cnt)
         box = cv.boxPoints(rect)
         box = np.int0(box)
+        x,y,w,h = cv.boundingRect(cnt)
+
+        # Extent 
+        extent = float(area)/(w*h)
 
         # Centroid
         moment = cv.moments(cnt)
@@ -173,6 +177,13 @@ for iter in range(sample_size):
 
         # Convex hull
         hull = cv.convexHull(cnt)
+        hullarea = cv.contourArea(hull)
+
+        # Solidity
+        solidity = float(area)/hullarea
+
+        # Convexity
+        convexity = cv.isContourConvex(cnt)
 
 
         # Ellipse
@@ -190,7 +201,7 @@ for iter in range(sample_size):
             # eccentricity = sqrt( 1 - (ma/MA)^2)
             eccentricity = np.sqrt(1-(minoraxis_length/majoraxis_length)**2)
 
-            arr = [shape, len(approxC), circularity, cnt.size, eccentricity]
+            arr = [shape, len(approxC), circularity, cnt.size, eccentricity, extent, solidity, convexity]
             data.append(arr)
 
             shape_dist[shape] += 1
@@ -202,7 +213,7 @@ for iter in range(sample_size):
                     not_a_shape_from_not_a_glass += 1
                 shape_dist[3] += 1
                 eccentricity = 0
-                arr = [3, len(approxC), circularity, cnt.size, eccentricity]
+                arr = [3, len(approxC), circularity, cnt.size, eccentricity, extent, solidity, convexity]
                 data.append(arr)
 
 
@@ -213,6 +224,9 @@ for iter in range(sample_size):
             print(f'Circularity: {circularity}')
             print(f'Contour size: {cnt.size}')
             print(f'Eccentricity: {eccentricity}')
+            print(f'Extent: {extent}')
+            print(f'Solidity: {solidity}')
+            print(f'Convexity: {convexity}')
 
             blank = np.zeros(src.shape, dtype="uint8")
             cv.drawContours(blank,[box],0,(255,255,0),1)
@@ -232,6 +246,6 @@ print(f'Progress: 100%    Shape distribution: {shape_dist}')
 
 print(len(data))
 datanp = np.array(data)
-np.save("./data_1.npy", datanp)
+np.save("./data_4.npy", datanp)
 
 print(f"Script took: {time.time() - start_time:.3f}s")
