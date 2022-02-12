@@ -1,9 +1,13 @@
 import cv2 as cv
+from cv2 import imread
 import numpy as np
 import random
 import time
 
 DEBUG = False
+
+# Simple model testing using generated data: 
+# https://colab.research.google.com/drive/1ioHqfHTLN5b0vslCkrpzNH2fUfuUStno?usp=sharing
 
 
 def util_segment(src, hue):
@@ -110,12 +114,28 @@ def create_image(type):
 
 start_time = time.time()
 
-# shape, number of vertices, circularity, contour size, eccentricity, extent, solidity, convexity
+# Get the target shapes we want
+target_cnt = []
+target_fn = ["./shapes/circle_pure.png", "./shapes/star_pure.png", "./shapes/glass_pure.png"]
+for i in range(3):
+    src = cv.imread(target_fn[i])
+    segment = util_segment(src, 0)
+    morph = morphological(segment, (2,2), (5,5))
+    contours, hierarchy = cv.findContours(morph, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
+    if (DEBUG):
+        ma = cv.matchShapes(contours[0], contours[1],1,0)
+        print(ma)
+    target_cnt.append(contours[0])
+
+cv.waitKey(0)
+
+# shape, number of vertices, circularity, contour size, eccentricity, extent, solidity, convexity, matchshape circle, matchshape star, matchshape glass
 data = []
 
-sample_size = 2000
+target_sample_size = 10000
+sample_size = int(target_sample_size / 1.25)
 
-print(f'Generating ~{2.5*sample_size} samples...')
+print(f'Generating ~{target_sample_size} samples...')
 
 shape = 0
 
@@ -134,7 +154,7 @@ for iter in range(sample_size):
 
     morph = morphological(segment, (2,2), (5,5))
 
-    contours, hierarchy = cv.findContours(morph, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
+    contours, hierarchy = cv.findContours(morph, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
 
 
     src_cnt = src.copy()
@@ -185,6 +205,25 @@ for iter in range(sample_size):
         # Convexity
         convexity = cv.isContourConvex(cnt)
 
+        # Match shapes
+        ma_c = cv.matchShapes(cnt, target_cnt[0],1,0)
+        ma_s = cv.matchShapes(cnt, target_cnt[1],1,0)
+        ma_g = cv.matchShapes(cnt, target_cnt[2],1,0)
+        if (ma_c > 5):
+            ma_c = 5
+        if (ma_s > 5):
+            ma_s = 5
+        if (ma_g > 5):
+            ma_g = 5
+
+        # Convexity defects
+        chull = cv.convexHull(cnt, returnPoints=False)
+        defects = cv.convexityDefects(cnt, chull)
+        if (defects is not None):
+            num_defects = defects.shape[0]
+        else:
+            num_defects = 0
+
 
         # Ellipse
         # We filter by area because we know how big the shapes should be in our generated data
@@ -201,19 +240,20 @@ for iter in range(sample_size):
             # eccentricity = sqrt( 1 - (ma/MA)^2)
             eccentricity = np.sqrt(1-(minoraxis_length/majoraxis_length)**2)
 
-            arr = [shape, len(approxC), circularity, cnt.size, eccentricity, extent, solidity, convexity]
+            arr = [shape, len(approxC), circularity, cnt.size, eccentricity, extent, solidity, convexity, ma_c, ma_s, ma_g, num_defects]
             data.append(arr)
 
             shape_dist[shape] += 1
-        else:
+
+        else: 
             # Sometimes there are a lot of contours from the shot glass image
-            if (shape_dist[3] < sample_size / 4 or shape_dist[3] < shape_dist[0] * 1.1):
+            if (shape_dist[3] < sample_size / 4 or shape_dist[3] < shape_dist[0] * 1.05):
                 if (shape < 2):
                     #print(f"\n==========\nTHIS ONE {shape}\n========\n")
                     not_a_shape_from_not_a_glass += 1
                 shape_dist[3] += 1
                 eccentricity = 0
-                arr = [3, len(approxC), circularity, cnt.size, eccentricity, extent, solidity, convexity]
+                arr = [3, len(approxC), circularity, cnt.size, eccentricity, extent, solidity, convexity, ma_c, ma_s, ma_g, num_defects]
                 data.append(arr)
 
 
@@ -227,6 +267,10 @@ for iter in range(sample_size):
             print(f'Extent: {extent}')
             print(f'Solidity: {solidity}')
             print(f'Convexity: {convexity}')
+            print(f'Match shape: circle: {ma_c}')
+            print(f'Match shape: star: {ma_s}')
+            print(f'Match shape: glass: {ma_g}')
+            print(f'Convexity defects: {num_defects}')
 
             blank = np.zeros(src.shape, dtype="uint8")
             cv.drawContours(blank,[box],0,(255,255,0),1)
@@ -246,6 +290,6 @@ print(f'Progress: 100%    Shape distribution: {shape_dist}')
 
 print(len(data))
 datanp = np.array(data)
-np.save("./data_4.npy", datanp)
+np.save("./data_11.npy", datanp)
 
 print(f"Script took: {time.time() - start_time:.3f}s")
