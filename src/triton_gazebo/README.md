@@ -6,7 +6,7 @@ This package contains the Gazebo models, worlds, and plugins needed to create a 
 ## Usage
 
 ### Gazebo
-To run a Gazebo simulation with a world file given in the `worlds` directory, use the `gazebo_lanch.py` file as follows
+To run a Gazebo simulation with a world file given in the `worlds` directory, use the `gazebo_launch.py` file as follows
 
     ros2 launch triton_gazebo gazebo_launch.py world:=<WORLD_FILE_NAME> headless:=<IS_HEADLESS>
 
@@ -19,29 +19,72 @@ To run the underwater camera node, use the following
 
 Sets of parameters for the underwater camera node (water transmission, spectral sensitivity, etc.) are stored in `config/underwater_camera.yaml`. To change which parameters are used, `launch/underwater_camera_launch.py` can be modified
 
-## Nodes
+### Generating Data with Bounding Box
+To run the data generation node, use the following
+
+        ros2 launch triton_gazebo gendata_launch.py
+
+This runs the Gazebo world `uc_gendata.world`, runs the underwater camera node with a random water type, and saves the output images along with label files containing the bounding box of the tracked model defined in `uc_gendata.world` under `bounding_box_controller/model_name`. The images and label files are saved in a folder called `data` in the triton_gazebo shared folder.
+
+Currently, the generated images are not always well-suited for training, and may not be rendered properly due to timing mismatches between the Gazebo render, the underwater camera node, and the bounding box node. Some manual cleaning (removing incorrect images) will need to be done to obtain a good dataset.
+
+Data is saved to a folder in the share directory, ie. `<PATH_TO_TRITON>/install/triton_gazebo/share/triton_gazebo/data`.
+If you get an error that the executable cannot be found, make sure `triton_gazebo/bounding_box_image_saver.py` has executable permissions (ie. `chmod +x bounding_box_image_saver.py`).
+
+### Training Yolo v3 Model
+The triton_gazebo shared folder should contain a folder called `data` with images with `.png` extensions (this can be changed in `train_yolo.py`). Each image should have a corresponding `.txt` file with the same name (other than extension) containing labels in standard Yolo format describing the bounding boxes (each line should be `<object class (integer)> <x centre> <y centre> <box width> <box height`, with x/y/width/height normalized between 0 and 1 using the image's dimensions).
+
+The `yolov3_custom.cfg` file should be modified based on the requirements of the model. See `AlexeyAB/darknet` on GitHub for a guide. 
+
+Run `ros2 launch triton_gazebo train_yolo_launch.py` to start training the model. By default, as training progresses backups will be saved in a folder called `backup` in the shared folder. If you get an error that the executable cannot be found, make sure `triton_gazebo/train_yolo.py` has executable permissions (ie. `chmod +x train_yolo.py`).
+
+
+## Nodes/Plugins
 
 - `underwater_camera`: A node which produces synthesized underwater images from a RGB/depth image pair
 
     ### Subscribed Topics
-     - `front_camera/image_raw` (`sensor_msgs/msg/Image.msg`) : Input RGB image
-     - `front_camera/depth/image_raw` (`sensor_msgs/msg/Image.msg`) : Input depth image
+    - `front_camera/image_raw` (`sensor_msgs/msg/Image.msg`) : Input RGB image
+    - `front_camera/depth/image_raw` (`sensor_msgs/msg/Image.msg`) : Input depth image
+    - `front_camera/bounding_box` (`triton_interfaces/msg/DetectionBoxArray`) : Bounding box (only republishes to avoid data generation timing issues)
 
     ### Published Topics
     - `front_camera/underwater/image_raw` (`sensor_msgs/msg/Image.msg`) : Synthesized underwater image
     - `repub/image_raw` (`sensor_msgs/msg/Image.msg`) : Republished RGB image
     - `repub/depth/image_raw` (`sensor_msgs/msg/Image.msg`) : Republished depth image
+    - `repub/bounding_box` (`triton_interfaces/msg/DetectionBoxArray`) : Republished bounding box
+
+- `bounding_box_plugin`: A Gazebo plugin which produces the bounding box of a specified object in camera image coordinates
+
+    ### Published Topics
+    - `front_camera/bounding_box` (`triton_interfaces/msg/DetectionBoxArray`) : Bounding box
+
+- `bounding_box_image_saver`: A node which saves images and bounding boxes for training.
+
+    ### Subscribed Topics
+    - `front_camera/underwater/image_raw` (`sensor_msgs/msg/Image.msg`) : Synthesized underwater image
+    - `repub/bounding_box` (`triton_interfaces/msg/DetectionBoxArray`) : Bounding box
+
+- `camera_orbit_plugin`: A Gazebo plugin which rotates the camera around a specified object for data collection (not recommended as training data). Attach this to a camera in a .world file to use.
+
+- `random_camera_plugin`: A Gazebo plugin which randomly moves the camera around for data collection (currently no guarantee the object is in view). Attach this to a camera in a .world file to use.
      
 ## Worlds
 
 `cube.world` 
 - A simple world with the `cube` model.
 
+`uc_gendata.world` 
+- A world used for generating synthetic data for training. A depth camera is defined with additional plugins for moving the camera (`random_camera_plugin`) and generating bounding boxes (`bounding_box_controller`). 
+
 ## Models
 `cube`
 - A simple cube which uses a ROS2 force plugin to accept `geometry_msgs/msg/Wrench` messages on the topic `/triton/gazebo_drivers/force`. Here is an example command to apply forces to the cube
 
         ros2 topic pub /triton/gazebo_drivers/force geometry_msgs/msg/Wrench "{force: {x: 1}}"
+
+`lenabox`
+- A cube with the Lena test image as its texture.
 
 ##  Importing Models From SolidWorks 
 

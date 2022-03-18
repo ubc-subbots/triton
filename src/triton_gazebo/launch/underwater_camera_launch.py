@@ -3,6 +3,7 @@ from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch_ros.actions import Node
 import yaml
+import random
 
 def generate_launch_description():
 
@@ -17,7 +18,7 @@ def generate_launch_description():
     params = yaml.load(open(config,"r"), Loader=yaml.FullLoader)
 
     camera_type = "SONY_IMX322"
-    water_type = "I"
+    water_type = random.choice(["I","IA","IB","II",'III',"1C","3C","5C","7C","9C"])
     irradiance_type = "ASTM_G173_03"
 
     underwater_camera = Node(
@@ -26,6 +27,8 @@ def generate_launch_description():
         package='triton_gazebo',
         executable='underwater_camera',
         output='screen',
+        remappings=[('/triton/gazebo_drivers/front_camera/underwater/image_raw',
+                     '/triton/drivers/front_camera/image_raw')],
         parameters=[
             {"rho": params["rho"]["default"]},
             {"irradiance_transmission": params["irradiance_transmission"][water_type]},

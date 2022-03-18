@@ -1,0 +1,108 @@
+<?xml version="1.0"?>
+<sdf version="1.7">
+    <model name="cube">
+        <pose>0 0 0 0 0 0</pose>
+        <link name="frame">
+            <pose>0 0 0 0 0 0</pose>
+            <gravity>0</gravity>
+            <inertial>
+                <mass>1</mass>
+            </inertial>
+            <visual name='cube_visual'>
+                <geometry>
+                    <box>
+                        <size>1 1 1</size>
+                    </box>
+                </geometry>
+                <material>
+                    <script>
+                      <uri>file://media/materials/scripts/gazebo.material</uri>
+                      <name>Gazebo/Blue</name>
+                    </script>
+                </material>
+            </visual>
+            <collision name='cube_collision'>
+                <geometry>
+                    <box>
+                        <size>1 1 1</size>
+                    </box>
+                </geometry>
+            </collision>
+        </link>
+
+        <include>
+            <uri>model://cube_thruster</uri>
+            <pose>-0.5 -0.5 0 0 1.5707 2.35619</pose>
+            <name>thruster1</name>
+        </include>
+
+        <include>
+            <uri>model://cube_thruster</uri>
+            <pose>-0.5 0.5 0 0 -1.5707 0.785398</pose>
+            <name>thruster2</name>
+        </include>
+
+        <include>
+            <uri>model://cube_thruster</uri>
+            <pose>0.5 0.5 0 0 1.5707 -0.785398</pose>
+            <name>thruster3</name>
+        </include>
+
+        <include>
+            <uri>model://cube_thruster</uri>
+            <pose>0.5 -0.5 0 0 -1.5707 -2.35619</pose>
+            <name>thruster4</name>
+        </include>
+
+        <include>
+            <uri>model://cube_thruster</uri>
+            <pose>0 -0.5 0 3.1415 3.1415 0</pose>
+            <name>thruster5</name>
+        </include>
+
+        <include>
+            <uri>model://cube_thruster</uri>
+            <pose>0 0.5 0 3.1415 3.1415 3.1415</pose>
+            <name>thruster6</name>
+        </include>
+
+        <joint name="thruster1_joint" type='fixed' >
+            <parent>frame</parent>
+            <child>thruster1::thruster</child>
+        </joint>
+
+        <joint name="thruster2_joint" type='fixed' >
+            <parent>frame</parent>
+            <child>thruster2::thruster</child>
+        </joint>
+
+        <joint name="thruster3_joint" type='fixed' >
+            <parent>frame</parent>
+            <child>thruster3::thruster</child>
+        </joint>
+
+        <joint name="thruster4_joint" type='fixed' >
+            <parent>frame</parent>
+            <child>thruster4::thruster</child>
+        </joint>
+
+        <joint name="thruster5_joint" type='fixed' >
+            <parent>frame</parent>
+            <child>thruster5::thruster</child>
+        </joint>
+
+        <joint name="thruster6_joint" type='fixed' >
+            <parent>frame</parent>
+            <child>thruster6::thruster</child>
+        </joint>
+
+        <!-- Thrust Vectors -->
+        <plugin name="thruster_array" filename="libthruster_driver_plugin.so">
+            <thruster_count>6</thruster_count>
+            <ros>
+                <namespace>/triton/controls</namespace>
+                <remapping>output_forces</remapping>
+            </ros>
+        </plugin>
+    </model>
+</sdf>

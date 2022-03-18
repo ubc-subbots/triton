@@ -19,10 +19,11 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(OpenCV 4 REQUIRED)
 
-include_directories(include/)
+include_directories(include)
 
 add_library(triton_vision_utils SHARED
-  src/vision_utils.cpp
+  src/object_detector.cpp
+  src/contour_features.cpp
 )
 
 target_include_directories(triton_vision_utils
@@ -32,12 +33,12 @@ target_include_directories(triton_vision_utils
 )
 
 ament_target_dependencies(triton_vision_utils
-  OpenCV
+  "OpenCV"
 )
 
 ament_export_targets(export_triton_vision_utils HAS_LIBRARY_TARGET)
 ament_export_dependencies(
-  OpenCV
+  "OpenCV"
 )
 
 install(

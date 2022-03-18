@@ -40,9 +40,12 @@ First, make sure you have all the dependencies installed for building and runnin
     sudo apt-get install cmake git libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev # required
     sudo apt-get install python3-dev python3-numpy libtbb2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev libdc1394-22-dev # optional
 
-Next, download and unzip the [OpenCV 4.2.0 sources](https://github.com/opencv/opencv/archive/4.2.0.zip) into your downloads folder (`~/Downloads`). You should now have the folder `~/Downloads/opencv-4.2.0`. Now navigate to this folder and create a build folder to navigate to as such
+Then download the OpenCV 4.5.3 source and create a build folder to navigate to as such
 
-    cd ~/Downloads/opencv-4.2.0
+    cd ~
+    git clone https://github.com/opencv/opencv
+    cd opencv
+    git checkout 4.5.3
     mkdir build
     cd build
 
@@ -89,7 +92,7 @@ Navigate to the bottom of the file and add the following three lines, be sure to
     
 The last line is helpful in that it colorizes ROS2 logging so that info/warn/error messages are easier to differentiate. Once this is done, open a new terminal for the `.bashrc` to be executed and the required scripts be sourced. To perform a sanity check that everything is working, launch the pipeline as such
 
-    ros2 launch triton_pipeline pipeline_launch.py
+    ros2 launch triton_pipeline pipeline_launch.py sequence:=example_sequence.yaml
    
 If this command executes successfully, you are ready to develop!
 
