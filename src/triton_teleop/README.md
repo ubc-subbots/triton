@@ -24,15 +24,15 @@ To launch the publisher for controlling the Teensy
     ros2 run triton_teleop key_publisher
 
 It publishes to the `/motor_control` topic that the Teensy listens to. Key controls:  
-<kbd>R</kbd>/<kbd>T</kbd> : Increment/Decrement power level of TLT  
-<kbd>F</kbd>/<kbd>G</kbd> : Increment/Decrement power level of TLF  
-<kbd>V</kbd>/<kbd>B</kbd> : Increment/Decrement power level of TLB  
-<kbd>Y</kbd>/<kbd>U</kbd> : Increment/Decrement power level of TRT  
-<kbd>H</kbd>/<kbd>J</kbd> : Increment/Decrement power level of TRF  
-<kbd>N</kbd>/<kbd>M</kbd> : Increment/Decrement power level of TRB  
-<kbd>W</kbd>/<kbd>E</kbd> : Increment/Decrement power level of TLT and TRT  
-<kbd>S</kbd>/<kbd>D</kbd> : Increment/Decrement power level of TLF and TLB  
-<kbd>X</kbd>/<kbd>C</kbd> : Increment/Decrement power level of TRF and TRB  
+<kbd>R</kbd>/<kbd>T</kbd> : Decrement/Increment power level of TLT  
+<kbd>F</kbd>/<kbd>G</kbd> : Decrement/Increment power level of TLF  
+<kbd>V</kbd>/<kbd>B</kbd> : Decrement/Increment power level of TLB  
+<kbd>Y</kbd>/<kbd>U</kbd> : Decrement/Increment power level of TRT  
+<kbd>H</kbd>/<kbd>J</kbd> : Decrement/Increment power level of TRF  
+<kbd>N</kbd>/<kbd>M</kbd> : Decrement/Increment power level of TRB  
+<kbd>W</kbd>/<kbd>E</kbd> : Decrement/Increment power level of TLT and TRT  
+<kbd>S</kbd>/<kbd>D</kbd> : Decrement/Increment power level of TLF and TLB  
+<kbd>X</kbd>/<kbd>C</kbd> : Decrement/Increment power level of TRF and TRB  
 
 where 'TXX' stands for '**T**hruster **L**eft/**R**ight **T**op/**F**ront/**B**ack'
 ## Nodes
