@@ -30,10 +30,12 @@ def encode_msg(thruster_power_level):
 class KeyPublisher(Node):
 
     def __init__(self):
-        super().__init__('minimal_publisher')
-        self.publisher_ = self.create_publisher(Int32,
-        '/triton/controls/keyboard',
-        10)
+        super().__init__('key_publisher')
+        self.publisher_ = self.create_publisher(
+            Int32,
+            '/triton/controls/key',
+            10
+        )
         self._start()
 
         # States
@@ -45,7 +47,7 @@ class KeyPublisher(Node):
         self.thruster_power_level["trt"] = 0
         self.thruster_power_level["trb"] = 0
 
-        self.get_logger().info('Keyboard teleop succesfully started!')
+        self.get_logger().info('Key publisher succesfully started!')
 
 
     def _start(self):
@@ -73,51 +75,53 @@ class KeyPublisher(Node):
         elif 'char' in dir(key):
             if key.char == 'r':
                 if self.thruster_power_level["tlt"] != 15:
-                    self.thruster_poewr_level["tlt"] += 1
+                    self.thruster_power_level["tlt"] += 1
             elif key.char == 't':
                 if self.thruster_power_level["tlt"] != -16:
-                    self.thruster_poewr_level["tlt"] -= 1
+                    self.thruster_power_level["tlt"] -= 1
             elif key.char == 'f':
-                if self.thruster_power_level["tlf"] != 16:
-                    self.thruster_poewr_level["tlf"] += 1
+                if self.thruster_power_level["tlf"] != 15:
+                    self.thruster_power_level["tlf"] += 1
             elif key.char == 'g':
                 if self.thruster_power_level["tlf"] != -16:
-                    self.thruster_poewr_level["tlf"] -= 1
+                    self.thruster_power_level["tlf"] -= 1
             elif key.char == 'v':
-                if self.thruster_power_level["tlb"] != 16:
-                    self.thruster_poewr_level["tlb"] += 1
+                if self.thruster_power_level["tlb"] != 15:
+                    self.thruster_power_level["tlb"] += 1
             elif key.char == 'b':
                 if self.thruster_power_level["tlb"] != -16:
-                    self.thruster_poewr_level["tlb"] -= 1
+                    self.thruster_power_level["tlb"] -= 1
             elif key.char == 'y':
                 if self.thruster_power_level["trt"] != 15:
-                    self.thruster_poewr_level["trt"] += 1
+                    self.thruster_power_level["trt"] += 1
             elif key.char == 'u':
                 if self.thruster_power_level["trt"] != -16:
-                    self.thruster_poewr_level["trt"] -= 1
+                    self.thruster_power_level["trt"] -= 1
             elif key.char == 'h':
-                if self.thruster_power_level["trf"] != 16:
-                    self.thruster_poewr_level["trf"] += 1
+                if self.thruster_power_level["trf"] != 15:
+                    self.thruster_power_level["trf"] += 1
             elif key.char == 'j':
                 if self.thruster_power_level["trf"] != -16:
-                    self.thruster_poewr_level["trf"] -= 1
+                    self.thruster_power_level["trf"] -= 1
             elif key.char == 'n':
-                if self.thruster_power_level["trb"] != 16:
-                    self.thruster_poewr_level["trb"] += 1
+                if self.thruster_power_level["trb"] != 15:
+                    self.thruster_power_level["trb"] += 1
             elif key.char == 'm':
                 if self.thruster_power_level["trb"] != -16:
-                    self.thruster_poewr_level["trb"] -= 1
+                    self.thruster_power_level["trb"] -= 1
 
-        msg = encode_msg(self.thruster_power_level)
-        self.force_pub.publish(msg)
+        msg = Int32()
+        msg.data = encode_msg(self.thruster_power_level)
+        self.publisher_.publish(msg)
 
     def _on_release(self, key):
         """
         Handles key releases
         @param key: They character of the key released
         """
-        msg = encode_msg(self.thruster_power_level)
-        self.force_pub.publish(msg)
+        msg = Int32()
+        msg.data = encode_msg(self.thruster_power_level)
+        self.publisher_.publish(msg)
 
 
 
