@@ -3,7 +3,7 @@ import rclpy
 from rclpy.node import Node
 from pynput import keyboard
 
-from std_msgs.msg import String, Int32
+from std_msgs.msg import String, Int32, UInt32
 
 THRUSTER_DATA_BIT_SIZE = 5
 
@@ -32,8 +32,9 @@ class KeyPublisher(Node):
     def __init__(self):
         super().__init__('key_publisher')
         self.publisher_ = self.create_publisher(
-            Int32,
-            '/triton/controls/key',
+            UInt32,
+            #'/triton/controls/key',
+            '/motor_control', # What the teensy expects
             10
         )
         self._start()
@@ -73,44 +74,74 @@ class KeyPublisher(Node):
             self.thruster_power_level["trt"] = 0
             self.thruster_power_level["trb"] = 0
         elif 'char' in dir(key):
-            if key.char == 'r':
+            if key.char == 't':
                 if self.thruster_power_level["tlt"] != 15:
                     self.thruster_power_level["tlt"] += 1
-            elif key.char == 't':
+            elif key.char == 'r':
                 if self.thruster_power_level["tlt"] != -16:
                     self.thruster_power_level["tlt"] -= 1
-            elif key.char == 'f':
+            elif key.char == 'g':
                 if self.thruster_power_level["tlf"] != 15:
                     self.thruster_power_level["tlf"] += 1
-            elif key.char == 'g':
+            elif key.char == 'f':
                 if self.thruster_power_level["tlf"] != -16:
                     self.thruster_power_level["tlf"] -= 1
-            elif key.char == 'v':
+            elif key.char == 'b':
                 if self.thruster_power_level["tlb"] != 15:
                     self.thruster_power_level["tlb"] += 1
-            elif key.char == 'b':
+            elif key.char == 'v':
                 if self.thruster_power_level["tlb"] != -16:
                     self.thruster_power_level["tlb"] -= 1
-            elif key.char == 'y':
+            elif key.char == 'u':
                 if self.thruster_power_level["trt"] != 15:
                     self.thruster_power_level["trt"] += 1
-            elif key.char == 'u':
+            elif key.char == 'y':
                 if self.thruster_power_level["trt"] != -16:
                     self.thruster_power_level["trt"] -= 1
-            elif key.char == 'h':
+            elif key.char == 'j':
                 if self.thruster_power_level["trf"] != 15:
                     self.thruster_power_level["trf"] += 1
-            elif key.char == 'j':
+            elif key.char == 'h':
                 if self.thruster_power_level["trf"] != -16:
                     self.thruster_power_level["trf"] -= 1
-            elif key.char == 'n':
+            elif key.char == 'm':
                 if self.thruster_power_level["trb"] != 15:
                     self.thruster_power_level["trb"] += 1
-            elif key.char == 'm':
+            elif key.char == 'n':
+                if self.thruster_power_level["trb"] != -16:
+                    self.thruster_power_level["trb"] -= 1
+            elif key.char == 'e':
+                if self.thruster_power_level["tlt"] != 15:
+                    self.thruster_power_level["tlt"] += 1
+                if self.thruster_power_level["trt"] != 15:
+                    self.thruster_power_level["trt"] += 1
+            elif key.char == 'w':
+                if self.thruster_power_level["tlt"] != -16:
+                    self.thruster_power_level["tlt"] -= 1
+                if self.thruster_power_level["trt"] != -16:
+                    self.thruster_power_level["trt"] -= 1
+            elif key.char == 'd':
+                if self.thruster_power_level["tlf"] != 15:
+                    self.thruster_power_level["tlf"] += 1
+                if self.thruster_power_level["tlb"] != 15:
+                    self.thruster_power_level["tlb"] += 1
+            elif key.char == 's':
+                if self.thruster_power_level["tlf"] != -16:
+                    self.thruster_power_level["tlf"] -= 1
+                if self.thruster_power_level["tlb"] != -16:
+                    self.thruster_power_level["tlb"] -= 1
+            elif key.char == 'c':
+                if self.thruster_power_level["trf"] != 15:
+                    self.thruster_power_level["trf"] += 1
+                if self.thruster_power_level["trb"] != 15:
+                    self.thruster_power_level["trb"] += 1
+            elif key.char == 'x':
+                if self.thruster_power_level["trf"] != -16:
+                    self.thruster_power_level["trf"] -= 1
                 if self.thruster_power_level["trb"] != -16:
                     self.thruster_power_level["trb"] -= 1
 
-        msg = Int32()
+        msg = UInt32()
         msg.data = encode_msg(self.thruster_power_level)
         self.publisher_.publish(msg)
 
@@ -119,7 +150,7 @@ class KeyPublisher(Node):
         Handles key releases
         @param key: They character of the key released
         """
-        msg = Int32()
+        msg = UInt32()
         msg.data = encode_msg(self.thruster_power_level)
         self.publisher_.publish(msg)
 
