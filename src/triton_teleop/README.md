@@ -34,6 +34,7 @@ It publishes to the `/motor_control` topic that the Teensy listens to. Key contr
 <kbd>S</kbd>/<kbd>D</kbd> : Increment/Decrement power level of TLF and TLB  
 <kbd>X</kbd>/<kbd>C</kbd> : Increment/Decrement power level of TRF and TRB  
 
+where 'TXX' stands for '**T**hruster **L**eft/**R**ight **T**op/**F**ront/**B**ack'
 ## Nodes
 
 - `keyboard_teleop` : A standalone node which listens on keyboard events and publishes forces corresponding to these events
