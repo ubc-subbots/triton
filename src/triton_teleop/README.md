@@ -21,7 +21,7 @@ This will open up Gazebo and allow you to control the AUV with a keyboard, below
 
 To launch the publisher for controlling the Teensy
 
-    ros2 launch triton_teleop key_publisher
+    ros2 run triton_teleop key_publisher
 
 It publishes to the `/motor_control` topic that the Teensy listens to. Key controls:  
 <kbd>R</kbd>/<kbd>T</kbd> : Increment/Decrement power level of TLT  
