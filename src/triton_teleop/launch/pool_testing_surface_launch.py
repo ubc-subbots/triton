@@ -17,11 +17,11 @@ def generate_launch_description():
 
     ld.add_action(keyboard_teleop)
 
-    # record = ExecuteProcess(
-    #     cmd=['ros2','bag','record','/imu/data_raw'],
-    #     output='screen'
-    # )
+    record = ExecuteProcess(
+        cmd=['ros2','bag','record','/camera1/image/compressed'],
+        output='screen'
+    )
 
-    # ld.add_action(record)
+    ld.add_action(record)
 
     return ld

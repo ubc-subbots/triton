@@ -65,13 +65,27 @@ def generate_launch_description():
             os.path.join(get_package_share_directory('triton_gate'), 'launch', 'gate_detector_launch.py')
         )
     )
+
+    underwater_camera = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            get_package_share_directory('triton_gazebo') + '/launch/underwater_camera_launch.py'
+        )
+    )
+
+    yolo = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            get_package_share_directory('triton_object_recognition') + '/launch/tiny_yolov4_launch.py'
+        )
+    )
     
     ld.add_action(gazebo)
-    ld.add_action(rviz_timer)
+    #ld.add_action(rviz_timer)
     ld.add_action(thrust_allocator)
     ld.add_action(keyboard_teleop)
     ld.add_action(gate_detector)
     ld.add_action(state_publisher)
     ld.add_action(transform_publisher)
+    ld.add_action(underwater_camera)
+    ld.add_action(yolo)
 
     return ld
