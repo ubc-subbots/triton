@@ -53,7 +53,10 @@ def generate_launch_description():
             {'frame_id': 'camera1'},
             {'fps': 24.},
             {'camera_id': 0},
-            {'camera_calibration_file': 'file:///opt/ros/foxy/src/ros2_usb_camera/config/camera.yaml'},
+            {'camera_calibration_file': 'file://' + os.path.join(
+                get_package_share_directory('triton_teleop'),
+                'config',
+                'camera.yaml')},
             {'image.format': 'png'},
             {'image.png_level': 3},
         ],
