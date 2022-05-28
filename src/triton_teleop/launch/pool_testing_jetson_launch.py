@@ -2,6 +2,8 @@ from launch import LaunchDescription
 from launch_ros.actions import Node, ComposableNodeContainer
 from launch.actions import ExecuteProcess
 from launch_ros.descriptions import ComposableNode
+from ament_index_python.packages import get_package_share_directory
+import os
 
 def generate_launch_description():
 
@@ -30,6 +32,19 @@ def generate_launch_description():
 
     ld.add_action(imu)
 
+    imu_filter = Node(
+        package='imu_filter_madgwick',
+        node_executable='imu_filter_madgwick_node',
+        node_name='imu_filter',
+        output='screen',
+        parameters=[os.path.join(
+            get_package_share_directory('triton_teleop'),
+            'config',
+            'imu_filter.yaml')],
+    )
+
+    ld.add_action(imu_filter)
+
     camera1 = Node(
         package='usb_camera_driver',
         executable='usb_camera_driver_node',
@@ -46,29 +61,28 @@ def generate_launch_description():
 
     ld.add_action(camera1)
 
-    camera2 = Node(
-        package='usb_camera_driver',
-        executable='usb_camera_driver_node',
-        namespace='/camera2',
-        parameters=[
-            {'frame_id': 'camera2'},
-            {'fps': 24.},
-            {'camera_id': 1},
-            {'camera_calibration_file': 'file:///opt/ros/foxy/src/ros2_usb_camera/config/camera.yaml'},
-            {'image.format': 'png'},
-            {'image.png_level': 3},
-        ],
-    )
+    # camera2 = Node(
+    #     package='usb_camera_driver',
+    #     executable='usb_camera_driver_node',
+    #     namespace='/camera2',
+    #     parameters=[
+    #         {'frame_id': 'camera2'},
+    #         {'fps': 24.},
+    #         {'camera_id': 1},
+    #         {'camera_calibration_file': 'file:///opt/ros/foxy/src/ros2_usb_camera/config/camera.yaml'},
+    #         {'image.format': 'png'},
+    #         {'image.png_level': 3},
+    #     ],
+    # )
 
-    ld.add_action(camera2)
+    # ld.add_action(camera2)
 
     record = ExecuteProcess(
-        cmd=['ros2','bag','record','/imu/data_raw','/camera1/image/compressed','/camera2/image/compressed','-d','60'],
+        #cmd=['ros2','bag','record','/imu/data_raw','/camera1/image/compressed','/camera2/image/compressed','-d','60'],
+        cmd=['ros2','bag','record','/imu/data_raw','/imu/mag','/imu/data','/camera1/image/compressed','d','60'],
         output='screen'
     )
 
     ld.add_action(record)
-
-   
 
     return ld
