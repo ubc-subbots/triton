@@ -10,7 +10,7 @@ def generate_launch_description():
     ld = LaunchDescription()
 
     micro_ros_agent = ExecuteProcess(
-        cmd=['docker','run','-it','--net=host','-v','/dev:/dev','--privileged','microros/micro-ros-agent:foxy','serial','--dev','/dev/ttyACM0','-v6'],
+        cmd=['docker','run','--net=host','-v','/dev:/dev','--privileged','microros/micro-ros-agent:foxy','serial','--dev','/dev/ttyACM0','-v6','--env','ROS_DOMAIN_ID=42'],
         output='screen'
     )
 
