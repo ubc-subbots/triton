@@ -14,7 +14,7 @@ def generate_launch_description():
         output='screen'
     )
 
-    #ld.add_action(micro_ros_agent)
+    ld.add_action(micro_ros_agent)
 
     imu = ComposableNodeContainer(
             name='phidget_container',
@@ -30,7 +30,7 @@ def generate_launch_description():
             output='both',
     )
 
-    #ld.add_action(imu)
+    ld.add_action(imu)
 
     imu_filter = Node(
         package='imu_filter_madgwick',
@@ -43,7 +43,7 @@ def generate_launch_description():
             'imu_filter.yaml')],
     )
 
-    #ld.add_action(imu_filter)
+    ld.add_action(imu_filter)
 
     camera1 = Node(
         package='usb_cam',
