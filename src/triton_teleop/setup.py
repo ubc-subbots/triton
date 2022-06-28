@@ -24,9 +24,9 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'key_publisher = triton_teleop.key_publisher:main'
-            #'keyboard_teleop = triton_teleop.keyboard_teleop:main',
-            #'sim_thrust_mapper = triton_teleop.sim_thrust_mapper:main'
+            'key_publisher = triton_teleop.key_publisher:main',
+            'keyboard_teleop = triton_teleop.keyboard_teleop:main',
+            'sim_thrust_mapper = triton_teleop.sim_thrust_mapper:main',
         ],
     },
 )

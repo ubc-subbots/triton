@@ -1,3 +1,4 @@
+from http.server import executable
 from launch import LaunchDescription
 from launch_ros.actions import Node, ComposableNodeContainer
 from launch.actions import ExecuteProcess
@@ -9,12 +10,27 @@ def generate_launch_description():
 
     ld = LaunchDescription()
 
-    micro_ros_agent = ExecuteProcess(
-        cmd=['docker','run','--net=host','-v','/dev:/dev','--privileged','microros/micro-ros-agent:foxy','serial','--dev','/dev/ttyACM0','-v6','--env','ROS_DOMAIN_ID=42'],
-        output='screen'
-    )
+    # micro_ros_agent = ExecuteProcess(
+    #     cmd=['docker','run','--net=host','-v','/dev:/dev','--privileged','microros/micro-ros-agent:foxy','serial','--dev','/dev/ttyACM0','-v6','--env','ROS_DOMAIN_ID=42'],
+    #     output='screen'
+    # )
 
-    ld.add_action(micro_ros_agent)
+    # ld.add_action(micro_ros_agent)
+
+    serial = ComposableNodeContainer(
+            name='serial_subscriber_container',
+            namespace='',
+            package='rclcpp_components',
+            executable='component_container',
+            composable_node_descriptions=[
+                ComposableNode(
+                    package='triton_controls',
+                    plugin='triton_controls::SerialSubscriber',
+                    name='serial_subscriber'),
+            ],
+            output='both',
+    ) 
+    ld.add_action(serial)
 
     imu = ComposableNodeContainer(
             name='phidget_container',
@@ -30,7 +46,7 @@ def generate_launch_description():
             output='both',
     )
 
-    ld.add_action(imu)
+    #ld.add_action(imu)
 
     imu_filter = Node(
         package='imu_filter_madgwick',
@@ -43,7 +59,7 @@ def generate_launch_description():
             'imu_filter.yaml')],
     )
 
-    ld.add_action(imu_filter)
+    #ld.add_action(imu_filter)
 
     camera1 = Node(
         package='usb_cam',
@@ -60,7 +76,7 @@ def generate_launch_description():
         ]
     )
 
-    ld.add_action(camera1)
+    #ld.add_action(camera1)
 
     camera2 = Node(
         package='usb_cam',
@@ -77,7 +93,7 @@ def generate_launch_description():
         ]
     )
 
-    ld.add_action(camera2)
+    #ld.add_action(camera2)
 
     record = ExecuteProcess(
         #cmd=['ros2','bag','record','/imu/data_raw','/camera1/image/compressed','/camera2/image/compressed','-d','60'],
@@ -111,8 +127,8 @@ def generate_launch_description():
         executable='component_container'
     )
 
-    ld.add_action(pipeline_manager)
-    ld.add_action(pipeline_sequence_manager)
-    ld.add_action(pipeline_container)
+    #ld.add_action(pipeline_manager)
+    #ld.add_action(pipeline_sequence_manager)
+    #ld.add_action(pipeline_container)
 
     return ld

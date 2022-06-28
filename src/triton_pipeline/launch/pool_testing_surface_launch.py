@@ -22,6 +22,6 @@ def generate_launch_description():
         output='screen'
     )
 
-    ld.add_action(record)
+    #ld.add_action(record)
 
     return ld
