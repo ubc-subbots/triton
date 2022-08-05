@@ -23,41 +23,62 @@ def main(args=None):
     # Populate train.txt and valid.txt
     counter = 1  
     index_test = round(100 / percentage_test)  
-    for file in glob.iglob(os.path.join(data_dir, '*.png')):  
+
+    for file in glob.iglob(os.path.join(data_dir, '**/*.png'), recursive=True):  
         if "_box" in file:
             continue
         title, ext = os.path.splitext(os.path.basename(file))
         if counter == index_test:
             counter = 1
-            file_test.write(data_dir + "/" + title + '.png' + "\n")
+            file_test.write(file + "\n")
         else:
-            file_train.write(data_dir + "/" + title + '.png' + "\n")
+            file_train.write(file + "\n")
+            counter = counter + 1
+
+    for file in glob.iglob(os.path.join(data_dir, '**/*.jpg'), recursive=True):  
+        if "_box" in file:
+            continue
+        title, ext = os.path.splitext(os.path.basename(file))
+        if counter == index_test:
+            counter = 1
+            file_test.write(file + "\n")
+        else:
+            file_train.write(file + "\n")
             counter = counter + 1
 
     file_train.close()
     file_test.close()
 
     file_obj_names = open(os.path.join(data_dir,'obj.names'), 'w')  
-    file_obj_names.write("Lenna\n") #Put class names here, one on each line
+    classes_string = """Bootlegger
+Gman
+BinsBootlegger
+BinsGman
+BuoyBootlegger
+BuoyGman
+OctagonBootlegger
+OctagonGman"""
+    file_obj_names.write(classes_string) #Put class names here, one on each line
     file_obj_names.close()
 
     file_obj_data = open(os.path.join(data_dir,'obj.data'), 'w')  
-    file_obj_data.write(f"classes = 1\n\
-    train  = {os.path.join(data_dir,'train.txt')}\n\
-    valid  = {os.path.join(data_dir,'valid.txt')}\n\
-    names = {os.path.join(data_dir,'obj.names')}\n\
-    backup = {backup_dir}\n")
+    file_obj_data.write(f"classes = 8\n\
+train  = {os.path.join(data_dir,'train.txt')}\n\
+valid  = {os.path.join(data_dir,'valid.txt')}\n\
+names = {os.path.join(data_dir,'obj.names')}\n\
+backup = {backup_dir}\n")
     file_obj_data.close()
 
+    model_name = 'yolov4-custom-3l'
 
     #gdown.download("https://drive.google.com/uc?id=18v36esoXCh-PsOKwyP2GWrpYDptDY8Zf", os.path.join(shared_dir,'yolov3-tiny.conv.11'))
     if not os.path.exists(os.path.join(shared_dir,'yolov4-tiny.conv.29')):
         with open(os.path.join(shared_dir,'yolov4-tiny.conv.29'),'wb') as f:
             f.write(requests.get('https://github.com/AlexeyAB/darknet/releases/download/darknet_yolo_v4_pre/yolov4-tiny.conv.29').content)
 
-    os.system(f"{darknet_exec} detector train {os.path.join(data_dir,'obj.data')} {os.path.join(shared_dir,'config','yolov4-custom.cfg')} {os.path.join(shared_dir,'yolov4-tiny.conv.29')} -map")
-    os.system(f"cp {os.path.join(backup_dir,'yolov4-custom_final.weights')} {get_package_share_directory('triton_object_recognition')}")
-    os.system(f"cp {os.path.join(shared_dir,'config','yolov4-custom.cfg')} {get_package_share_directory('triton_object_recognition')}")
+    os.system(f"{darknet_exec} detector train {os.path.join(data_dir,'obj.data')} {os.path.join(shared_dir,'config',model_name+'.cfg')} {os.path.join(shared_dir,'yolov4-tiny.conv.29')} -map")
+    os.system(f"cp {os.path.join(backup_dir,model_name+'_final.weights')} {get_package_share_directory('triton_object_recognition')}")
+    os.system(f"cp {os.path.join(shared_dir,'config',model_name+'.cfg')} {get_package_share_directory('triton_object_recognition')}")
 
 
 if __name__ == '__main__':

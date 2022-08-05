@@ -7,7 +7,7 @@
         </include>
 
         <!-- Bounding box with sea surface -->
-        <!-- <include>
+        <include>
             <uri>model://ocean_box</uri>
             <pose>0 0 20 0 0 0</pose>
         </include>
@@ -27,14 +27,14 @@
         <include>
             <uri>model://sea_bottom</uri>
             <name>wall3</name>
-            <pose>20 0 0 1.57 0</pose>
+            <pose>0 0 -20 0 0 0</pose>
         </include>
         
-        <include>
+        <!-- <include>
             <uri>model://sea_bottom</uri>
             <name>wall4</name>
             <pose>-20 0 0 1.57 0</pose>
-        </include>
+        </include> -->
 
         <include>
             <uri>model://tree</uri>
@@ -66,7 +66,7 @@
             <pose>10 0 1.57 0 0</pose>
         </include>
 
-        <include>
+        <!-- <include>
             <uri>model://herkules_ship_wreck</uri>
             <name>ship2</name>
             <pose>0 -10 0 0 0</pose>
@@ -75,7 +75,7 @@
         <model name="cube1">
             <static>false</static>
             <include>
-                <uri>model://lenabox</uri>
+                <uri>model://octagon-gman</uri>
             </include>
             <pose>0 0 0 0 0 0</pose>
             <plugin name="initial_velocity" filename="libInitialVelocityPlugin.so">
@@ -87,24 +87,26 @@
         <model name="camera_model">
             <pose>2 0 0 0 0 3.14159</pose>
             <static>false</static>
+
             <!-- <plugin name="random_camera" filename="librandom_camera_plugin.so">
-                <radius_range>1 5</radius_range>
+                <radius_range>0.5 7</radius_range>
                 <track_model>cube1</track_model>
             </plugin> -->
-            <plugin name="smooth_camera" filename="libsmooth_camera_plugin.so">
+            <!-- <plugin name="smooth_camera" filename="libsmooth_camera_plugin.so">
                 <radius_range>1 5</radius_range>
                 <track_model>cube1</track_model>
-            </plugin>
-            <!--
+                <spin_speed>0.05</spin_speed>
+            </plugin> -->
+            
             <plugin name="track_orbit" filename="libcamera_orbit_plugin.so">
-                <radius_range>1 5</radius_range>
+                <radius_range>0.5 5</radius_range>
                 <track_model>cube1</track_model>
                 <orbit_angle_range>0.1 0.5</orbit_angle_range>
                 <camera_angle_range>0.1 0.5</camera_angle_range>
                 <height_range>-1 1</height_range>
-                <period>1</period>
+                <period>10</period>
             </plugin>
-            -->
+           
             <link name="camera_link">
                 <gravity>0</gravity>
                 <sensor type="depth" name="camera1">
@@ -146,6 +148,7 @@
                         </ros>
                         <camera_name>front_camera</camera_name>
                         <model_name>cube1</model_name>
+                        <class_id>7</class_id>
                     </plugin>
                 </sensor>
             </link>

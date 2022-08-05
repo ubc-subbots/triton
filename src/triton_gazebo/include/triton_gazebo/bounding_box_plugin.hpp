@@ -23,6 +23,7 @@ namespace triton_gazebo
     gazebo::sensors::CameraSensorPtr parentSensor;
     gazebo::event::ConnectionPtr updateConnection;
     std::string model_name_;
+    int class_id_;
 
     //ROS
     gazebo_ros::Node::SharedPtr node_;

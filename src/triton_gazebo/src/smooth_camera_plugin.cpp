@@ -30,6 +30,21 @@ namespace triton_gazebo
         }
         this->track_model_ = camera_model_->GetWorld()->ModelByName(_sdf->GetElement("track_model")->Get<std::string>());
         
+        // Make sure spin_speed has been specified
+        if (!_sdf->HasElement("spin_speed"))
+        {
+            gzerr << "<spin_speed> element missing from SmoothCamera plugin. "
+            << "The plugin will not function.\n";
+            return;
+        }
+        this->spin_speed = _sdf->GetElement("spin_speed")->Get<double>();
+
+        // Get ranges for random parameters
+        if (_sdf->HasElement("radius_range"))
+            radius_range_ = _sdf->Get<ignition::math::Vector2d>("radius_range");
+        else
+            radius_range_ = {1,5};
+
         // Connect to the world update signal
         this->update_connection_ = event::Events::ConnectWorldUpdateBegin(
             std::bind(&SmoothCameraPlugin::Update, this, std::placeholders::_1));
@@ -38,7 +53,7 @@ namespace triton_gazebo
         rotx = 0;
         roty = 0;
         rotz = 1;
-        radius = 1;
+        radius = radius_range_[0];
         theta = M_PI/2;
         phi = 0;
         incr_phi = 1;
@@ -88,10 +103,10 @@ namespace triton_gazebo
         if (change_pos) {
             change_pos = 0;
             if ((phi < M_PI / 2 && incr_phi) || (phi > 0 && !incr_phi)) {
-                phi += incr_phi * 0.01;
+                phi += double(incr_phi) * spin_speed;
             }
             else if (theta > 0) {
-                theta -= 0.01;
+                theta -= spin_speed;
                 incr_phi = incr_phi ? 0 : 1;
             }
             else {
@@ -107,7 +122,7 @@ namespace triton_gazebo
                 spinned_one_cycle = 0;
                 change_pos = 0;
 
-                if (radius < 11) {
+                if (radius < radius_range_[1]) {
                     radius += 1;
                 }
                 else {

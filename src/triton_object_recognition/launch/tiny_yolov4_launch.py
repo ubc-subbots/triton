@@ -4,6 +4,7 @@ import launch
 from launch_ros.actions import ComposableNodeContainer
 from launch_ros.descriptions import ComposableNode
 
+
 def generate_launch_description():
 
     ld = launch.LaunchDescription()
@@ -11,15 +12,17 @@ def generate_launch_description():
     config = os.path.join(
         get_package_share_directory('triton_object_recognition'),
         'config',
-        'tiny_yolov4.yaml'
+        'custom_yolov4.yaml'
     )
 
     object_recognizer = ComposableNode(
         name='object_recognizer',
         namespace='/triton',
         package='triton_object_recognition',
-        parameters=[config], 
-        plugin='triton_object_recognition::ObjectRecognizer'
+        parameters=[config],
+        plugin='triton_object_recognition::ObjectRecognizer',
+        remappings=[('/triton/object_recognizer/in',
+                     '/triton/drivers/front_camera/image_raw')],
     )
 
     object_recognizer_container = ComposableNodeContainer(
