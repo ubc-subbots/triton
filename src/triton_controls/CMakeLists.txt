@@ -53,10 +53,12 @@ install(TARGETS thrust_allocator
 add_library(triton_controls SHARED
   src/thrust_allocator.cpp
   src/waypoint_marker.cpp
+  src/serial_subscriber
 )
 
 rclcpp_components_register_nodes(triton_controls "triton_controls::ThrustAllocator")
 rclcpp_components_register_nodes(triton_controls "triton_controls::WaypointMarker")
+rclcpp_components_register_nodes(triton_controls "triton_controls::SerialSubscriber")
 
 target_compile_definitions(triton_controls
   PRIVATE "triton_controls_CPP_BUILDING_DLL"

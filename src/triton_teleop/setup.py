@@ -13,6 +13,7 @@ setup(
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
         (os.path.join('share', package_name, 'launch'), glob('launch/*.py')),
+        (os.path.join('share', package_name, 'config'), glob('config/*.yaml')),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -23,8 +24,9 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            'key_publisher = triton_teleop.key_publisher:main',
             'keyboard_teleop = triton_teleop.keyboard_teleop:main',
-            'sim_thrust_mapper = triton_teleop.sim_thrust_mapper:main'
+            'sim_thrust_mapper = triton_teleop.sim_thrust_mapper:main',
         ],
     },
 )

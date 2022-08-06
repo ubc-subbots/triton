@@ -17,6 +17,24 @@ This will open up Gazebo and allow you to control the AUV with a keyboard, below
 <kbd>←</kbd>/<kbd>→</kbd> : Rotate Left/Rotate Right (Around Z-Axis)   
 <kbd>↑</kbd>/<kbd>↓</kbd> : Rotate Left/Rotate Right (Around X-Axis)
 
+### Another control scheme
+
+To launch the publisher for controlling the Teensy
+
+    ros2 run triton_teleop key_publisher
+
+It publishes to the `/motor_control` topic that the Teensy listens to. Key controls:  
+<kbd>R</kbd>/<kbd>T</kbd> : Decrement/Increment power level of TLT  
+<kbd>F</kbd>/<kbd>G</kbd> : Decrement/Increment power level of TLF  
+<kbd>V</kbd>/<kbd>B</kbd> : Decrement/Increment power level of TLB  
+<kbd>Y</kbd>/<kbd>U</kbd> : Decrement/Increment power level of TRT  
+<kbd>H</kbd>/<kbd>J</kbd> : Decrement/Increment power level of TRF  
+<kbd>N</kbd>/<kbd>M</kbd> : Decrement/Increment power level of TRB  
+<kbd>W</kbd>/<kbd>E</kbd> : Decrement/Increment power level of TLT and TRT  
+<kbd>S</kbd>/<kbd>D</kbd> : Decrement/Increment power level of TLF and TLB  
+<kbd>X</kbd>/<kbd>C</kbd> : Decrement/Increment power level of TRF and TRB  
+
+where 'TXX' stands for '**T**hruster **L**eft/**R**ight **T**op/**F**ront/**B**ack'
 ## Nodes
 
 - `keyboard_teleop` : A standalone node which listens on keyboard events and publishes forces corresponding to these events
@@ -33,6 +51,10 @@ This will open up Gazebo and allow you to control the AUV with a keyboard, below
 
     ### Parameters
     - `num_thrusters` (`integer`): Number of thrusters to map the control output to
+
+- `key_publisher` : A standalone node which listens on keyboard events and publishes interge values corresponding to power levels of thrusters
+    ### Published Topics
+    - `/motor_control` (`std_msgs/msg/UInt32`) : The unsigned integer message which consists of six 5-bit integers representing the power levels of the six thrusters.
 
 
 ## Contributors
