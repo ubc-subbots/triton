@@ -1,0 +1,14 @@
+enable_depth: true
+depth_width: 640
+depth_height: 480
+depth_fps: 15.
+enable_color: true
+color_width: 640
+color_height: 480
+color_fps: 15.
+enable_infra1: false
+enable_infra2: false
+align_depth: true
+enable_sync: true
+initial_reset: true
+stereo_module.emitter_enabled: 0
