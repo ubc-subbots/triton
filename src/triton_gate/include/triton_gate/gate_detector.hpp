@@ -7,6 +7,7 @@
 #include "image_transport/image_transport.hpp"
 #include "cv_bridge/cv_bridge.h"
 #include "sensor_msgs/image_encodings.hpp"
+#include "std_msgs/msg/float32_multi_array.hpp"
 #include "triton_gate/pole_featurizer.hpp"
 #include "triton_vision_utils/object_detector.hpp"
 
@@ -77,6 +78,7 @@ private:
   image_transport::Publisher debug_segment_publisher_;
   image_transport::Publisher debug_detection_publisher_;
   triton_gate::PoleFeaturizer featurizer_;
+  rclcpp::Publisher<std_msgs::msg::Float32MultiArray>::SharedPtr gate_center_publisher_;  
 };
 
 }  // namespace triton_gate

@@ -29,6 +29,9 @@ GateDetector::GateDetector(const rclcpp::NodeOptions& options) : Node("gate_dete
   debug_detection_publisher_ = image_transport::create_publisher(this, "detector/debug/detection");
   debug_segment_publisher_ = image_transport::create_publisher(this, "detector/debug/segment");
 
+  gate_center_publisher_ = this->create_publisher<std_msgs::msg::Float32MultiArray>(
+    "detector/gate_center", 10);
+
   RCLCPP_INFO(this->get_logger(), "GateDetector succesfully started!");
 }
 
@@ -70,7 +73,6 @@ cv::Mat GateDetector::segment(cv::Mat& src)
   Mat hsvChannels[3];
   split(hsv, hsvChannels);
   Mat grad = gradient(hsvChannels[1]);
-  return grad;
   Scalar grad_mean, grad_std;
   meanStdDev(grad, grad_mean, grad_std);
   Mat grad_thres;
@@ -79,8 +81,13 @@ cv::Mat GateDetector::segment(cv::Mat& src)
 
   // Orange/red hue mask
   Mat upper_hue_mask, lower_hue_mask, color_mask;
+  /*
   inRange(hsvChannels[0], 175, 180, upper_hue_mask);
   inRange(hsvChannels[0], 0, 30, lower_hue_mask);
+  bitwise_or(upper_hue_mask, lower_hue_mask, color_mask);
+  */
+  inRange(hsv, Scalar(175, 60, 60), Scalar(180, 255, 255), upper_hue_mask);
+  inRange(hsv, Scalar(0, 60, 60), Scalar(30, 255, 225), lower_hue_mask);
   bitwise_or(upper_hue_mask, lower_hue_mask, color_mask);
 
   // Combine the two binary image, note that the gradient threshold has the best response from farther away
@@ -89,7 +96,9 @@ cv::Mat GateDetector::segment(cv::Mat& src)
   Mat segmented;
   bitwise_or(grad_thres, color_mask, segmented);
   vector<int> compression_params;
-  return segmented;
+  //return segmented;
+  // grad_thres seems to introduce more noise than information
+  return color_mask;
 }
 
 void GateDetector::boundGateUsingPoles(std::vector<std::vector<Point>> hulls, cv::Mat& src)
@@ -102,6 +111,8 @@ void GateDetector::boundGateUsingPoles(std::vector<std::vector<Point>> hulls, cv
 
   // Determine pole hulls
   vector<vector<Point>> pole_hulls;
+  vector<Point> largest, second_largest;
+  double largest_area = 0, second_largest_area = 0;
   for (int i=0; i< (int) hulls.size(); i++)
   {
     vector<Point> hull = hulls.at(i);
@@ -117,13 +128,29 @@ void GateDetector::boundGateUsingPoles(std::vector<std::vector<Point>> hulls, cv
     // a more robust way to categorize hulls would be a model that can classify hulls
     // as poles or not based on features other than just the aspect ratio. In testing
     // this however, the model method did not perform as well as this method and needs works
-    float thresh = 0.03;
-    float desired_ratio = 0.11;
-    if (aspect_ratio > desired_ratio - thresh && aspect_ratio < desired_ratio + thresh)
+    //float thresh = 0.03;
+    //float desired_ratio = 0.11;
+    //RCLCPP_INFO(this->get_logger(), "Aspect ratio " + std::to_string(aspect_ratio));
+    //if (aspect_ratio > desired_ratio - thresh && aspect_ratio < desired_ratio + thresh)
+    if (aspect_ratio < 1) // If taller than wide
     {
-      pole_hulls.push_back(hull);
+      //pole_hulls.push_back(hull);
+      if (contourArea(hull) > largest_area)
+      {
+        second_largest = largest;
+        second_largest_area = largest_area;
+        largest = hull;
+        largest_area = contourArea(hull);
+      }
+      else if (contourArea(hull) > second_largest_area)
+      {
+        second_largest = hull;
+        second_largest_area = contourArea(hull);
+      }
     }
   }
+  pole_hulls.push_back(largest);
+  pole_hulls.push_back(second_largest);
 
   // Get 2D array of all the points of the pole hulls (to determine extrema)
   vector<Point> hull_points;
@@ -156,6 +183,17 @@ void GateDetector::boundGateUsingPoles(std::vector<std::vector<Point>> hulls, cv
   if (gate_cntr_.size() != 0)
   {
     polylines(src, gate_cntr_, true, Scalar(0, 0, 255), 2);
+
+    // Publish the normalized position of the center of the gate
+    vector<float> center; // [x, y]
+    // Find centroid using moments
+    Moments M;
+    M = moments(gate_cntr_);
+    center.push_back((M.m10/M.m00) / src.cols);
+    center.push_back((M.m01/M.m00) / src.rows);
+    auto center_msg = std_msgs::msg::Float32MultiArray();
+    center_msg.data = center;
+    gate_center_publisher_->publish(center_msg);
   }
 
   // Draw all non pole hulls and pole hulls on src for debug purposes
