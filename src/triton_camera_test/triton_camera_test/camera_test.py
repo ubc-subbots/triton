@@ -24,6 +24,18 @@ class CameraTest(Node):
             self.listener_callback, 
             10
         )
+        self.subscription_segment = self.create_subscription(
+            Image, 
+            '/triton/gate/detector/debug/segment', 
+            self.listener_callback_debug_segmentation_images, 
+            10
+        )
+        self.subscription_detect = self.create_subscription(
+            Image, 
+            '/triton/gate/detector/debug/detection', 
+            self.listener_callback_debug_detection_images, 
+            10
+        )
         self._start()
 
         self.get_logger().info('Camera tester succesfully started!')
@@ -113,6 +125,19 @@ class CameraTest(Node):
             self.cap = cv2.VideoCapture(0)
         else:
             self.cap = cv2.VideoCapture(data_str)
+
+    def listener_callback_debug_detection_images(self, data):
+        # self.get_logger().info('Receiving debug images')
+        frame = self.br.imgmsg_to_cv2(data)
+        cv2.imshow("Detection", frame)
+        cv2.waitKey(1)
+
+    def listener_callback_debug_segmentation_images(self, data):
+        # self.get_logger().info('Receiving segmentation images')
+        frame = self.br.imgmsg_to_cv2(data)
+        cv2.imshow("Segmentation", frame)
+        cv2.waitKey(1)
+
     
     
 

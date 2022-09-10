@@ -13,6 +13,11 @@ To launch the video publisher, gate detector, and rviz:
 
     ros2 launch src/triton_camera_test/launch/camera_test_launch.py 
 
+To launch the video publisher and gate detector:
+
+    ros2 launch src/triton_camera_test/launch/camera_test_launch_wo_rviz.py 
+
+
 
 ## Nodes
 
