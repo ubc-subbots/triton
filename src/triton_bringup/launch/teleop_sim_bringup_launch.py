@@ -29,6 +29,12 @@ def generate_launch_description():
         )
     )
 
+    state_estimator = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(get_package_share_directory('triton_controls'), 'launch', 'state_estimator_launch.py')
+        )
+    )
+
     rviz_timer = TimerAction(
         period=5.,
         actions=[rviz]
@@ -87,5 +93,6 @@ def generate_launch_description():
     ld.add_action(transform_publisher)
     ld.add_action(underwater_camera)
     ld.add_action(yolo)
+    ld.add_action(state_estimator)
 
     return ld
