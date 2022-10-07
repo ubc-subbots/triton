@@ -1,7 +1,8 @@
 # Reference
 # https://github.com/cra-ros-pkg/robot_localization/blob/foxy-devel/params/ukf.yaml
 ### ukf config file ###
-ukf_filter_node:
+#ukf_filter_node:
+/triton/controls/ukf/state_estimator:
     ros__parameters:
 # The frequency, in Hz, at which the filter will output a position estimate. Note that the filter will not begin
 # computation until it receives at least one message from one of the inputs. It will then run continuously at the
@@ -145,7 +146,7 @@ ukf_filter_node:
 # predicition. Note that if an acceleration measurement for the variable in question is available from one of the
 # inputs, the control term will be ignored.
 # Whether or not we use the control input during predicition. Defaults to false.
-        use_control: true
+        use_control: false
 # Whether the input (assumed to be cmd_vel) is a geometry_msgs/Twist or geometry_msgs/TwistStamped message. Defaults to
 # false.
         stamped_control: false
