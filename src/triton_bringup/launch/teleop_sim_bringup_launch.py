@@ -44,14 +44,15 @@ def generate_launch_description():
         package='robot_state_publisher', 
         executable='robot_state_publisher',
         output='screen', 
-        parameters=[rsp_params]
+        parameters=[rsp_params, {'use_sim_time': True}]
     )
 
     transform_publisher = Node(
         package='triton_controls',
         executable='auv_transform_publisher.py',
         name='auv_transform_publisher',
-        output='screen'
+        output='screen', 
+        parameters=[rsp_params, {'use_sim_time': True}]
     )
 
     thrust_allocator = IncludeLaunchDescription(
@@ -92,7 +93,7 @@ def generate_launch_description():
     ld.add_action(state_publisher)
     ld.add_action(transform_publisher)
     ld.add_action(underwater_camera)
-    ld.add_action(yolo)
+    #ld.add_action(yolo)
     ld.add_action(state_estimator)
 
     return ld
