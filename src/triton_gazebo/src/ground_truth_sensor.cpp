@@ -21,9 +21,18 @@ namespace triton_gazebo
             gzerr << "state_topic value not specified, exiting.\n";
             exit(1);
         }
+        if (_sdf->HasElement("update_rate"))
+        {
+            this->update_rate = _sdf->Get<int>("update_rate");
+        }
+        else
+        {
+            gzmsg << "update_rate value not specified, using default: 1Hz.\n";
+            this->update_rate = 1;
+        }
 
         this->state_publisher = node->
-            create_publisher<geometry_msgs::msg::PoseStamped>(this->state_topic, 10);
+            create_publisher<geometry_msgs::msg::PoseWithCovarianceStamped>(this->state_topic, 10);
 
         this->model = _model;
     
@@ -32,26 +41,36 @@ namespace triton_gazebo
 
         /// @todo feels like there should be a way to pass rclcpp::spin directly to thread, this works the way it is though 
         this->spinThread = std::thread(std::bind(&GroundTruthSensor::SpinNode, this));
+
+        this->prev_time = node->now();
     }
 
     void GroundTruthSensor::OnUpdate()
     {
         ignition::math::Pose3d pose = model->WorldPose();
-        auto msg = geometry_msgs::msg::PoseStamped();
-        msg.pose.position.x = pose.Pos()[0];
-        msg.pose.position.y = pose.Pos()[1];
-        msg.pose.position.z = pose.Pos()[2];
-        msg.pose.orientation.x = pose.Rot().X();
-        msg.pose.orientation.y = pose.Rot().Y();
-        msg.pose.orientation.z = pose.Rot().Z();
-        msg.pose.orientation.w = pose.Rot().W();
-        msg.header.stamp = node->now();
+        auto msg = geometry_msgs::msg::PoseWithCovarianceStamped();
+        msg.pose.pose.position.x = pose.Pos()[0];
+        msg.pose.pose.position.y = pose.Pos()[1];
+        msg.pose.pose.position.z = pose.Pos()[2];
+        msg.pose.pose.orientation.x = pose.Rot().X();
+        msg.pose.pose.orientation.y = pose.Rot().Y();
+        msg.pose.pose.orientation.z = pose.Rot().Z();
+        msg.pose.pose.orientation.w = pose.Rot().W();
+        // TODO: set a reasonable covariance
+        msg.pose.covariance[0] = 0;
+        msg.pose.covariance[7] = 0;
+        msg.pose.covariance[14] = 0;
+        msg.pose.covariance[21] = 0;
+        msg.pose.covariance[28] = 0;
+        msg.pose.covariance[35] = 0;
+        rclcpp::Time now = node->now();
+        msg.header.stamp = now;
         msg.header.frame_id = "odom";
-        if (count % 1000 == 0) // send every 1000 updates, should instead send on a given frequency
+        if ((now- this->prev_time).seconds() >= (1.0/this->update_rate))
         {
-            state_publisher->publish(msg);
+            this->prev_time = now;
+            this->state_publisher->publish(msg);
         }
-        count++;
     }
 
     void GroundTruthSensor::SpinNode()
