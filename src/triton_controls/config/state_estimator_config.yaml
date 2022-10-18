@@ -72,7 +72,7 @@
         map_frame: map              # Defaults to "map" if unspecified
         odom_frame: odom            # Defaults to "odom" if unspecified
         base_link_frame: base_link  # Defaults to "base_link" if unspecified
-        world_frame: odom           # Defaults to the value of odom_frame if unspecified
+        world_frame: map           # Defaults to the value of odom_frame if unspecified
 
 # The filter accepts an arbitrary number of inputs from each input message type (nav_msgs/Odometry,
 # geometry_msgs/PoseWithCovarianceStamped, geometry_msgs/TwistWithCovarianceStamped,
@@ -137,14 +137,14 @@
 
         pose0: /triton/state
         pose0_config: [true,  true,  true,
-                       true, true, true,
+                       false, false, false,
                        false, false, false,
                        false, false, false,
                        false, false, false]
         pose0_differential: true
         pose0_relative: false
         pose0_queue_size: 5
-        pose0_rejection_threshold: 2.0  # Note the difference in parameter name
+        # pose0_rejection_threshold: 2.0  # Note the difference in parameter name
         pose0_nodelay: false
 
 # [ADVANCED]  The EKF and UKF models follow a standard predict/correct cycle. During prediction, if there is no
