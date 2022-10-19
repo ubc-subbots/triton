@@ -19,6 +19,13 @@ To run the underwater camera node, use the following
 
 Sets of parameters for the underwater camera node (water transmission, spectral sensitivity, etc.) are stored in `config/underwater_camera.yaml`. To change which parameters are used, `launch/underwater_camera_launch.py` can be modified
 
+### Robot Localization
+To run the state estimation node with teleoperated simulation of the AUV and RViz visualization, run
+
+        ros2 launch triton_gazebo ukf_teleop_sim_launch.py
+
+It launches the `cube.world` in Gazebo with `cube_auv/model.urdf`, and an RViz instance displaying AUV state and estimated state.  
+
 ### Generating Data with Bounding Box
 To run the data generation node, use the following
 
@@ -126,3 +133,4 @@ At this point your model should be ready to be added to a Gazebo world, you can 
 - Logan Fillo (logan.fillo@gmail.com)
 - Jake Cronin (jcronin97@live.ca)
 - Kevin Huang (kevinh42@student.ubc.ca)
+- Jared Chan (jaredchan42@gmail.com)
