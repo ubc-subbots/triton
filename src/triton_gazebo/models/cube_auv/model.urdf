@@ -84,7 +84,7 @@
     </plugin>
     <plugin name="ground_truth_sensor" filename="libground_truth_sensor.so">
       <state_topic>/triton/state</state_topic>
-      <update_rate>30</update_rate>
+      <update_rate>10</update_rate>
     </plugin>
   </gazebo>
   <gazebo reference="base_link">
