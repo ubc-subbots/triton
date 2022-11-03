@@ -4,23 +4,23 @@ using std::placeholders::_1;
 namespace triton_controls
 {
 
-  WaypointMarker::WaypointMarker(const rclcpp::NodeOptions & options)
-  : Node("waypoint_marker", options),
-    waypoint_set_ (false),
-    waypoint_achieved_ (false)
+  WaypointMarker::WaypointMarker(const rclcpp::NodeOptions &options)
+      : Node("waypoint_marker", options),
+        waypoint_set_(false),
+        waypoint_achieved_(false),
+        waypoint_being_achieved_(false)
   {
 
     publisher_ = this->create_publisher<triton_interfaces::msg::Waypoint>("/triton/controls/input_pose", 10);
 
     state_subscription_ = this->create_subscription<nav_msgs::msg::Odometry>(
-      "/triton/controls/ukf/odometry/filtered", 10, std::bind(&WaypointMarker::state_callback, this, _1));
+        "/triton/controls/ukf/odometry/filtered", 10, std::bind(&WaypointMarker::state_callback, this, _1));
 
     waypoint_subscription_ = this->create_subscription<triton_interfaces::msg::Waypoint>(
-      "/triton/controls/waypoint_marker/set", 10, std::bind(&WaypointMarker::waypoint_callback, this, _1));
+        "/triton/controls/waypoint_marker/set", 10, std::bind(&WaypointMarker::waypoint_callback, this, _1));
 
     RCLCPP_INFO(this->get_logger(), "Waypoint Marker successfully started!");
   }
-
 
   void WaypointMarker::state_callback(const nav_msgs::msg::Odometry::SharedPtr msg)
   {
@@ -29,23 +29,113 @@ namespace triton_controls
 
     if (waypoint_set_)
     {
+
+      // 1. Determine if current_pose_ is within max_pose_offset_ of waypoint_pose_
+
+      // Calculate the orientation difference, by converting to tf2 Quaternia, 
+      // then multiplying one by the inverse of the other
+      tf2::Quaternion tf2_quat_from_msg, tf2_quat_waypoint;
+      tf2::convert(current_pose_.orientation, tf2_quat_from_msg);
+      tf2::convert(waypoint_pose_.orientation, tf2_quat_waypoint);
+      // quat_waypoint = quat_diff * quat_msg_inverse
+      tf2::Quaternion tf2_quat_difference = tf2_quat_waypoint * tf2_quat_from_msg.inverse();
+
+      if (tf2_quat_difference.x() <= max_pose_offset_.orientation.x
+        && tf2_quat_difference.y() <= max_pose_offset_.orientation.y
+        && tf2_quat_difference.z() <= max_pose_offset_.orientation.z
+        && tf2_quat_difference.w() <= max_pose_offset_.orientation.w // TODO: check the math
+        && current_pose_.position.x - waypoint_pose_.position.x <= max_pose_offset_.position.x
+        && current_pose_.position.y - waypoint_pose_.position.y <= max_pose_offset_.position.y
+        && current_pose_.position.z - waypoint_pose_.position.z <= max_pose_offset_.position.z)
+      {
+        // 2.1. If we are within max_pose_offset_, check duration
+        if (waypoint_being_achieved_)
+        {
+          rclcpp::Time now = this->now();
+          if ((now - last_stable_start_time_).seconds() >= min_stabilize_duration_s_)
+          {
+            waypoint_achieved_ = true;
+            waypoint_set_ = false; // If waypoint is achieved, then we wait for the next one
+
+            RCLCPP_INFO(this->get_logger(), "Waypoint at: (x:%f, y:%f, z:%f), (x:%f, y:%f, z:%f, w:%f) achieved!", 
+                        waypoint_pose_.position.x,
+                        waypoint_pose_.position.y,
+                        waypoint_pose_.position.z,
+                        waypoint_pose_.orientation.x,
+                        waypoint_pose_.orientation.y,
+                        waypoint_pose_.orientation.z,
+                        waypoint_pose_.orientation.w
+                        );
+          }
+          // else keep waiting
+        }
+        else
+        {
+          waypoint_being_achieved_ = true;
+          last_stable_start_time_ = this->now();
+        }
+      }
+      else
+      {
+        // 2.2 If we are not within max_pose_offset_, reset variables
+        waypoint_being_achieved_ = false;
+      }
+
       auto reply_msg = triton_interfaces::msg::Waypoint();
-      reply_msg.pose = current_pose_;
+      reply_msg.pose = waypoint_pose_;
+      reply_msg.distance = max_pose_offset_;
+      reply_msg.duration = min_stabilize_duration_s_;
+      reply_msg.success = waypoint_achieved_;
+      reply_msg.type = waypoint_type_;
 
       publisher_->publish(reply_msg);
-
     }
+    // else waypoint is not set, do nothing
 
   }
-
 
   void WaypointMarker::waypoint_callback(const triton_interfaces::msg::Waypoint::SharedPtr msg)
   {
+
+    if (waypoint_set_)
+    {
+      // If it is the same waypoint, nothing is done.
+
+      // Calculate the orientation difference, by converting to tf2 Quaternia, 
+      // then multiplying one by the inverse of the other
+      tf2::Quaternion tf2_quat_from_msg, tf2_quat_waypoint;
+      tf2::convert(msg->pose.orientation, tf2_quat_from_msg);
+      tf2::convert(waypoint_pose_.orientation, tf2_quat_waypoint);
+      // quat_waypoint = quat_diff * quat_msg_inverse
+      tf2::Quaternion tf2_quat_difference = tf2_quat_waypoint * tf2_quat_from_msg.inverse();
+
+      if (tf2_quat_difference.x() == 0 
+        && tf2_quat_difference.y() == 0
+        && tf2_quat_difference.z() == 0
+        && tf2_quat_difference.w() == 0 // TODO: check the math
+        && msg->pose.position.x - waypoint_pose_.position.x == 0
+        && msg->pose.position.y - waypoint_pose_.position.y == 0
+        && msg->pose.position.z - waypoint_pose_.position.z == 0)
+      {
+        RCLCPP_INFO(this->get_logger(), "Attempt to set an identical waypoint ignored. ");
+        return;
+      }
+    }
+
+    waypoint_set_ = true;
+    waypoint_pose_ = msg->pose;
+    min_stabilize_duration_s_ = msg->duration;
+    max_pose_offset_ = msg->distance;
+    waypoint_achieved_ = false;
+    waypoint_type_ = msg->type;
+
     auto reply_msg = triton_interfaces::msg::Waypoint();
     reply_msg.pose = current_pose_;
+    reply_msg.success = waypoint_achieved_;
+    reply_msg.type = waypoint_type_;
+    reply_msg.distance = max_pose_offset_;
+    reply_msg.duration = min_stabilize_duration_s_;
 
     publisher_->publish(reply_msg);
-
   }
 } // namespace triton_controls
-

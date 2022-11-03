@@ -8,6 +8,7 @@
 #include "nav_msgs/msg/odometry.hpp"
 #include "tf2/LinearMath/Quaternion.h"
 #include "tf2/LinearMath/Matrix3x3.h"
+#include <tf2/convert.h>
 #include "triton_interfaces/msg/waypoint.hpp"
 
 namespace triton_controls
@@ -53,9 +54,11 @@ namespace triton_controls
         geometry_msgs::msg::Pose waypoint_pose_;    // Destination waypoint pose
         geometry_msgs::msg::Pose current_pose_;     // AUV current pose
         geometry_msgs::msg::Pose max_pose_offset_;  // Distance criterion
-        float min_stabilize_duration_;              // Time criterion
+        uint8_t waypoint_type_;                     // Type
+        float min_stabilize_duration_s_;              // Time criterion
         rclcpp::Time last_stable_start_time_;       // Time stamp of the last time meeting waypoint criteria
         bool waypoint_achieved_;                    // Whether a waypoint is achieved
+        bool waypoint_being_achieved_;              // Whether the AUV is within 'distance' to the destination
 
     };
 
