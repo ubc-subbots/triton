@@ -119,6 +119,19 @@ namespace triton_controls
 
       publisher_->publish(reply_msg);
     }
+    else if (waypoint_achieved_) 
+    {
+      // Publish the last waypoint, so that the AUV stabilizes at current pose
+      auto reply_msg = triton_interfaces::msg::Waypoint();
+      reply_msg.pose = waypoint_.pose;
+      reply_msg.distance = waypoint_.distance;
+      reply_msg.duration = waypoint_.duration;
+      reply_msg.success = waypoint_achieved_;
+      reply_msg.type = waypoint_.type;
+
+      publisher_->publish(reply_msg);
+
+    }
     // else waypoint is not set, do nothing
 
   }
