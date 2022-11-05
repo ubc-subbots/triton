@@ -36,43 +36,72 @@ namespace triton_controls
       // then multiplying one by the inverse of the other
       tf2::Quaternion tf2_quat_from_msg, tf2_quat_waypoint;
       tf2::convert(current_pose_.orientation, tf2_quat_from_msg);
-      tf2::convert(waypoint_pose_.orientation, tf2_quat_waypoint);
-      // quat_waypoint = quat_diff * quat_msg_inverse
+      tf2::convert(waypoint_.pose.orientation, tf2_quat_waypoint);
+      // quat_waypoint = quat_diff * quat_msg
       tf2::Quaternion tf2_quat_difference = tf2_quat_waypoint * tf2_quat_from_msg.inverse();
 
-      if (tf2_quat_difference.x() <= max_pose_offset_.orientation.x
-        && tf2_quat_difference.y() <= max_pose_offset_.orientation.y
-        && tf2_quat_difference.z() <= max_pose_offset_.orientation.z
-        && tf2_quat_difference.w() <= max_pose_offset_.orientation.w // TODO: check the math
-        && current_pose_.position.x - waypoint_pose_.position.x <= max_pose_offset_.position.x
-        && current_pose_.position.y - waypoint_pose_.position.y <= max_pose_offset_.position.y
-        && current_pose_.position.z - waypoint_pose_.position.z <= max_pose_offset_.position.z)
+      if (tf2_quat_difference.x() <= waypoint_.distance.orientation.x
+        && tf2_quat_difference.y() <= waypoint_.distance.orientation.y
+        && tf2_quat_difference.z() <= waypoint_.distance.orientation.z
+        && tf2_quat_difference.w() <= waypoint_.distance.orientation.w // TODO: check the math
+        && current_pose_.position.x - waypoint_.pose.position.x <= waypoint_.distance.position.x
+        && current_pose_.position.y - waypoint_.pose.position.y <= waypoint_.distance.position.y
+        && current_pose_.position.z - waypoint_.pose.position.z <= waypoint_.distance.position.z)
       {
         // 2.1. If we are within max_pose_offset_, check duration
         if (waypoint_being_achieved_)
         {
           rclcpp::Time now = this->now();
-          if ((now - last_stable_start_time_).seconds() >= min_stabilize_duration_s_)
+          if ((now - last_stable_start_time_).seconds() >= waypoint_.duration)
           {
             waypoint_achieved_ = true;
             waypoint_set_ = false; // If waypoint is achieved, then we wait for the next one
 
-            RCLCPP_INFO(this->get_logger(), "Waypoint at: (x:%f, y:%f, z:%f), (x:%f, y:%f, z:%f, w:%f) achieved!", 
-                        waypoint_pose_.position.x,
-                        waypoint_pose_.position.y,
-                        waypoint_pose_.position.z,
-                        waypoint_pose_.orientation.x,
-                        waypoint_pose_.orientation.y,
-                        waypoint_pose_.orientation.z,
-                        waypoint_pose_.orientation.w
+            RCLCPP_INFO(this->get_logger(), "Stabilize Waypoint at: (x:%f, y:%f, z:%f), (x:%f, y:%f, z:%f, w:%f) achieved!", 
+                        waypoint_.pose.position.x,
+                        waypoint_.pose.position.y,
+                        waypoint_.pose.position.z,
+                        waypoint_.pose.orientation.x,
+                        waypoint_.pose.orientation.y,
+                        waypoint_.pose.orientation.z,
+                        waypoint_.pose.orientation.w
                         );
           }
           // else keep waiting
         }
         else
         {
-          waypoint_being_achieved_ = true;
-          last_stable_start_time_ = this->now();
+          if (waypoint_.type == waypoint_.STABILIZE) 
+          {
+            waypoint_being_achieved_ = true;
+            last_stable_start_time_ = this->now();
+          }
+          else if (waypoint_.type == waypoint_.PASSTHROUGH)
+          {
+            // Passthrough waypoints have no duration requirements. 
+            waypoint_achieved_ = true;
+            waypoint_set_ = false; // If waypoint is achieved, then we wait for the next one
+
+            RCLCPP_INFO(this->get_logger(), "Passthrough Waypoint at: (x:%f, y:%f, z:%f), (x:%f, y:%f, z:%f, w:%f) achieved!", 
+                        waypoint_.pose.position.x,
+                        waypoint_.pose.position.y,
+                        waypoint_.pose.position.z,
+                        waypoint_.pose.orientation.x,
+                        waypoint_.pose.orientation.y,
+                        waypoint_.pose.orientation.z,
+                        waypoint_.pose.orientation.w
+                        );
+          }
+          else 
+          {
+            RCLCPP_WARN(this->get_logger(), "Unknown waypoint type. Resetting waypoint marker. ");
+
+            waypoint_set_ = false;
+            waypoint_achieved_ = false;
+            waypoint_being_achieved_ = false;
+            return;
+
+          }
         }
       }
       else
@@ -82,11 +111,11 @@ namespace triton_controls
       }
 
       auto reply_msg = triton_interfaces::msg::Waypoint();
-      reply_msg.pose = waypoint_pose_;
-      reply_msg.distance = max_pose_offset_;
-      reply_msg.duration = min_stabilize_duration_s_;
+      reply_msg.pose = waypoint_.pose;
+      reply_msg.distance = waypoint_.distance;
+      reply_msg.duration = waypoint_.duration;
       reply_msg.success = waypoint_achieved_;
-      reply_msg.type = waypoint_type_;
+      reply_msg.type = waypoint_.type;
 
       publisher_->publish(reply_msg);
     }
@@ -105,7 +134,7 @@ namespace triton_controls
       // then multiplying one by the inverse of the other
       tf2::Quaternion tf2_quat_from_msg, tf2_quat_waypoint;
       tf2::convert(msg->pose.orientation, tf2_quat_from_msg);
-      tf2::convert(waypoint_pose_.orientation, tf2_quat_waypoint);
+      tf2::convert(waypoint_.pose.orientation, tf2_quat_waypoint);
       // quat_waypoint = quat_diff * quat_msg_inverse
       tf2::Quaternion tf2_quat_difference = tf2_quat_waypoint * tf2_quat_from_msg.inverse();
 
@@ -113,9 +142,9 @@ namespace triton_controls
         && tf2_quat_difference.y() == 0
         && tf2_quat_difference.z() == 0
         && tf2_quat_difference.w() == 0 // TODO: check the math
-        && msg->pose.position.x - waypoint_pose_.position.x == 0
-        && msg->pose.position.y - waypoint_pose_.position.y == 0
-        && msg->pose.position.z - waypoint_pose_.position.z == 0)
+        && msg->pose.position.x - waypoint_.pose.position.x == 0
+        && msg->pose.position.y - waypoint_.pose.position.y == 0
+        && msg->pose.position.z - waypoint_.pose.position.z == 0)
       {
         RCLCPP_INFO(this->get_logger(), "Attempt to set an identical waypoint ignored. ");
         return;
@@ -123,18 +152,19 @@ namespace triton_controls
     }
 
     waypoint_set_ = true;
-    waypoint_pose_ = msg->pose;
-    min_stabilize_duration_s_ = msg->duration;
-    max_pose_offset_ = msg->distance;
+    waypoint_.pose = msg->pose;
+    waypoint_.duration = msg->duration;
+    waypoint_.distance = msg->distance;
     waypoint_achieved_ = false;
-    waypoint_type_ = msg->type;
+    waypoint_being_achieved_ = false;
+    waypoint_.type = msg->type;
 
     auto reply_msg = triton_interfaces::msg::Waypoint();
-    reply_msg.pose = current_pose_;
+    reply_msg.pose = waypoint_.pose;
     reply_msg.success = waypoint_achieved_;
-    reply_msg.type = waypoint_type_;
-    reply_msg.distance = max_pose_offset_;
-    reply_msg.duration = min_stabilize_duration_s_;
+    reply_msg.type = waypoint_.type;
+    reply_msg.distance = waypoint_.distance;
+    reply_msg.duration = waypoint_.duration;
 
     publisher_->publish(reply_msg);
   }

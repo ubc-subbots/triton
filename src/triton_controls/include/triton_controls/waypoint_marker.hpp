@@ -51,11 +51,8 @@ namespace triton_controls
         rclcpp::Subscription<triton_interfaces::msg::Waypoint>::SharedPtr waypoint_subscription_;
 
         bool waypoint_set_;                         // Whether a waypoint is set
-        geometry_msgs::msg::Pose waypoint_pose_;    // Destination waypoint pose
+        triton_interfaces::msg::Waypoint waypoint_; // Destination waypoint pose
         geometry_msgs::msg::Pose current_pose_;     // AUV current pose
-        geometry_msgs::msg::Pose max_pose_offset_;  // Distance criterion
-        uint8_t waypoint_type_;                     // Type
-        float min_stabilize_duration_s_;              // Time criterion
         rclcpp::Time last_stable_start_time_;       // Time stamp of the last time meeting waypoint criteria
         bool waypoint_achieved_;                    // Whether a waypoint is achieved
         bool waypoint_being_achieved_;              // Whether the AUV is within 'distance' to the destination
