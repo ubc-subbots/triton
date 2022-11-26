@@ -1,8 +1,8 @@
 #pragma once
 
 #include <rclcpp/rclcpp.hpp>
-#include <sensor_msgs/msg/joint_state.hpp>
-#include <sensor_msgs/msg/imu.hpp>
+#include "geometry_msgs/msg/wrench.hpp"
+#include "geometry_msgs/msg/pose.hpp"
 #include <yaml-cpp/yaml.h>
 #include "triton_interfaces/msg/float.hpp" 
 
@@ -14,25 +14,16 @@ public:
     ~PidController();
 
 private:
-    void imu_callback(const sensor_msgs::msg::Imu::SharedPtr msg);
-    void motor_state_callback(const sensor_msgs::msg::JointState::SharedPtr msg);
-    void cur_pitch_update_callback(const triton_interfaces::msg::Float::SharedPtr msg);
-    void target_update_callback(const triton_interfaces::msg::Float::SharedPtr msg);
+    
     void control_loop();
-    rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr sub_;
-    rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr sub_motor_state_;
-    rclcpp::Subscription<triton_interfaces::msg::Float>::SharedPtr sub_target_;
-    rclcpp::Subscription<triton_interfaces::msg::Float>::SharedPtr sub_cur_pitch_;
+    rclcpp::Subscription<geometry_msgs::msg::Pose>::SharedPtr sub_;
 
-    rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr pub_;
-
-    sensor_msgs::msg::Imu::SharedPtr imu_state_;
-    sensor_msgs::msg::JointState::SharedPtr motor_state_;
-    sensor_msgs::msg::JointState command_;
+    rclcpp::Publisher<geometry_msgs::msg::Wrench>::SharedPtr pub_;
+    geometry_msgs::msg::Pose::SharedPtr cur_pose ;
 
     std::chrono::time_point<std::chrono::high_resolution_clock> last_time_;
     rclcpp::TimerBase::SharedPtr control_loop_timer_;
-
+    void pose_update(const geometry_msgs::msg::Pose::SharedPtr msg);
     struct PID
     {
         void load(const std::string &path)
@@ -58,8 +49,10 @@ private:
         }
     };
 
-    PID pid_pitch_;
-    PID pid_pos_;
-    float pitch_target_;
-    float cur_pitch_;
+    PID pid_force_x;
+    PID pid_force_y;
+    PID pid_force_z;
+    PID pid_yaw;
 };
+#include "rclcpp_components/register_node_macro.hpp"
+//RCLCPP_COMPONENTS_REGISTER_NODE(triton_pid_controller::PidController)
