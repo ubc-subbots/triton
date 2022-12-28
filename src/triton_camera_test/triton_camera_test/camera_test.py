@@ -9,15 +9,24 @@ from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 import cv2
 
+# takes in local video file of gate,
+# gate detector is subscribed to the cameratest publisher topic
+# sends it to gate_detector to process it and se
+# 
+
 class CameraTest(Node):
 
     def __init__(self):
         super().__init__('camera_test')
         self.publisher_ = self.create_publisher(
-            Image,
+            Image, 
             '/triton/drivers/front_camera/image_raw',
             10
         )
+
+        # The publisher topic ^^
+
+        # What it is subscribed to :
         self.subscription = self.create_subscription(
             String, 
             '/triton/triton_camera_test/video_source', 
@@ -54,7 +63,7 @@ class CameraTest(Node):
             
         # Create a VideoCapture object
         # The argument '0' gets the default webcam.
-        self.cap = cv2.VideoCapture("/home/jared/Videos/gate2.mp4")
+        self.cap = cv2.VideoCapture("/home/mark/coding/gate2.mp4")
             
         # Used to convert between ROS and OpenCV images
         self.br = CvBridge()

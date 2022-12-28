@@ -172,7 +172,7 @@ void GateDetector::boundGateUsingPoles(std::vector<std::vector<Point>> hulls, cv
 
     int w = box.width;
     int h = box.height;
-
+    
     // If the bounding rectangle is more wide than high, most likely we have detected both poles
     if ((float)w / h >= 1)
     {
@@ -230,6 +230,52 @@ std::vector<Point> GateDetector::createGateContour(std::vector<Point> hull_point
     circle(src, top_right, 8, Scalar(0, 128, 0), 4);
     circle(src, bot_left, 8, Scalar(0, 128, 0), 4);
     circle(src, bot_right, 8, Scalar(0, 128, 0), 4);
+
+    double standard_pixel_width = 550;
+    // double standard_pixel_height = 223;
+
+    double standard_distance = 100; // in cm
+    double standard_width = 150; // in cm
+
+    // F = (P x D) / W
+
+    // D' = (W x F) / Pnew
+
+
+    double focal_length = (standard_pixel_width*standard_distance)/standard_width;
+
+    // double curr_height = bot_right.y - top_right.y;
+    double curr_pixel_width = top_right.x - top_left.x;
+
+    double distance = (standard_width*focal_length)/curr_pixel_width;
+
+    std::ostringstream ss;
+    ss << std::setprecision(3) << distance;
+    std::string distance_str = ss.str();
+
+    Point distance_text_position(200, 700);//Declaring the text position//
+    int font_size = 1;//Declaring the font size//
+    Scalar font_Color(0, 0, 0);//Declaring the color of the font//
+    int font_weight = 2;//Declaring the font weight//
+    putText(src, "Distance: "+distance_str+" cm" , distance_text_position,FONT_HERSHEY_COMPLEX, font_size,font_Color, font_weight);//Putting the text in the matrix//
+
+
+    // std::ostringstream ss2;
+    // ss2 << std::setprecision(3) << real_height;
+    // std::string real_height_str = ss2.str();
+
+    // Point rheight_text_position(800, 700);//Declaring the text position//
+    // putText(src, "real_Height: "+real_height_str+" deg" , rheight_text_position,FONT_HERSHEY_COMPLEX, font_size,font_Color, font_weight);//Putting the text in the matrix//
+
+
+    // std::ostringstream ss3;
+    // ss3 << std::setprecision(3) << curr_height;
+    // std::string curr_height_str = ss3.str();
+
+    // Point cheight_text_position(800, 800);//Declaring the text position//
+    // putText(src, "curr_Height: "+curr_height_str+" deg" , cheight_text_position,FONT_HERSHEY_COMPLEX, font_size,font_Color, font_weight);//Putting the text in the matrix//
+
+
   }
   std::vector<cv::Point> gate_cntr;
   gate_cntr.push_back(top_left);
