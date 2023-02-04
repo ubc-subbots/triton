@@ -4,7 +4,7 @@ import threading
 import rclpy
 from rclpy.node import Node
 from rclpy.qos import QoSProfile
-from geometry_msgs.msg import Quaternion, PoseStamped
+from geometry_msgs.msg import Quaternion, PoseStamped, PoseWithCovarianceStamped
 from nav_msgs.msg import Path
 from tf2_ros import TransformBroadcaster, TransformStamped
 
@@ -16,7 +16,8 @@ class AUVTransformPublisher(Node):
 
         qos_profile = QoSProfile(depth=10)
         self.state_subscriber = self.create_subscription(
-            PoseStamped,
+            #PoseStamped,
+            PoseWithCovarianceStamped,
             '/triton/state',
             self.state_callback,
             10
@@ -32,10 +33,13 @@ class AUVTransformPublisher(Node):
         self.get_logger().info("AUVTransformPublisher successfully started!")
 
     def state_callback(self, msg):
-        self.pose_array.append(msg)
+        msg_wo_cov = PoseStamped()
+        msg_wo_cov.header = msg.header
+        msg_wo_cov.pose = msg.pose.pose
+        self.pose_array.append(msg_wo_cov)
         now = self.get_clock().now()
-        p = msg.pose.position
-        q = msg.pose.orientation
+        p = msg.pose.pose.position
+        q = msg.pose.pose.orientation
         odom_trans = TransformStamped()
         odom_trans.header.frame_id = msg.header.frame_id
         odom_trans.child_frame_id = 'base_link'

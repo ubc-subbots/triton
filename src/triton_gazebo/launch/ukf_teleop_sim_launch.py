@@ -23,21 +23,21 @@ def generate_launch_description():
         launch_arguments={'world': 'cube.world'}.items()
     )
 
-    rviz = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(get_package_share_directory('triton_gazebo'), 'launch', 'rviz_launch.py')
-        )
+    rviz_config_file = os.path.join(
+        pkg_share, 'config', 'rviz_ukf_teleop_sim_config.rviz')
+
+    rviz = Node(
+        package='rviz2',
+        executable='rviz2',
+        name='rviz2',
+        output='screen',
+        arguments=['-d', rviz_config_file]
     )
 
     state_estimator = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(get_package_share_directory('triton_controls'), 'launch', 'state_estimator_launch.py')
         )
-    )
-
-    rviz_timer = TimerAction(
-        period=5.,
-        actions=[rviz]
     )
 
     state_publisher = Node(
@@ -79,21 +79,14 @@ def generate_launch_description():
         )
     )
 
-    yolo = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            get_package_share_directory('triton_object_recognition') + '/launch/tiny_yolov4_launch.py'
-        )
-    )
-    
     ld.add_action(gazebo)
-    #ld.add_action(rviz_timer)
+    ld.add_action(rviz)
     ld.add_action(thrust_allocator)
     ld.add_action(keyboard_teleop)
     ld.add_action(gate_detector)
     ld.add_action(state_publisher)
     ld.add_action(transform_publisher)
     ld.add_action(underwater_camera)
-    #ld.add_action(yolo)
     ld.add_action(state_estimator)
 
     return ld
