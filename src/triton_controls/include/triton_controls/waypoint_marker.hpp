@@ -10,6 +10,7 @@
 #include "tf2/LinearMath/Matrix3x3.h"
 #include <tf2/convert.h>
 #include "triton_interfaces/msg/waypoint.hpp"
+#include <math.h>
 
 namespace triton_controls
 {
@@ -46,8 +47,13 @@ namespace triton_controls
          */
         void waypoint_callback(const triton_interfaces::msg::Waypoint::SharedPtr msg);
 
+        // Current waypoint status
         rclcpp::Publisher<triton_interfaces::msg::Waypoint>::SharedPtr publisher_;
+        // Goal minus current state. For the PID Controller
+        rclcpp::Publisher<geometry_msgs::msg::Pose>::SharedPtr error_publisher_;
+        // Current state of AUV
         rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr state_subscription_;
+        // New goal
         rclcpp::Subscription<triton_interfaces::msg::Waypoint>::SharedPtr waypoint_subscription_;
 
         bool waypoint_set_;                         // Whether a waypoint is set
@@ -56,6 +62,7 @@ namespace triton_controls
         rclcpp::Time last_stable_start_time_;       // Time stamp of the last time meeting waypoint criteria
         bool waypoint_achieved_;                    // Whether a waypoint is achieved
         bool waypoint_being_achieved_;              // Whether the AUV is within 'distance' to the destination
+        geometry_msgs::msg::Pose error_pose_;       // Error of goal minus current pose
 
     };
 

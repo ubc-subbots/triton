@@ -11,7 +11,9 @@ namespace triton_controls
         waypoint_being_achieved_(false)
   {
 
-    publisher_ = this->create_publisher<triton_interfaces::msg::Waypoint>("/triton/controls/input_pose", 10);
+    publisher_ = this->create_publisher<triton_interfaces::msg::Waypoint>("/triton/controls/waypoint_marker/current_goal", 10);
+
+    error_publisher_ = this->create_publisher<geometry_msgs::msg::Pose>("/triton/controls/input_pose", 10);
 
     state_subscription_ = this->create_subscription<nav_msgs::msg::Odometry>(
         "/triton/controls/ukf/odometry/filtered", 10, std::bind(&WaypointMarker::state_callback, this, _1));
@@ -40,13 +42,22 @@ namespace triton_controls
       // quat_waypoint = quat_diff * quat_msg
       tf2::Quaternion tf2_quat_difference = tf2_quat_waypoint * tf2_quat_from_msg.inverse();
 
-      if (tf2_quat_difference.x() <= waypoint_.distance.orientation.x
-        && tf2_quat_difference.y() <= waypoint_.distance.orientation.y
-        && tf2_quat_difference.z() <= waypoint_.distance.orientation.z
-        && tf2_quat_difference.w() <= waypoint_.distance.orientation.w // TODO: check the math
-        && current_pose_.position.x - waypoint_.pose.position.x <= waypoint_.distance.position.x
-        && current_pose_.position.y - waypoint_.pose.position.y <= waypoint_.distance.position.y
-        && current_pose_.position.z - waypoint_.pose.position.z <= waypoint_.distance.position.z)
+      // Assign differences to error_pose_
+      error_pose_.position.x = waypoint_.pose.position.x - current_pose_.position.x;
+      error_pose_.position.y = waypoint_.pose.position.y - current_pose_.position.y;
+      error_pose_.position.z = waypoint_.pose.position.z - current_pose_.position.z;
+      error_pose_.orientation.x = tf2_quat_difference.x();
+      error_pose_.orientation.y = tf2_quat_difference.y();
+      error_pose_.orientation.z = tf2_quat_difference.z();
+      error_pose_.orientation.w = tf2_quat_difference.w();
+
+      if ( fabs(error_pose_.orientation.x) <= waypoint_.distance.orientation.x
+        && fabs(error_pose_.orientation.y) <= waypoint_.distance.orientation.y
+        && fabs(error_pose_.orientation.z) <= waypoint_.distance.orientation.z
+        && fabs(error_pose_.orientation.w) <= waypoint_.distance.orientation.w // TODO: check the math
+        && fabs(error_pose_.position.x) <= waypoint_.distance.position.x
+        && fabs(error_pose_.position.y) <= waypoint_.distance.position.y
+        && fabs(error_pose_.position.z) <= waypoint_.distance.position.z)
       {
         // 2.1. If we are within max_pose_offset_, check duration
         if (waypoint_being_achieved_)
@@ -132,7 +143,21 @@ namespace triton_controls
       publisher_->publish(reply_msg);
 
     }
-    // else waypoint is not set, do nothing
+    // else waypoint is not set
+
+    // If a waypoint is set, then error_pose_ contains the error
+    // Else, it will be set to all 0s, so the AUV stays still
+    if (!waypoint_set_) 
+    {
+      error_pose_.position.x = 0;
+      error_pose_.position.y = 0;
+      error_pose_.position.z = 0;
+      error_pose_.orientation.x = 0;
+      error_pose_.orientation.y = 0;
+      error_pose_.orientation.z = 0;
+      error_pose_.orientation.w = 0;
+    }
+    error_publisher_->publish(error_pose_);
 
   }
 
