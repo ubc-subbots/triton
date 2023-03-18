@@ -3,8 +3,11 @@ import rclpy
 from rclpy.node import Node
 from pynput import keyboard
 
+from std_msgs.msg import Float32MultiArray
 from std_msgs.msg import String
 from sensor_msgs.msg import Image
+
+import numpy as np
 
 from cv_bridge import CvBridge
 import cv2
@@ -45,6 +48,15 @@ class CameraTest(Node):
             self.listener_callback_debug_detection_images, 
             10
         )
+
+        self.subscription_offset = self.create_subscription(
+            Float32MultiArray, 
+            '/triton/gate/detector/gate_center', 
+            self.listener_callback_debug_gate_center, 
+            10
+        )
+
+
         self._start()
 
         self.get_logger().info('Camera tester succesfully started!')
@@ -56,14 +68,16 @@ class CameraTest(Node):
 
         # https://automaticaddison.com/getting-started-with-opencv-in-ros-2-foxy-fitzroy-python/
         
-        timer_period = 0.1  # seconds
+        timer_period = 0.000001  # seconds
         
         # Create the timer
         self.timer = self.create_timer(timer_period, self.timer_callback)
             
         # Create a VideoCapture object
         # The argument '0' gets the default webcam.
-        self.cap = cv2.VideoCapture("/home/mark/coding/gate2.mp4")
+        self.cap = cv2.VideoCapture("/home/mark/coding/Pathmarker_Test.mp4")
+        # self.cap = cv2.VideoCapture(0)
+
             
         # Used to convert between ROS and OpenCV images
         self.br = CvBridge()
@@ -146,6 +160,15 @@ class CameraTest(Node):
         frame = self.br.imgmsg_to_cv2(data)
         cv2.imshow("Segmentation", frame)
         cv2.waitKey(1)
+
+    def listener_callback_debug_gate_center(self, msg):
+        # Do something with the received message
+        data = np.array(msg.data, dtype=np.float32)  # Convert the data to a numpy array
+        print("Center:")  # Print a label
+        print(data)  # Print the array
+
+        
+
 
     
     

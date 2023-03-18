@@ -49,7 +49,7 @@ private:
    * @param src The raw unscaled image
    * @return The raw scaled image with the bounding box around the gate location drawn on
    */
-  void boundGateUsingPoles(std::vector<std::vector<cv::Point>> hulls, cv::Mat& src);
+  void boundGateUsingPoles(std::vector<std::vector<cv::Point>> hulls, cv::Mat& src, cv::Mat& src_seg);
 
   /**
    * Creates the estimated gate contour from the given hull points, draws debug info on src if activated
@@ -79,6 +79,8 @@ private:
   image_transport::Publisher debug_detection_publisher_;
   triton_gate::PoleFeaturizer featurizer_;
   rclcpp::Publisher<std_msgs::msg::Float32MultiArray>::SharedPtr gate_center_publisher_;  
+  rclcpp::Publisher<std_msgs::msg::Float32MultiArray>::SharedPtr gate_offset_publisher_;  
+
 };
 
 }  // namespace triton_gate

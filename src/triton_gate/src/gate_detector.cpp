@@ -29,8 +29,11 @@ GateDetector::GateDetector(const rclcpp::NodeOptions& options) : Node("gate_dete
   debug_detection_publisher_ = image_transport::create_publisher(this, "detector/debug/detection");
   debug_segment_publisher_ = image_transport::create_publisher(this, "detector/debug/segment");
 
-  gate_center_publisher_ = this->create_publisher<std_msgs::msg::Float32MultiArray>(
-    "detector/gate_center", 10);
+  // gate_center_publisher_ = this->create_publisher<std_msgs::msg::Float32MultiArray>(
+  //   "detector/gate_center", 10);
+
+  gate_offset_publisher_ = this->create_publisher<std_msgs::msg::Float32MultiArray>(
+    "detector/gate_offset", 10);  
 
   RCLCPP_INFO(this->get_logger(), "GateDetector succesfully started!");
 }
@@ -54,7 +57,9 @@ void GateDetector::detect(const sensor_msgs::msg::Image & msg)
   cv::Mat detection = cv_ptr->image;
   cv::Mat segmented = morphological(segment(detection), Size(3, 3), Size(3, 3));
   std::vector<std::vector<cv::Point>> hulls = convexHulls(segmented, detection.rows*detection.cols, 0);
-  boundGateUsingPoles(hulls, detection);
+
+
+  boundGateUsingPoles(hulls, detection, segmented);
 
   if (debug_)
   {
@@ -101,60 +106,21 @@ cv::Mat GateDetector::segment(cv::Mat& src)
   return color_mask;
 }
 
-void GateDetector::boundGateUsingPoles(std::vector<std::vector<Point>> hulls, cv::Mat& src)
+void GateDetector::boundGateUsingPoles(std::vector<std::vector<Point>> hulls, cv::Mat& src, cv::Mat& src_seg)
 {
+  int offset_x = 0;
+  int offset_y = 0;
+  float yaw_angle = 0;
+
   // We can't do anything if we aren't given any hulls
   if (hulls.size() == 0)
   {
     return;
   }
 
-  // Determine pole hulls
-  vector<vector<Point>> pole_hulls;
-  vector<Point> largest, second_largest;
-  double largest_area = 0, second_largest_area = 0;
-  for (int i=0; i< (int) hulls.size(); i++)
-  {
-    vector<Point> hull = hulls.at(i);
-    float aspect_ratio = 1.0;
-    // We can only create a bounding rectangle if a hull has at least 3 points
-    if (hull.size() >= 3)
-    {
-      Rect boundingR = boundingRect(hull);
-      aspect_ratio = (float) boundingR.width / boundingR.height ;
-    }
-    // To determine if a hull is associated to a pole, we check that it's aspect ratio
-    // is within a threshold of a desired aspect ratio. This is quite elementary, and
-    // a more robust way to categorize hulls would be a model that can classify hulls
-    // as poles or not based on features other than just the aspect ratio. In testing
-    // this however, the model method did not perform as well as this method and needs works
-    //float thresh = 0.03;
-    //float desired_ratio = 0.11;
-    //RCLCPP_INFO(this->get_logger(), "Aspect ratio " + std::to_string(aspect_ratio));
-    //if (aspect_ratio > desired_ratio - thresh && aspect_ratio < desired_ratio + thresh)
-    if (aspect_ratio < 1) // If taller than wide
-    {
-      //pole_hulls.push_back(hull);
-      if (contourArea(hull) > largest_area)
-      {
-        second_largest = largest;
-        second_largest_area = largest_area;
-        largest = hull;
-        largest_area = contourArea(hull);
-      }
-      else if (contourArea(hull) > second_largest_area)
-      {
-        second_largest = hull;
-        second_largest_area = contourArea(hull);
-      }
-    }
-  }
-  pole_hulls.push_back(largest);
-  pole_hulls.push_back(second_largest);
-
   // Get 2D array of all the points of the pole hulls (to determine extrema)
   vector<Point> hull_points;
-  for (vector<Point> h : pole_hulls)
+  for (vector<Point> h : hulls)
   {
     for (Point p : h)
     {
@@ -170,37 +136,113 @@ void GateDetector::boundGateUsingPoles(std::vector<std::vector<Point>> hulls, cv
     // Get bounding box of contour to get it's approximate width/height
     Rect box = boundingRect(gate_cntr);
 
-    int w = box.width;
-    int h = box.height;
+    gate_cntr_ = gate_cntr;
+
+    // Get the top-left and bottom-right corners of the bounding box
+    Point top_left = box.tl();
+    Point bottom_right = box.br();
     
-    // If the bounding rectangle is more wide than high, most likely we have detected both poles
-    if ((float)w / h >= 1)
+
+    // Calculate the center point of the bounding box
+    int gate_center_x = (top_left.x + bottom_right.x) / 2;
+    int gate_center_y = (top_left.y + bottom_right.y) / 2;
+    Point center_gate(gate_center_x, gate_center_y);
+    circle(src, center_gate, 12, Scalar(0, 255, 0), 6);
+    
+    // Get the size of the frame
+    int height = src.rows;
+    int width = src.cols;
+
+    // Calculate the center point of the frame
+    int frame_center_x = width / 2;
+    int frame_center_y = height / 2;
+    Point center_frame(frame_center_x, frame_center_y);
+
+    // calculate the offset of center of frame to center of bounding box
+    offset_x = gate_center_x-frame_center_x;
+    offset_y = gate_center_y-frame_center_y;
+
+    std::string offset_x_str = std::to_string(offset_x);
+    std::string offset_y_str = std::to_string(offset_y);
+
+    Point offset_text_position(100, 600);//Declaring the text position//
+    int font_size = 1;//Declaring the font size//
+    Scalar font_Color(0, 0, 0);//Declaring the color of the font//
+    int font_weight = 2;//Declaring the font weight//
+    putText(src, "Offset X: "+offset_x_str+" || Offset Y: "+offset_y_str, offset_text_position,FONT_HERSHEY_COMPLEX, font_size,font_Color, font_weight);//Putting the text in the matrix//
+
+    // Draw a circle at the center of the frame
+    circle(src, center_frame, 12, cv::Scalar(0, 0, 255), 6);
+
+    // Drawing line from center of frame to center of gate
+    line(src, center_frame, center_gate, cv::Scalar(0, 255, 255), 3);
+
+
+    // get countours of binary image (segmented)
+    std::vector<std::vector<cv::Point> > contours;
+    findContours(src_seg, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_NONE);
+    
+    if (contours.size() > 0)
     {
-      gate_cntr_ = gate_cntr;
+      // Get the rotated bounding rectangle of the first contour
+      RotatedRect rect = minAreaRect(contours[0]);
+
+      // Get the angle of rotation
+      yaw_angle = rect.angle;
+
+      // width is initially less that height
+      // when top of contour is pointing to top right??
+      if (rect.size.width > rect.size.height)
+      {
+        yaw_angle = yaw_angle - 90;
+      }
+
+      // convert to string for debug print
+      std::ostringstream ss;
+      ss << std::setprecision(3) << yaw_angle;
+      std::string yaw_str = ss.str();
+
+      // PRINTING YAW ANGLE
+      Point pitch_text_position(100, 100);//Declaring the text position//
+      putText(src, "YAW offset: "+yaw_str+" deg" , pitch_text_position,FONT_HERSHEY_COMPLEX, font_size,font_Color, font_weight);//Putting the text in the matrix//    
+    
     }
+
+    vector<float> offset; // [x, y]
+
+    offset.push_back(static_cast<float>(offset_x));
+    offset.push_back(static_cast<float>(offset_y));
+    offset.push_back(yaw_angle);
+
+    auto offset_msg = std_msgs::msg::Float32MultiArray();
+    offset_msg.data = offset;
+    gate_offset_publisher_->publish(offset_msg);
+  
+
+
   }
   // Draw the gate if we have detected it
   if (gate_cntr_.size() != 0)
   {
     polylines(src, gate_cntr_, true, Scalar(0, 0, 255), 2);
 
-    // Publish the normalized position of the center of the gate
-    vector<float> center; // [x, y]
-    // Find centroid using moments
-    Moments M;
-    M = moments(gate_cntr_);
-    center.push_back((M.m10/M.m00) / src.cols);
-    center.push_back((M.m01/M.m00) / src.rows);
-    auto center_msg = std_msgs::msg::Float32MultiArray();
-    center_msg.data = center;
-    gate_center_publisher_->publish(center_msg);
+    // // Publish the normalized position of the center of the gate
+    // vector<float> center; // [x, y]
+    // // Find centroid using moments
+    // Moments M;
+    // M = moments(gate_cntr_);
+    // center.push_back((M.m10/M.m00) / src.cols);
+    // center.push_back((M.m01/M.m00) / src.rows);
+    // auto center_msg = std_msgs::msg::Float32MultiArray();
+    // center_msg.data = center;
+    // gate_center_publisher_->publish(center_msg);
   }
 
   // Draw all non pole hulls and pole hulls on src for debug purposes
   if (debug_)
   {
     polylines(src, hulls, true, Scalar(255, 255, 255), 1);
-    polylines(src, pole_hulls, true, Scalar(0, 128, 256), 1);
+    //polylines(src, pole_hulls, true, Scalar(0, 128, 256), 1);
   }
   return;
 }
@@ -230,52 +272,6 @@ std::vector<Point> GateDetector::createGateContour(std::vector<Point> hull_point
     circle(src, top_right, 8, Scalar(0, 128, 0), 4);
     circle(src, bot_left, 8, Scalar(0, 128, 0), 4);
     circle(src, bot_right, 8, Scalar(0, 128, 0), 4);
-
-    double standard_pixel_width = 550;
-    // double standard_pixel_height = 223;
-
-    double standard_distance = 100; // in cm
-    double standard_width = 150; // in cm
-
-    // F = (P x D) / W
-
-    // D' = (W x F) / Pnew
-
-
-    double focal_length = (standard_pixel_width*standard_distance)/standard_width;
-
-    // double curr_height = bot_right.y - top_right.y;
-    double curr_pixel_width = top_right.x - top_left.x;
-
-    double distance = (standard_width*focal_length)/curr_pixel_width;
-
-    std::ostringstream ss;
-    ss << std::setprecision(3) << distance;
-    std::string distance_str = ss.str();
-
-    Point distance_text_position(200, 700);//Declaring the text position//
-    int font_size = 1;//Declaring the font size//
-    Scalar font_Color(0, 0, 0);//Declaring the color of the font//
-    int font_weight = 2;//Declaring the font weight//
-    putText(src, "Distance: "+distance_str+" cm" , distance_text_position,FONT_HERSHEY_COMPLEX, font_size,font_Color, font_weight);//Putting the text in the matrix//
-
-
-    // std::ostringstream ss2;
-    // ss2 << std::setprecision(3) << real_height;
-    // std::string real_height_str = ss2.str();
-
-    // Point rheight_text_position(800, 700);//Declaring the text position//
-    // putText(src, "real_Height: "+real_height_str+" deg" , rheight_text_position,FONT_HERSHEY_COMPLEX, font_size,font_Color, font_weight);//Putting the text in the matrix//
-
-
-    // std::ostringstream ss3;
-    // ss3 << std::setprecision(3) << curr_height;
-    // std::string curr_height_str = ss3.str();
-
-    // Point cheight_text_position(800, 800);//Declaring the text position//
-    // putText(src, "curr_Height: "+curr_height_str+" deg" , cheight_text_position,FONT_HERSHEY_COMPLEX, font_size,font_Color, font_weight);//Putting the text in the matrix//
-
-
   }
   std::vector<cv::Point> gate_cntr;
   gate_cntr.push_back(top_left);
