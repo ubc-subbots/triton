@@ -56,14 +56,18 @@ class CameraTest(Node):
 
         # https://automaticaddison.com/getting-started-with-opencv-in-ros-2-foxy-fitzroy-python/
         
-        timer_period = 0.1  # seconds
+        timer_period = 0.01  # seconds
         
         # Create the timer
         self.timer = self.create_timer(timer_period, self.timer_callback)
             
         # Create a VideoCapture object
         # The argument '0' gets the default webcam.
-        self.cap = cv2.VideoCapture("/home/mark/coding/gate2.mp4")
+        # self.cap = cv2.VideoCapture("/home/mark/coding/gate2.mp4")
+        self.cap = cv2.VideoCapture("/home/mark/coding/Gate_and_backpole.mov")
+        # self.cap = cv2.VideoCapture(0)
+
+
             
         # Used to convert between ROS and OpenCV images
         self.br = CvBridge()

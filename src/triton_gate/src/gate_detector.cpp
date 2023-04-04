@@ -29,8 +29,11 @@ GateDetector::GateDetector(const rclcpp::NodeOptions& options) : Node("gate_dete
   debug_detection_publisher_ = image_transport::create_publisher(this, "detector/debug/detection");
   debug_segment_publisher_ = image_transport::create_publisher(this, "detector/debug/segment");
 
-  gate_center_publisher_ = this->create_publisher<std_msgs::msg::Float32MultiArray>(
-    "detector/gate_center", 10);
+  // gate_center_publisher_ = this->create_publisher<std_msgs::msg::Float32MultiArray>(
+  //   "detector/gate_center", 10);
+
+  // gate_offset_publisher_ = this->create_publisher<std_msgs::msg::Float32MultiArray>(
+  // "detector/gate_offset", 10); 
 
   RCLCPP_INFO(this->get_logger(), "GateDetector succesfully started!");
 }
@@ -185,15 +188,15 @@ void GateDetector::boundGateUsingPoles(std::vector<std::vector<Point>> hulls, cv
     polylines(src, gate_cntr_, true, Scalar(0, 0, 255), 2);
 
     // Publish the normalized position of the center of the gate
-    vector<float> center; // [x, y]
-    // Find centroid using moments
-    Moments M;
-    M = moments(gate_cntr_);
-    center.push_back((M.m10/M.m00) / src.cols);
-    center.push_back((M.m01/M.m00) / src.rows);
-    auto center_msg = std_msgs::msg::Float32MultiArray();
-    center_msg.data = center;
-    gate_center_publisher_->publish(center_msg);
+    // vector<float> center; // [x, y]
+    // // Find centroid using moments
+    // Moments M;
+    // M = moments(gate_cntr_);
+    // center.push_back((M.m10/M.m00) / src.cols);
+    // center.push_back((M.m01/M.m00) / src.rows);
+    // auto center_msg = std_msgs::msg::Float32MultiArray();
+    // center_msg.data = center;
+    // gate_center_publisher_->publish(center_msg);
   }
 
   // Draw all non pole hulls and pole hulls on src for debug purposes
@@ -226,10 +229,10 @@ std::vector<Point> GateDetector::createGateContour(std::vector<Point> hull_point
 
   if (debug_)
   {
-    circle(src, top_left, 8, Scalar(0, 128, 0), 4);
-    circle(src, top_right, 8, Scalar(0, 128, 0), 4);
-    circle(src, bot_left, 8, Scalar(0, 128, 0), 4);
-    circle(src, bot_right, 8, Scalar(0, 128, 0), 4);
+    circle(src, top_left, 8, Scalar(0, 255, 0), 4);
+    circle(src, top_right, 8, Scalar(0, 255, 255), 4);
+    circle(src, bot_left, 8, Scalar(0, 255, 0), 4);
+    circle(src, bot_right, 8, Scalar(0, 255, 255), 4);
 
     double standard_pixel_width = 550;
     // double standard_pixel_height = 223;
@@ -260,21 +263,47 @@ std::vector<Point> GateDetector::createGateContour(std::vector<Point> hull_point
     putText(src, "Distance: "+distance_str+" cm" , distance_text_position,FONT_HERSHEY_COMPLEX, font_size,font_Color, font_weight);//Putting the text in the matrix//
 
 
-    // std::ostringstream ss2;
-    // ss2 << std::setprecision(3) << real_height;
-    // std::string real_height_str = ss2.str();
+    int offset_x = 0;
+    int offset_y = 0;
+    // Calculate the center point of the bounding box
+    int gate_center_x = (top_left.x + bot_right.x) / 2;
+    int gate_center_y = (top_left.y + bot_right.y) / 2;
+    Point center_gate(gate_center_x, gate_center_y);
+    circle(src, center_gate, 12, Scalar(0, 255, 0), 6);
+    
+    // Get the size of the frame
+    int height = src.rows;
+    int width = src.cols;
 
-    // Point rheight_text_position(800, 700);//Declaring the text position//
-    // putText(src, "real_Height: "+real_height_str+" deg" , rheight_text_position,FONT_HERSHEY_COMPLEX, font_size,font_Color, font_weight);//Putting the text in the matrix//
+    // Calculate the center point of the frame
+    int frame_center_x = width / 2;
+    int frame_center_y = height / 2;
+    Point center_frame(frame_center_x, frame_center_y);
 
+    // calculate the offset of center of frame to center of bounding box
+    offset_x = gate_center_x-frame_center_x;
+    offset_y = gate_center_y-frame_center_y;
 
-    // std::ostringstream ss3;
-    // ss3 << std::setprecision(3) << curr_height;
-    // std::string curr_height_str = ss3.str();
+    std::string offset_x_str = std::to_string(offset_x);
+    std::string offset_y_str = std::to_string(offset_y);
 
-    // Point cheight_text_position(800, 800);//Declaring the text position//
-    // putText(src, "curr_Height: "+curr_height_str+" deg" , cheight_text_position,FONT_HERSHEY_COMPLEX, font_size,font_Color, font_weight);//Putting the text in the matrix//
+    Point offset_text_position(100, 600);//Declaring the text position//
+    putText(src, "Offset X: "+offset_x_str+" || Offset Y: "+offset_y_str, offset_text_position,FONT_HERSHEY_COMPLEX, font_size,font_Color, font_weight);//Putting the text in the matrix//
 
+    // Draw a circle at the center of the frame
+    circle(src, center_frame, 12, cv::Scalar(0, 0, 255), 6);
+
+    // Drawing line from center of frame to center of gate
+    line(src, center_frame, center_gate, cv::Scalar(0, 255, 255), 3);
+
+    vector<float> offset; // [x, y]
+
+    offset.push_back(static_cast<float>(offset_x));
+    offset.push_back(static_cast<float>(offset_y));
+
+    auto offset_msg = std_msgs::msg::Float32MultiArray();
+    offset_msg.data = offset;
+    // gate_offset_publisher_->publish(offset_msg);
 
   }
   std::vector<cv::Point> gate_cntr;
