@@ -79,6 +79,7 @@ private:
   image_transport::Publisher debug_detection_publisher_;
   triton_gate::PoleFeaturizer featurizer_;
   rclcpp::Publisher<std_msgs::msg::Float32MultiArray>::SharedPtr gate_center_publisher_;  
+  rclcpp::Publisher<std_msgs::msg::Float32MultiArray>::SharedPtr gate_offset_publisher_;  
 };
 
 }  // namespace triton_gate

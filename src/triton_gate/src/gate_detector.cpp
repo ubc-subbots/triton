@@ -32,8 +32,9 @@ GateDetector::GateDetector(const rclcpp::NodeOptions& options) : Node("gate_dete
   // gate_center_publisher_ = this->create_publisher<std_msgs::msg::Float32MultiArray>(
   //   "detector/gate_center", 10);
 
-  gate_center_publisher_ = this->create_publisher<std_msgs::msg::Float32MultiArray>(
-  "detector/gate_offset", 10); 
+  // initialize in header file 
+  gate_offset_publisher_ = this->create_publisher<std_msgs::msg::Float32MultiArray>(
+    "detector/gate_offset", 10);  
 
   RCLCPP_INFO(this->get_logger(), "GateDetector succesfully started!");
 }
@@ -303,7 +304,7 @@ std::vector<Point> GateDetector::createGateContour(std::vector<Point> hull_point
 
     auto offset_msg = std_msgs::msg::Float32MultiArray();
     offset_msg.data = offset;
-    gate_center_publisher_->publish(offset_msg);
+    gate_offset_publisher_->publish(offset_msg);
 
   }
   std::vector<cv::Point> gate_cntr;
