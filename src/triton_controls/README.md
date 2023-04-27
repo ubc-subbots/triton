@@ -11,6 +11,14 @@ To launch the `thrust_allocator` node, use the following command
 
 You can change the configuration file for the `thrust_allocator` in the launch file, just be sure that the configuration file you want to use exists in `triton_controls/config`.
 
+### DELETEME
+
+    
+    ros2 run triton_controls waypoint_marker_tester.py
+
+    ros2 topic pub -1 /triton/controls/waypoint_marker_tester/start std_msgs/msg/String "{data: 1}"
+
+
 ### Robot Localization
 To run the robot localization node, which estimates the pose, twist, and acceleration of the AUV, run
 
@@ -50,6 +58,22 @@ To run the robot localization node, which estimates the pose, twist, and acceler
     - `controls/ukf/odometry/filtered` (`nav_msgs/Odometry`) : AUV state
     ### Notes
     - This node is configured with the config file `state_estimator_config.yaml`.
+
+- `waypoint_marker` : A standalone node that monitors whether a set waypoint has been achieved, and publishes waypoint information and error to target. 
+
+    ### Subscribed Topics
+    - `controls/ukf/odometry/filtered` (`nav_msgs/Odometry`) : AUV state
+    - `controls/waypoint_marker/set` (`triton_interfaces/Waypoint`) : Target waypoint
+    ### Published Topics
+    - `controls/waypoint_marker/current_goal` (`triton_interfaces/Waypoint`) : Current target waypoint
+    - `controls/input_pose` (`geometry_msgs/Pose`) : Error to target pose. For navigation. 
+    ### Notes
+    - Initially, no goal is set. 
+    - When a goal is set, the waypoint marker continuously monitors AUV state to determine whether the goal is achieved
+        - If a goal is set, attempts to set the same goal is ignored
+        - After a goal is achieved, it returns to the 'no goal' state
+        - Success is determined by the 'current_goal' topic, in the 'success' field of the waypoint messages
+    - When no goal is set, Poses with all zeros are published to the 'input_pose' topic, indicating that the AUV should not move
 
 ## Contributors
 

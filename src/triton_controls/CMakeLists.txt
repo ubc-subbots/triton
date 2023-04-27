@@ -17,12 +17,14 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
+find_package(ament_cmake_python REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_components REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(triton_interfaces REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
+find_package(nav_msgs REQUIRED)
 find_package(OpenCV 4.2 REQUIRED)
 find_package(tf2 REQUIRED)
 
@@ -31,11 +33,19 @@ include_directories(include ${catkin_INCLUDE_DIRS})
 add_executable(thrust_allocator 
   src/thrust_allocator.cpp
 )
-
 target_include_directories(thrust_allocator PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
 )
+
+add_executable(waypoint_marker
+  src/waypoint_marker.cpp
+)
+target_include_directories(waypoint_marker PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+)
+
 ament_target_dependencies(
   thrust_allocator
   "rclcpp"
@@ -50,9 +60,23 @@ install(TARGETS thrust_allocator
   DESTINATION lib/${PROJECT_NAME}
 )
 
+ament_target_dependencies(
+  waypoint_marker
+  "rclcpp"
+  "rclcpp_components"
+  "tf2"
+  "triton_interfaces"
+  "geometry_msgs"
+  "sensor_msgs"
+  "nav_msgs"
+)
+install(TARGETS waypoint_marker
+  DESTINATION lib/${PROJECT_NAME}
+)
+
 add_library(triton_controls SHARED
   src/thrust_allocator.cpp
-  src/waypoint_marker.cpp
+  # src/waypoint_marker.cpp
   src/serial_subscriber
 )
 
@@ -73,6 +97,7 @@ ament_target_dependencies(triton_controls
   "sensor_msgs"
   "OpenCV"
   "tf2"
+  "nav_msgs"
 )
 
 install(TARGETS
@@ -100,6 +125,7 @@ ament_python_install_package(${PROJECT_NAME})
 # Install Python executables
 install(PROGRAMS
   triton_controls/auv_transform_publisher.py
+  triton_controls/waypoint_marker_tester.py
   DESTINATION lib/${PROJECT_NAME}
 )
 

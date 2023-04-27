@@ -37,8 +37,8 @@ namespace triton_controls
       // Calculate the orientation difference, by converting to tf2 Quaternia, 
       // then multiplying one by the inverse of the other
       tf2::Quaternion tf2_quat_from_msg, tf2_quat_waypoint;
-      tf2::convert(current_pose_.orientation, tf2_quat_from_msg);
-      tf2::convert(waypoint_.pose.orientation, tf2_quat_waypoint);
+      tf2::fromMsg(current_pose_.orientation, tf2_quat_from_msg);
+      tf2::fromMsg(waypoint_.pose.orientation, tf2_quat_waypoint);
       // quat_waypoint = quat_diff * quat_msg
       tf2::Quaternion tf2_quat_difference = tf2_quat_waypoint * tf2_quat_from_msg.inverse();
 
@@ -171,11 +171,12 @@ namespace triton_controls
       // Calculate the orientation difference, by converting to tf2 Quaternia, 
       // then multiplying one by the inverse of the other
       tf2::Quaternion tf2_quat_from_msg, tf2_quat_waypoint;
-      tf2::convert(msg->pose.orientation, tf2_quat_from_msg);
-      tf2::convert(waypoint_.pose.orientation, tf2_quat_waypoint);
+      tf2::fromMsg(msg->pose.orientation, tf2_quat_from_msg);
+      tf2::fromMsg(waypoint_.pose.orientation, tf2_quat_waypoint);
       // quat_waypoint = quat_diff * quat_msg_inverse
       tf2::Quaternion tf2_quat_difference = tf2_quat_waypoint * tf2_quat_from_msg.inverse();
 
+      // TODO: set a margin of error. E.g. distances within 1cm are considered 0
       if (tf2_quat_difference.x() == 0 
         && tf2_quat_difference.y() == 0
         && tf2_quat_difference.z() == 0
@@ -204,6 +205,19 @@ namespace triton_controls
     reply_msg.distance = waypoint_.distance;
     reply_msg.duration = waypoint_.duration;
 
+    RCLCPP_INFO(this->get_logger(), "A new waypoint is set. ");
     publisher_->publish(reply_msg);
   }
 } // namespace triton_controls
+
+int main(int argc, char * argv[])
+{
+  try {
+    rclcpp::init(argc, argv);
+    auto options = rclcpp::NodeOptions();
+    rclcpp::spin(std::make_shared<triton_controls::WaypointMarker>(options));
+    rclcpp::shutdown();
+  } catch (rclcpp::exceptions::RCLError const&){} // during testing sometimes throws error
+  return 0;
+}
+

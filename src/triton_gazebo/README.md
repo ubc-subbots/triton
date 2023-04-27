@@ -26,6 +26,17 @@ To run the state estimation node with teleoperated simulation of the AUV and RVi
 
 It launches the `cube.world` in Gazebo with `cube_auv/model.urdf`, and an RViz instance displaying AUV state and estimated state.  
 
+### Waypoint Marker
+To run the waypoint marker test
+
+        ros2 launch triton_gazebo waypoint_test_launch.py
+
+It launches ukf_teleop_sim_launch.py, a waypoint marker, and a waypoint marker tester. The tester supports publishing one target pose. The target pose can be edited and more target poses can be added by editing the file src/triton_controls/triton_controls/waypoint_marker_tester.py. To notify the tester to publish a target waypoint: 
+
+        ros2 topic pub -1 /triton/controls/waypoint_marker_tester/start std_msgs/msg/String "{data: 1}"
+
+Then, the user can use the keyboard to navigate the cube_auv in Gazebo to achieve the waypoint and look for the 'success' messages. 
+
 ### Generating Data with Bounding Box
 To run the data generation node, use the following
 
