@@ -11,18 +11,15 @@ To launch the `thrust_allocator` node, use the following command
 
 You can change the configuration file for the `thrust_allocator` in the launch file, just be sure that the configuration file you want to use exists in `triton_controls/config`.
 
-### DELETEME
-
-    
-    ros2 run triton_controls waypoint_marker_tester.py
-
-    ros2 topic pub -1 /triton/controls/waypoint_marker_tester/start std_msgs/msg/String "{data: 1}"
-
-
 ### Robot Localization
 To run the robot localization node, which estimates the pose, twist, and acceleration of the AUV, run
 
         ros2 launch triton_controls state_estimator_launch.py
+
+### Waypoint Marker
+To run the waypoint marker node, run
+
+        ros2 launch triton_controls waypoint_marker_launch.py
 
 ## Nodes
 
