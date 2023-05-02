@@ -18,6 +18,7 @@ endif()
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(rclcpp_components REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(yaml-cpp REQUIRED)
@@ -38,7 +39,13 @@ target_include_directories(triton_pid_controller PUBLIC
 install(TARGETS triton_pid_controller
   DESTINATION lib/${PROJECT_NAME})
 
-ament_target_dependencies(triton_pid_controller rclcpp sensor_msgs  std_msgs triton_interfaces)
+ament_target_dependencies(triton_pid_controller rclcpp rclcpp_components sensor_msgs  std_msgs triton_interfaces)
+
+install(DIRECTORY
+  launch
+  config
+  DESTINATION share/${PROJECT_NAME}/
+)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

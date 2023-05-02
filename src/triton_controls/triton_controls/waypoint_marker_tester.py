@@ -12,7 +12,7 @@ target_poses = [
     {
         'pose': {
             'position': {
-                'x': 1.0,
+                'x': 5.0,
                 'y': 0.0,
                 'z': 0.0
             },
