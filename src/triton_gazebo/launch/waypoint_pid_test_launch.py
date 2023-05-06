@@ -95,7 +95,7 @@ def generate_launch_description():
     )
 
     ld.add_action(gazebo)
-    ld.add_action(rviz)
+    # ld.add_action(rviz)
     ld.add_action(thrust_allocator)
     ld.add_action(gate_detector)
     ld.add_action(state_publisher)

@@ -57,15 +57,15 @@ namespace triton_gazebo
         msg.pose.pose.orientation.z = pose.Rot().Z();
         msg.pose.pose.orientation.w = pose.Rot().W();
         // TODO: set a reasonable covariance
-        msg.pose.covariance[0] = 0;
-        msg.pose.covariance[7] = 0;
-        msg.pose.covariance[14] = 0;
-        msg.pose.covariance[21] = 0;
-        msg.pose.covariance[28] = 0;
-        msg.pose.covariance[35] = 0;
+        msg.pose.covariance[0] = 0.001;
+        msg.pose.covariance[7] = 0.001;
+        msg.pose.covariance[14] = 0.001;
+        msg.pose.covariance[21] = 0.001;
+        msg.pose.covariance[28] = 0.001;
+        msg.pose.covariance[35] = 0.001;
         rclcpp::Time now = node->now();
         msg.header.stamp = now;
-        msg.header.frame_id = "odom";
+        msg.header.frame_id = "map";
         if ((now- this->prev_time).seconds() >= (1.0/this->update_rate))
         {
             this->prev_time = now;
