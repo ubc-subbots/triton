@@ -43,6 +43,8 @@ namespace triton_gazebo
         this->spinThread = std::thread(std::bind(&GroundTruthSensor::SpinNode, this));
 
         this->prev_time = node->now();
+
+        gzmsg << "Ground Truth sensor successfully started!\n";
     }
 
     void GroundTruthSensor::OnUpdate()

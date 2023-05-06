@@ -14,12 +14,12 @@ target_poses = [
             'position': {
                 'x': 5.0,
                 'y': 0.0,
-                'z': 0.0
+                'z': 5.0
             },
             'orientation': {
                 'x': 0.0,
                 'y': 0.0,
-                'z': 5.0,
+                'z': 0.0,
                 'w': 1.0,
             }
         },
@@ -27,7 +27,7 @@ target_poses = [
             'position': {
                 'x': 0.5,
                 'y': 10.0,
-                'z': 10.0
+                'z': 0.5
             },
             'orientation': {
                 'x': 100.0,

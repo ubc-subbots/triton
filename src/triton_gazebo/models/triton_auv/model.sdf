@@ -234,6 +234,22 @@
 
     <plugin name="hydrodynamics" filename="libhydrodynamics_plugin.so"></plugin>
 
+    <plugin name="ground_truth_sensor" filename="libground_truth_sensor.so">
+      <state_topic>/triton/state</state_topic>
+      <update_rate>50</update_rate>
+    </plugin>
+    <plugin name="p3d_base_controller" filename="libgazebo_ros_p3d.so">
+      <always_on>true</always_on>
+      <update_rate>50.0</update_rate>
+      <body_name>frame::frame</body_name>
+      <topic_name>/triton/state</topic_name>
+      <gaussian_noise>0.01</gaussian_noise>
+      <frame_name>map</frame_name>
+      <xyz_offset>0 0 0</xyz_offset>
+      <rpy_offset>0 0 0</rpy_offset>
+    </plugin>
+
+
     <static>0</static>
     <allow_auto_disable>1</allow_auto_disable>
 

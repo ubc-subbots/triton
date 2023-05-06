@@ -32,8 +32,8 @@ def generate_launch_description():
     )
 
     pkg_share = get_package_share_directory('triton_gazebo')
-    urdf_file =  os.path.join(pkg_share, 'gazebo', 'models', 'cube_auv', 'model.urdf')
-    with open(urdf_file, 'r') as infp:
+    sdf_file =  os.path.join(pkg_share, 'gazebo', 'models', 'triton_auv', 'model.sdf')
+    with open(sdf_file, 'r') as infp:
         robot_desc = infp.read()
     rsp_params = {'robot_description': robot_desc}
 
@@ -41,8 +41,9 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(
             os.path.join(get_package_share_directory('triton_gazebo'), 'launch', 'gazebo_launch.py')
         ),
-        launch_arguments={'world': 'cube.world'}.items()
+        launch_arguments={'world': 'triton_auv.world'}.items()
     )
+
 
     rviz_config_file = os.path.join(
         pkg_share, 'config', 'rviz_ukf_teleop_sim_config.rviz')
