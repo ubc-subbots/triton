@@ -8,6 +8,36 @@ STABILIZE = 0
 PASSTHROUGH = 1
 
 target_poses = [
+    {
+        'pose': {
+            'position': {
+                'x': 0.0,
+                'y': 0.0,
+                'z': 3.0
+            },
+            'orientation': {
+                'x': 0.0,
+                'y': 0.0,
+                'z': 0.7,
+                'w': -0.7,
+            }
+        },
+        'distance': {
+            'position': {
+                'x': 0.5,
+                'y': 0.5,
+                'z': 0.5
+            },
+            'orientation': {
+                'x': 0.1,
+                'y': 0.1,
+                'z': 0.05,
+                'w': 0.05,
+            }
+        },
+        'type': STABILIZE,
+        'duration': 5.0
+    },
     # Move forward by 1 unit in x
     {
         'pose': {
