@@ -4,7 +4,8 @@ MAINTAINER Fei Kuan for UBC Subbots - kuan@iatfei.com
 # IMPORTANT!!!! Future maintainers, before running rosdep or colcon commands, you must source the ros2 installation in the same RUN command. See examples below.
 
 # Kitware APT key rotation update, upgrade packages, and install necessary packages.
-RUN sed -i '/apt.kitware.com/d' /etc/apt/sources.list                                                                                                                                                                                        RUN wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | tee /usr/share/keyrings/kitware-archive-keyring.gpg >/dev/null \
+RUN sed -i '/apt.kitware.com/d' /etc/apt/sources.list
+RUN wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | tee /usr/share/keyrings/kitware-archive-keyring.gpg >/dev/null \
     && echo 'deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ focal main' | tee /etc/apt/sources.list.d/kitware.list >/dev/null
 RUN apt-get -y update
 RUN apt-get install -y --no-install-recommends apt-utils
@@ -23,11 +24,14 @@ RUN exec bash
 # Download and build ros2 packages
 RUN mkdir /opt/ros/foxy/src
 WORKDIR /opt/ros/foxy/src
-RUN git clone -b foxy https://github.com/ros-drivers/phidgets_drivers && \                                                                                                                                                                           git clone -b foxy https://github.com/ros-perception/image_common && \                                                                                                                                                                        git clone -b foxy https://github.com/ros-perception/vision_opencv && \
+RUN git clone -b foxy https://github.com/ros-drivers/phidgets_drivers && \
+        git clone -b foxy https://github.com/ros-perception/image_common && \
+        git clone -b foxy https://github.com/ros-perception/vision_opencv && \
         git clone -b foxy-devel https://github.com/ros-perception/image_transport_plugins && \
         git clone -b ros2 https://github.com/ros-drivers/usb_cam && \
         git clone -b stale/foxy https://github.com/ros/diagnostics && \
-        git clone -b foxy-devel https://github.com/cra-ros-pkg/robot_localization.git && \                                                                                                                                                           git clone -b foxy-devel https://github.com/ros/angles.git && \
+        git clone -b foxy-devel https://github.com/cra-ros-pkg/robot_localization.git && \
+        git clone -b foxy-devel https://github.com/ros/angles.git && \
         git clone -b ros2 https://github.com/ros-geographic-info/geographic_info.git && \
         git clone -b foxy https://github.com/CCNYRoboticsLab/imu_tools.git
 RUN touch /opt/ros/foxy/src/imu_tools/rviz_imu_plugin/COLCON_IGNORE
@@ -47,7 +51,8 @@ WORKDIR /root/ros2_ws
 RUN /bin/bash -c 'source /opt/ros/foxy/install/setup.bash; rosdep update && rosdep install -i --from-path src --rosdistro $ROS_DISTRO --skip-keys="librealsense2 xacro" -y'
 RUN /bin/bash -c 'source /opt/ros/foxy/install/setup.bash; colcon build --cmake-args " -Wno-dev"'
 RUN /bin/bash -c "source /opt/ros/foxy/install/setup.bash; . install/local_setup.bash"
-RUN echo "source /root/ros2_ws/install/local_setup.bash" >> /root/.bashrc                                                                                                                                                                    RUN echo 'echo "Sourced RealSense in /root/ros2_ws/"' >> /root/.bashrc
+RUN echo "source /root/ros2_ws/install/local_setup.bash" >> /root/.bashrc
+RUN echo 'echo "Sourced RealSense in /root/ros2_ws/"' >> /root/.bashrc
 
 # Build and Install OpenCV
 WORKDIR /root/
