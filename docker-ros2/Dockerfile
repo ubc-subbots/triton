@@ -11,7 +11,7 @@ RUN apt-get -y update
 RUN apt-get install -y --no-install-recommends apt-utils
 RUN apt-get -y upgrade
 RUN rm /usr/share/keyrings/kitware-archive-keyring.gpg
-RUN apt install -y libssl-dev qtbase5-dev libboost-all-dev kitware-archive-keyring libogg-dev libtheora-dev libgeographic-dev libgtk2.0-dev libdc1394-22-dev nano htop less
+RUN apt install -y libssl-dev qtbase5-dev libboost-all-dev kitware-archive-keyring libogg-dev libtheora-dev libgeographic-dev libgtk2.0-dev libdc1394-22-dev nano htop less qt5-default libusb-1.0-0-dev
 RUN apt-get -y autoremove
 
 # Build and install cmake
@@ -36,7 +36,7 @@ RUN git clone -b foxy https://github.com/ros-drivers/phidgets_drivers && \
         git clone -b foxy https://github.com/CCNYRoboticsLab/imu_tools.git
 RUN touch /opt/ros/foxy/src/imu_tools/rviz_imu_plugin/COLCON_IGNORE
 WORKDIR /opt/ros/foxy
-RUN /bin/bash -c "source /opt/ros/foxy/install/setup.bash; colcon build --symlink-install --merge-install"
+RUN /bin/bash -c "source /opt/ros/foxy/install/setup.bash; rosdep install --from-paths . --ignore-src --rosdistro foxy -yr; colcon build --symlink-install --merge-install"
 # RUN cp /root/colcon_ws/src/phidgets_drivers/phidgets_api/debian/udev /etc/udev/rules.d/99-phidgets.rules
 # RUN udevadm control --reload-rules
 
