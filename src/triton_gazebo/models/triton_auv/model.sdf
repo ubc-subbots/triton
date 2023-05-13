@@ -44,13 +44,13 @@
     <include>
       <uri>model://triton_thruster</uri>
       <pose>0.0474091 -0.357124 0.2136902 0 -1.5707 -2.35619</pose>
-      <name>thruster3</name>
+      <name>thruster4</name>
     </include>
 
     <include>
       <uri>model://triton_thruster</uri>
       <pose>0.0474091 0.026924 0.2136902 0 1.5707 -0.785398</pose>
-      <name>thruster4</name>
+      <name>thruster3</name>
     </include>
 
     <include>
@@ -77,7 +77,8 @@
     <base_link>frame::frame</base_link>
     <neutrally_buoyant>1</neutrally_buoyant>
     <volume>0.0209673336007</volume>
-    <center_of_buoyancy>-0.1460	-0.1651	0.2339</center_of_buoyancy>
+    <center_of_buoyancy>-0.14826	-0.1687	0.2339</center_of_buoyancy>
+        <!-- <pose>-0.14826 -0.1687 0.19368 0 -0 0</pose> -->
     <hydrodynamic_model>
         <!-- Useful params for controls simplifications-->
         <scalingBuoyancy>0.93</scalingBuoyancy>

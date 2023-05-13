@@ -81,8 +81,7 @@ namespace triton_pid_controller
     auto & z = cur_pose->orientation.z;
     auto & w = cur_pose->orientation.w;
     
-    // float cur_yaw = -std::atan2(2*y*w + 2*x*z, 1 - 2*y*y - 2*z*z);
-    float cur_yaw = -std::atan2(2.0*(y*z + w*x), w*w - x*x - y*y + z*z);
+    float cur_yaw = -std::atan2(2*y*w + 2*x*z, 1 - 2*y*y - 2*z*z);
     
     float yaw_error = cur_yaw;
     float pos_x_error = cur_pose->position.x;

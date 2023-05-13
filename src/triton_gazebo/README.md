@@ -35,6 +35,8 @@ It launches ukf_teleop_sim_launch.py, a PID controller, a waypoint marker, and a
 
         ros2 topic pub -1 /triton/controls/waypoint_marker_tester/start std_msgs/msg/String "{data: 1}"
 
+With 'data' being the index of the target pose, as defined in waypoint_marker_tester.py
+
 Then, the user can use the keyboard to navigate the cube_auv in Gazebo to achieve the waypoint and look for the 'success' messages. 
 
 ### Generating Data with Bounding Box
