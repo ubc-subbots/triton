@@ -76,7 +76,7 @@ namespace triton_object_recognition
         //Check cfg file exists and downloads if it doesn't
         boost::filesystem::path model_config = model_folder / cfg_filename_;
         if (!boost::filesystem::exists(model_config)){
-            RCLCPP_WARN(get_logger(),"Model config not found. Downloading from " + cfg_url_);
+            RCLCPP_WARN(get_logger(), "Model config not found. Downloading from %s", cfg_url_.c_str());
             //Warning: This command is not portable
             string command = "wget -O " + model_config.string() + " " + cfg_url_;
             if (system(command.c_str())){
@@ -87,7 +87,7 @@ namespace triton_object_recognition
         //Check weights file exists and download if it doesn't
         boost::filesystem::path model_weights = model_folder / weights_filename_;
         if (!boost::filesystem::exists(model_weights)){
-            RCLCPP_WARN(get_logger(),"Model weights not found. Downloading from " + weights_url_);
+            RCLCPP_WARN(get_logger(), "Model weights not found. Downloading from %s", weights_url_.c_str());
             //Warning: This command is not portable
             string command = "wget -O " + model_weights.string() + " " + weights_url_;
             if (system(command.c_str())){

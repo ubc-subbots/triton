@@ -29,8 +29,7 @@ namespace triton_gazebo
                             this->topic_name, 
                             10, 
                             std::bind(&ThrusterDriver::GetForceCmd, this, _1));
-
-        RCLCPP_INFO(node->get_logger(), "Listening on " + this->topic_name + "\n");
+        RCLCPP_INFO(node->get_logger(), "Listening on %s", this->topic_name.c_str());
 
         std::string model_name = _model->GetName();
 
@@ -39,7 +38,7 @@ namespace triton_gazebo
             std::string thruster_name = model_name + "::thruster" + std::to_string(i) + "::thruster";
             this->thruster.push_back(_model->GetLink(thruster_name));
 
-            RCLCPP_INFO(this->node->get_logger(), this->thruster[i-1]->GetName());
+            RCLCPP_INFO(this->node->get_logger(), this->thruster[i-1]->GetName().c_str());
         }
     
         this->updateConnection_ = gazebo::event::Events::ConnectWorldUpdateBegin(
