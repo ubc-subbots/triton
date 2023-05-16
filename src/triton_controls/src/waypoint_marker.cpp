@@ -34,23 +34,7 @@ namespace triton_controls
 
       // 1. Determine if current_pose_ is within max_pose_offset_ of waypoint_pose_
 
-      // Calculate the orientation difference, by converting to tf2 Quaternia, 
-      // then multiplying one by the inverse of the other
-      // tf2::Quaternion tf2_quat_from_msg, tf2_quat_waypoint;
-      // tf2::fromMsg(current_pose_.orientation, tf2_quat_from_msg);
-      // tf2::fromMsg(waypoint_.pose.orientation, tf2_quat_waypoint);
-      // quat_waypoint = quat_diff * quat_msg
-      // tf2::Quaternion tf2_quat_difference = tf2_quat_waypoint * tf2_quat_from_msg.inverse();
-
-      tf2::Quaternion waypoint_q(
-        waypoint_.pose.orientation.x,
-        waypoint_.pose.orientation.y,
-        waypoint_.pose.orientation.z,
-        waypoint_.pose.orientation.w);
-      tf2::Matrix3x3 waypoint_q_m(waypoint_q);
-      double waypoint_roll, waypoint_pitch, waypoint_yaw;
-      waypoint_q_m.getRPY(waypoint_roll, waypoint_pitch, waypoint_yaw);
-
+      // Calculate the orientation difference, by converting to RPY
       tf2::Quaternion current_pose_q(
         current_pose_.orientation.x,
         current_pose_.orientation.y,
@@ -59,15 +43,6 @@ namespace triton_controls
       tf2::Matrix3x3 current_pose_q_m(current_pose_q);
       double current_pose_roll, current_pose_pitch, current_pose_yaw;
       current_pose_q_m.getRPY(current_pose_roll, current_pose_pitch, current_pose_yaw);
-
-      tf2::Quaternion distance_q(
-        waypoint_.distance.orientation.x,
-        waypoint_.distance.orientation.y,
-        waypoint_.distance.orientation.z,
-        waypoint_.distance.orientation.w);
-      tf2::Matrix3x3 distance_q_m(distance_q);
-      double distance_roll, distance_pitch, distance_yaw;
-      distance_q_m.getRPY(distance_roll, distance_pitch, distance_yaw);
 
       double error_roll, error_pitch, error_yaw;
       error_roll = waypoint_roll - current_pose_roll;
@@ -89,10 +64,6 @@ namespace triton_controls
       if ( fabs(error_roll) <= fabs(distance_roll)
         && fabs(error_pitch) <= fabs(distance_pitch)
         && fabs(error_yaw) <= fabs(distance_yaw)
-      // if ( fabs(error_pose_.orientation.x) <= waypoint_.distance.orientation.x
-      //   && fabs(error_pose_.orientation.y) <= waypoint_.distance.orientation.y
-      //   && fabs(error_pose_.orientation.z) <= waypoint_.distance.orientation.z
-      //   && fabs(error_pose_.orientation.w) <= waypoint_.distance.orientation.w // TODO: check the math
         && fabs(error_pose_.position.x) <= waypoint_.distance.position.x
         && fabs(error_pose_.position.y) <= waypoint_.distance.position.y
         && fabs(error_pose_.position.z) <= waypoint_.distance.position.z)
@@ -235,6 +206,24 @@ namespace triton_controls
     waypoint_achieved_ = false;
     waypoint_being_achieved_ = false;
     waypoint_.type = msg->type;
+
+    // Calculate and store waypoint orientation in RPY
+    tf2::Quaternion waypoint_q(
+      waypoint_.pose.orientation.x,
+      waypoint_.pose.orientation.y,
+      waypoint_.pose.orientation.z,
+      waypoint_.pose.orientation.w);
+    tf2::Matrix3x3 waypoint_q_m(waypoint_q);
+    waypoint_q_m.getRPY(waypoint_roll, waypoint_pitch, waypoint_yaw);
+
+    tf2::Quaternion distance_q(
+      waypoint_.distance.orientation.x,
+      waypoint_.distance.orientation.y,
+      waypoint_.distance.orientation.z,
+      waypoint_.distance.orientation.w);
+    tf2::Matrix3x3 distance_q_m(distance_q);
+    distance_q_m.getRPY(distance_roll, distance_pitch, distance_yaw);
+
 
     auto reply_msg = triton_interfaces::msg::Waypoint();
     reply_msg.pose = waypoint_.pose;

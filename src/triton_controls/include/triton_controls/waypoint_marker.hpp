@@ -59,6 +59,8 @@ namespace triton_controls
 
         bool waypoint_set_;                         // Whether a waypoint is set
         triton_interfaces::msg::Waypoint waypoint_; // Destination waypoint pose
+        double waypoint_roll, waypoint_pitch, waypoint_yaw; // Waypoint orientation in RPY
+        double distance_roll, distance_pitch, distance_yaw; // Waypoint distance orientation in RPY
         geometry_msgs::msg::Pose current_pose_;     // AUV current pose
         rclcpp::Time last_stable_start_time_;       // Time stamp of the last time meeting waypoint criteria
         bool waypoint_achieved_;                    // Whether a waypoint is achieved

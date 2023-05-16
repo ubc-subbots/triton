@@ -24,7 +24,7 @@ To run the state estimation node with teleoperated simulation of the AUV and RVi
 
         ros2 launch triton_gazebo ukf_teleop_sim_launch.py
 
-It launches the `cube.world` in Gazebo with `cube_auv/model.urdf`, and an RViz instance displaying AUV state and estimated state.  
+It launches the `triton_auv.world` in Gazebo with `triton_auv/model.sdf`.
 
 ### Waypoint Marker and PID Controller
 To run the waypoint marker test
