@@ -8,7 +8,16 @@
   <license>TODO: License declaration</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
-
+  
+  <depend>rclcpp</depend>
+  <depend>rclcpp_components</depend>
+  <depend>eigen</depend>
+  <depend>triton_interfaces</depend>
+  <depend>geometry_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>tf2</depend>
+  <depend>yaml-cpp</depend>
+  
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
 
