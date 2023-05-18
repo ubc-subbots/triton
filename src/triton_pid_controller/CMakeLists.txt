@@ -23,13 +23,13 @@ find_package(rclcpp REQUIRED)
 find_package(rclcpp_components REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
-# find_package(yaml-cpp REQUIRED)
+find_package(yaml-cpp REQUIRED)
 find_package(triton_interfaces REQUIRED)
-#include_directories("include"
-#   ${YAML_CPP_INCLUDE_DIRS})
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(YAML_CPP REQUIRED yaml-cpp)
-include_directories("include" ${YAML_CPP_INCLUDEDIR})
+include_directories("include"
+   ${YAML_CPP_INCLUDE_DIRS})
+# find_package(PkgConfig REQUIRED)
+# pkg_check_modules(YAML_CPP REQUIRED yaml-cpp)
+# include_directories("include" ${YAML_CPP_INCLUDEDIR})
 
 include_directories(include ${catkin_INCLUDE_DIRS})
 
