@@ -30,6 +30,9 @@ find_package(triton_interfaces REQUIRED)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(YAML_CPP REQUIRED yaml-cpp)
 include_directories("include" ${YAML_CPP_INCLUDEDIR})
+
+include_directories(include ${catkin_INCLUDE_DIRS})
+
 # uncomment the following section in order to fill in
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
