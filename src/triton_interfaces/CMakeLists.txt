@@ -34,6 +34,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/DetectionBox.msg"
   "msg/DetectionBoxArray.msg"
   "msg/Waypoint.msg"
+  "msg/ObjectOffset.msg"
   "srv/ObjectDetection.srv"
   "msg/Float.msg"
   DEPENDENCIES builtin_interfaces std_msgs sensor_msgs geometry_msgs
