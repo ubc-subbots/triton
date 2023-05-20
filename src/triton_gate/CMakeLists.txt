@@ -24,6 +24,8 @@ find_package(OpenCV 4 REQUIRED)
 find_package(triton_vision_utils REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(image_transport REQUIRED)
+find_package(triton_interfaces REQUIRED)
+find_package(tf2 REQUIRED)
 
 include_directories(include)
 
@@ -48,6 +50,8 @@ ament_target_dependencies(triton_gate
   "triton_vision_utils"
   "sensor_msgs"
   "image_transport"
+  "tf2"
+  "triton_interfaces"
 )
 
 install(TARGETS

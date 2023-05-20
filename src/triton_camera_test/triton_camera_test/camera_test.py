@@ -64,7 +64,8 @@ class CameraTest(Node):
         # Create a VideoCapture object
         # The argument '0' gets the default webcam.
         # self.cap = cv2.VideoCapture("/home/mark/coding/gate2.mp4")
-        self.cap = cv2.VideoCapture("/home/mark/coding/Gate_and_backpole.mov")
+        self.cap = cv2.VideoCapture("/home/jared/Videos/gate2.mp4")
+        # self.cap = cv2.VideoCapture("/home/mark/coding/Gate_and_backpole.mov")
         # self.cap = cv2.VideoCapture(0)
 
 

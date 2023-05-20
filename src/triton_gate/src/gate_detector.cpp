@@ -1,6 +1,7 @@
+#include <string> 
 #include "triton_gate/gate_detector.hpp"
 #include "triton_gate/pole_featurizer.hpp"
-#include <string> 
+#include "tf2/LinearMath/Quaternion.h"
 
 using namespace std;
 using namespace cv;
@@ -31,6 +32,9 @@ GateDetector::GateDetector(const rclcpp::NodeOptions& options) : Node("gate_dete
 
   // gate_center_publisher_ = this->create_publisher<std_msgs::msg::Float32MultiArray>(
   //   "detector/gate_center", 10);
+  gate_pose_publisher_ = this->create_publisher<triton_interfaces::msg::ObjectOffset>("detector/gate_pose", 10);
+  if (debug_)
+    gate_pose_only_publisher_ = this->create_publisher<geometry_msgs::msg::PoseStamped>("detector/gate_pose_only", 10);
 
   // initialize in header file 
   gate_offset_publisher_ = this->create_publisher<std_msgs::msg::Float32MultiArray>(
@@ -211,6 +215,8 @@ void GateDetector::boundGateUsingPoles(std::vector<std::vector<Point>> hulls, cv
 
 std::vector<Point> GateDetector::createGateContour(std::vector<Point> hull_points, cv::Mat& src)
 {
+  // Get the size of the frame
+  int height = src.rows;
   int width = src.cols;
 
   // Get extrema points of hulls (i.e the points closest/furthest from the top left (0,0) and top right (width, 0) of
@@ -228,30 +234,76 @@ std::vector<Point> GateDetector::createGateContour(std::vector<Point> hull_point
     return (sqrt(pow(a.x, 2) + pow(a.y, 2)) < sqrt(pow(b.x, 2) + pow(b.y, 2)));
   });
 
+  // Calculate distance (x in pose)
+
+  double standard_pixel_width = 550;
+  double standard_distance = 1; // in m
+  double standard_width = 1.5; // in m
+
+  // F = (P x D) / W
+  // D' = (W x F) / Pnew
+
+  double focal_length = (standard_pixel_width*standard_distance)/standard_width;
+
+  double curr_pixel_width = top_right.x - top_left.x;
+
+  double distance = (standard_width*focal_length)/curr_pixel_width;
+
+  // Calculate (y and z in pose)
+
+  // Calculate the center point of the bounding box
+  int gate_center_x = (top_left.x + bot_right.x) / 2;
+  int gate_center_y = (top_left.y + bot_right.y) / 2;
+
+  // Calculate the center point of the frame
+  int frame_center_x = width / 2;
+  int frame_center_y = height / 2;
+  // calculate the offset of center of frame to center of bounding box
+  int offset_x = gate_center_x-frame_center_x;
+  int offset_y = gate_center_y-frame_center_y;
+  // x in image x-axis, distance_x is distance in the y-axis in 3D, same for y/z
+  // Math is wrong, assume linear for simplicity
+  double distance_x = offset_x/curr_pixel_width * distance; 
+  double distance_y = offset_y/curr_pixel_width * distance; 
+
+  // Calculate yaw of gate 
+  // Ignore roll and pitch
+  // Assume always head-on for now
+  // TODO: calculate yaw, and fix distance calculation, since it assumes no yaw
+  double gate_yaw = 0.001;
+
+  tf2::Quaternion tf2_quat_gate;
+  tf2_quat_gate.setRPY(0.001, 0.001, gate_yaw); // TODO: add back roll and pitch if we control them in the future
+
+  // Put values in message
+
+  triton_interfaces::msg::ObjectOffset gate_pose_;
+
+  gate_pose_.class_id = 0;
+  gate_pose_.pose.position.x = distance;
+  gate_pose_.pose.position.y = -distance_x; // ENU
+  gate_pose_.pose.position.z = distance_y;
+  gate_pose_.pose.orientation.x = tf2_quat_gate.x();
+  gate_pose_.pose.orientation.y = tf2_quat_gate.y();
+  gate_pose_.pose.orientation.z = tf2_quat_gate.z();
+  gate_pose_.pose.orientation.w = tf2_quat_gate.w();
+
+  gate_pose_publisher_->publish(gate_pose_);
+
   if (debug_)
   {
+    auto msg = geometry_msgs::msg::PoseStamped();
+    msg.pose = gate_pose_.pose;
+    rclcpp::Time now = this->get_clock()->now(); 
+    msg.header.stamp = now;
+    msg.header.frame_id = "map";
+    gate_pose_only_publisher_->publish(msg);
+
     circle(src, top_left, 8, Scalar(0, 255, 0), 4);
     circle(src, top_right, 8, Scalar(0, 255, 255), 4);
     circle(src, bot_left, 8, Scalar(0, 255, 0), 4);
     circle(src, bot_right, 8, Scalar(0, 255, 255), 4);
 
-    double standard_pixel_width = 550;
-    // double standard_pixel_height = 223;
-
-    double standard_distance = 100; // in cm
-    double standard_width = 150; // in cm
-
-    // F = (P x D) / W
-
-    // D' = (W x F) / Pnew
-
-
-    double focal_length = (standard_pixel_width*standard_distance)/standard_width;
-
-    // double curr_height = bot_right.y - top_right.y;
-    double curr_pixel_width = top_right.x - top_left.x;
-
-    double distance = (standard_width*focal_length)/curr_pixel_width;
 
     std::ostringstream ss;
     ss << std::setprecision(3) << distance;
@@ -261,29 +313,13 @@ std::vector<Point> GateDetector::createGateContour(std::vector<Point> hull_point
     int font_size = 1;//Declaring the font size//
     Scalar font_Color(0, 0, 0);//Declaring the color of the font//
     int font_weight = 2;//Declaring the font weight//
-    putText(src, "Distance: "+distance_str+" cm" , distance_text_position,FONT_HERSHEY_COMPLEX, font_size,font_Color, font_weight);//Putting the text in the matrix//
+    putText(src, "Distance: "+distance_str+" m" , distance_text_position,FONT_HERSHEY_COMPLEX, font_size,font_Color, font_weight);//Putting the text in the matrix//
 
 
-    int offset_x = 0;
-    int offset_y = 0;
-    // Calculate the center point of the bounding box
-    int gate_center_x = (top_left.x + bot_right.x) / 2;
-    int gate_center_y = (top_left.y + bot_right.y) / 2;
     Point center_gate(gate_center_x, gate_center_y);
     circle(src, center_gate, 12, Scalar(0, 255, 0), 6);
     
-    // Get the size of the frame
-    int height = src.rows;
-    int width = src.cols;
-
-    // Calculate the center point of the frame
-    int frame_center_x = width / 2;
-    int frame_center_y = height / 2;
     Point center_frame(frame_center_x, frame_center_y);
-
-    // calculate the offset of center of frame to center of bounding box
-    offset_x = gate_center_x-frame_center_x;
-    offset_y = gate_center_y-frame_center_y;
 
     std::string offset_x_str = std::to_string(offset_x);
     std::string offset_y_str = std::to_string(offset_y);

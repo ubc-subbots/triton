@@ -4,12 +4,15 @@
 #include <opencv2/opencv.hpp>
 
 #include "rclcpp/rclcpp.hpp"
+#include "rclcpp/time.hpp"
 #include "image_transport/image_transport.hpp"
 #include "cv_bridge/cv_bridge.h"
 #include "sensor_msgs/image_encodings.hpp"
 #include "std_msgs/msg/float32_multi_array.hpp"
 #include "triton_gate/pole_featurizer.hpp"
 #include "triton_vision_utils/object_detector.hpp"
+#include "triton_interfaces/msg/object_offset.hpp"
+#include "geometry_msgs/msg/pose_stamped.hpp"
 
 namespace triton_gate
 {
@@ -78,7 +81,12 @@ private:
   image_transport::Publisher debug_segment_publisher_;
   image_transport::Publisher debug_detection_publisher_;
   triton_gate::PoleFeaturizer featurizer_;
-  rclcpp::Publisher<std_msgs::msg::Float32MultiArray>::SharedPtr gate_center_publisher_;  
+  // rclcpp::Publisher<std_msgs::msg::Float32MultiArray>::SharedPtr gate_center_publisher_;  
+  // Gate Pose relative to AUV
+  rclcpp::Publisher<triton_interfaces::msg::ObjectOffset>::SharedPtr gate_pose_publisher_;
+  // Gate Pose relative to AUV: Debug
+  rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr gate_pose_only_publisher_;
+  // Gate Offset on image
   rclcpp::Publisher<std_msgs::msg::Float32MultiArray>::SharedPtr gate_offset_publisher_;  
 };
 
