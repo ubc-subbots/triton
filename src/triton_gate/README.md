@@ -19,6 +19,8 @@ In RViz, you can see a row of images frame to the right, which has both raw came
     
     ### Published Topics
     - `detector/gate_center` (`std_msgs/msg/Float32MultiArray.msg`) : Normalized position of the center of the gate. The first element is the x-coordinate of the center divided by the width of the image. The second element is the y-coordinate divided by the height of the image. The center of the gate is determined by the moments of the gate contour. 
+    - `detector/gate_pose` (`triton_interfaces/msg/ObjectOffset`) : Pose of Gate relative to AUV.
+    - `detector/gate_pose_only` (`geometry_msgs/PoseStamped`) : Pose of Gate. For debug.
     - `detector/debug/detection` (`sensor_msgs/msg/Image.msg`) : Detection debug output image.
     - `detector/debug/segment` (`sensor_msgs/msg/Image.msg`) : Segmentation debug output image.
 
