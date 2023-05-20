@@ -25,3 +25,4 @@ In RViz, you can see a row of images frame to the right, which has both raw came
 ## Contributors
 
 - Logan Fillo (logan.fillo@gmail.com)
+- Jared Chan (jaredchan42@gmail.com)

@@ -19,6 +19,26 @@ To run the underwater camera node, use the following
 
 Sets of parameters for the underwater camera node (water transmission, spectral sensitivity, etc.) are stored in `config/underwater_camera.yaml`. To change which parameters are used, `launch/underwater_camera_launch.py` can be modified
 
+### Robot Localization
+To run the state estimation node with teleoperated simulation of the AUV and RViz visualization, run
+
+        ros2 launch triton_gazebo ukf_teleop_sim_launch.py
+
+It launches the `triton_auv.world` in Gazebo with `triton_auv/model.sdf`.
+
+### Waypoint Marker and PID Controller
+To run the waypoint marker test
+
+        ros2 launch triton_gazebo waypoint_test_launch.py
+
+It launches ukf_teleop_sim_launch.py, a PID controller, a waypoint marker, and a waypoint marker tester. The tester supports publishing one target pose. The target pose can be edited and more target poses can be added by editing the file src/triton_controls/triton_controls/waypoint_marker_tester.py. To notify the tester to publish a target waypoint: 
+
+        ros2 topic pub -1 /triton/controls/waypoint_marker_tester/start std_msgs/msg/String "{data: 1}"
+
+With 'data' being the index of the target pose, as defined in waypoint_marker_tester.py
+
+Then, the user can use the keyboard to navigate the cube_auv in Gazebo to achieve the waypoint and look for the 'success' messages. 
+
 ### Generating Data with Bounding Box
 To run the data generation node, use the following
 
@@ -126,3 +146,4 @@ At this point your model should be ready to be added to a Gazebo world, you can 
 - Logan Fillo (logan.fillo@gmail.com)
 - Jake Cronin (jcronin97@live.ca)
 - Kevin Huang (kevinh42@student.ubc.ca)
+- Jared Chan (jaredchan42@gmail.com)

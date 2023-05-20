@@ -8,6 +8,7 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include "geometry_msgs/msg/pose_stamped.hpp"
+#include "geometry_msgs/msg/pose_with_covariance_stamped.hpp"
 
 namespace triton_gazebo
 {
@@ -45,7 +46,7 @@ namespace triton_gazebo
         void SpinNode(void);
 
         rclcpp::Node::SharedPtr node;
-        rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr state_publisher;
+        rclcpp::Publisher<geometry_msgs::msg::PoseWithCovarianceStamped>::SharedPtr state_publisher;
         gazebo::event::ConnectionPtr updateConnection_;
         gazebo::physics::ModelPtr model;
         std::string state_topic;
@@ -53,6 +54,8 @@ namespace triton_gazebo
 
         std::thread spinThread;
         std::string topic_name;
+        int update_rate;
+        rclcpp::Time prev_time;
     };
 
     GZ_REGISTER_MODEL_PLUGIN(GroundTruthSensor)

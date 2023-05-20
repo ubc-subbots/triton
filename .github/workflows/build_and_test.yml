@@ -24,6 +24,9 @@ jobs:
         run: |
           rosdep update
           rosdep install -i --from-path src --rosdistro foxy -y
+          
+      - name: Install yaml-cpp
+        run: sudo apt update && sudo apt install -y libyaml-cpp0.6
 
       - name: Cache OpenCV
         id: opencv-cache
