@@ -12,6 +12,9 @@ def generate_launch_description():
         namespace='/triton/gate',
         package='triton_gate',
         plugin='triton_gate::GateDetector',
+        parameters=[
+            {'debug': True}
+        ]
     )
 
     gate_container = ComposableNodeContainer(

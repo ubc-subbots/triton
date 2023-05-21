@@ -54,7 +54,8 @@ namespace triton_controls
 
          /** Gate pose message callback
          * 
-         * Updates private variable containing the gate's current pose (in the base_link frame)
+         * Updates private variable containing the current target pose if Object type is 
+         * TRAJ_GATE
          * 
          * @param msg triton_interfaces object offset message with pose and object type
          */
@@ -84,6 +85,7 @@ namespace triton_controls
         geometry_msgs::msg::Pose destination_pose_;     
         std::vector<triton_interfaces::msg::Waypoint> waypoints_; // Destination waypoints in trajectory 
         bool destination_achieved_;                    
+        float start_turning_factor_;
 
     };
 

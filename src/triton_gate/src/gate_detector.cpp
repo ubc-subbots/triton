@@ -13,7 +13,14 @@ namespace triton_gate
 {
 GateDetector::GateDetector(const rclcpp::NodeOptions& options) : Node("gate_detector", options)
 {
-  debug_ = true;
+  this->declare_parameter("debug", debug_);
+  this->get_parameter("debug", debug_);
+
+  if (debug_)
+    RCLCPP_INFO(this->get_logger(), "DEBUG ON");
+  else
+    RCLCPP_INFO(this->get_logger(), "DEBUG OFF");
+
   ObjectDetector(1.0, debug_, 400.0);
   gate_cntr_ = {};
   featurizer_ = PoleFeaturizer();
@@ -279,7 +286,7 @@ std::vector<Point> GateDetector::createGateContour(std::vector<Point> hull_point
 
   triton_interfaces::msg::ObjectOffset gate_pose_;
 
-  gate_pose_.class_id = 0;
+  gate_pose_.class_id = 1;
   gate_pose_.pose.position.x = distance;
   gate_pose_.pose.position.y = -distance_x; // ENU
   gate_pose_.pose.position.z = distance_y;

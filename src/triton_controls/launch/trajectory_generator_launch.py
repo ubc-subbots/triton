@@ -14,6 +14,9 @@ def generate_launch_description():
         namespace='/triton/controls',
         package='triton_controls',
         executable='trajectory_generator',
+        # parameters=[
+        #     {'start_turning_factor': 0.8}
+        # ],
         output='screen',
     )
 

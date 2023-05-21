@@ -19,10 +19,13 @@ namespace triton_controls
         "/triton/controls/trajectory_generator/set_type", 10, std::bind(&TrajectoryGenerator::type_callback, this, _1));
 
     gate_subscription_ = this->create_subscription<triton_interfaces::msg::ObjectOffset>(
-        "/triton/controls/trajectory_generator/set_destination", 10, std::bind(&TrajectoryGenerator::gate_callback, this, _1));
+        "/triton/gate/detector/gate_pose", 10, std::bind(&TrajectoryGenerator::gate_callback, this, _1));
 
     waypoint_subscription_ = this->create_subscription<triton_interfaces::msg::Waypoint>(
         "/triton/controls/waypoint_marker/current_goal", 10, std::bind(&TrajectoryGenerator::waypoint_callback, this, _1));
+
+    // this->declare_parameter("start_turning_factor", start_turning_factor_);
+    // this->get_parameter("start_turning_factor", start_turning_factor_);
 
     RCLCPP_INFO(this->get_logger(), "Trajectory Generator successfully started!");
   }
@@ -96,13 +99,14 @@ namespace triton_controls
   {
 
     type_ = msg->type;
+    destination_achieved_ = false;
 
   }
 
   void TrajectoryGenerator::gate_callback(const triton_interfaces::msg::ObjectOffset::SharedPtr msg)
   {
 
-    if (msg->class_id == type_)
+    if (msg->class_id == type_ && type_ == TRAJ_GATE)
     {
       destination_achieved_ = false;
       destination_pose_ = msg->pose;

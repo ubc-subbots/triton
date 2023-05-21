@@ -9,6 +9,6 @@
     force_z_p: 0.5
     force_z_i: 0.0
     force_z_d: 0.0
-    force_yaw_p: 5.0
+    force_yaw_p: 8.0
     force_yaw_i: 0.0
     force_yaw_d: 0.0

@@ -72,6 +72,21 @@ To run the waypoint marker node, run
         - Success is determined by the 'current_goal' topic, in the 'success' field of the waypoint messages
     - When no goal is set, Poses with all zeros are published to the 'input_pose' topic, indicating that the AUV should not move
 
+- `trajectory_generator` : A standalone node that generates a set of waypoints based on current pose, destination pose, and trajectory type. 
+
+    ### Subscribed Topics
+    - `controls/ukf/odometry/filtered` (`nav_msgs/Odometry`) : AUV state
+    - `controls/waypoint_marker/current_goal` (`triton_interfaces/Waypoint`) : Current target waypoint
+    - `controls/trajectory_generator/set` (`triton_interfaces/ObjectOffset`) : Current destination and object type
+    - `controls/trajectory_generator/set_type` (`triton_interfaces/TrajectoryType`) : Current trajectory type
+    ### Published Topics
+    - `controls/waypoint_marker/set` (`triton_interfaces/Waypoint`) : Set current target waypoint
+    ### Notes
+    - Initially, trajectory type is 'START'. It publishes a waypoint that is always +0.5 rad in yaw of the current pose, causing the AUV to turn around slowly. 
+    - Other nodes (e.g. the Mission Planner) decide when to start the next stage, and change trajectory type to 'GATE'
+    - When trajectory type is 'GATE', the trajectory generator sets the gate pose to be the destination pose
+        - TODO: make an actual trajectory
+
 ## Contributors
 
 - Logan Fillo (logan.fillo@gmail.com)
