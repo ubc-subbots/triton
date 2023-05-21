@@ -3,7 +3,6 @@
 #pragma once
 
 #include <string>
-#include <yaml-cpp/yaml.h>
 #include "rclcpp/rclcpp.hpp"
 #include "geometry_msgs/msg/wrench.hpp"
 #include "geometry_msgs/msg/pose.hpp"
@@ -31,12 +30,11 @@ private:
     void pose_update(const geometry_msgs::msg::Pose::SharedPtr msg);
     struct PID
     {
-        void load(const std::string &path)
+        void load(float p, float i, float d)
         {
-            YAML::Node config = YAML::LoadFile(path);
-            Kp = config["Kp"].as<float>();
-            Ki = config["Ki"].as<float>();
-            Kd = config["Kd"].as<float>();
+            Kp = p;
+            Ki = i;
+            Kd = d;
         }
 
         float Kp = 0;

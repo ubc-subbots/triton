@@ -11,7 +11,7 @@ def generate_launch_description():
     config = os.path.join(
         get_package_share_directory('triton_pid_controller'),
         'config',
-        'pid_files.yaml'
+        'pid.yaml'
     )
 
     pid_controller = Node(
