@@ -31,35 +31,42 @@ namespace triton_pid_controller
         "/triton/controls/input_forces",
         10);
 
-    std::string pid_force_x_file;
-    std::string pid_force_y_file;
-    std::string pid_force_z_file;
-    std::string pid_yaw_file;
-
     RCLCPP_INFO(this->get_logger(), "PID Controller starting!");
 
-    this->declare_parameter("pid_force_x_file", pid_force_x_file);
-    this->declare_parameter("pid_force_y_file", pid_force_y_file);
-    this->declare_parameter("pid_force_z_file", pid_force_z_file);
-    this->declare_parameter("pid_yaw_file", pid_yaw_file);
-    this->get_parameter("pid_force_x_file", pid_force_x_file);
-    this->get_parameter("pid_force_y_file", pid_force_y_file);
-    this->get_parameter("pid_force_z_file", pid_force_z_file);
-    this->get_parameter("pid_yaw_file", pid_yaw_file);
+    float x_p, x_i, x_d;
+    float y_p, y_i, y_d;
+    float z_p, z_i, z_d;
+    float yaw_p, yaw_i, yaw_d;
+    this->declare_parameter("force_x_p", x_p);
+    this->declare_parameter("force_x_i", x_i);
+    this->declare_parameter("force_x_d", x_d);
+    this->declare_parameter("force_y_p", y_p);
+    this->declare_parameter("force_y_i", y_i);
+    this->declare_parameter("force_y_d", y_d);
+    this->declare_parameter("force_z_p", z_p);
+    this->declare_parameter("force_z_i", z_i);
+    this->declare_parameter("force_z_d", z_d);
+    this->declare_parameter("force_yaw_p", yaw_p);
+    this->declare_parameter("force_yaw_i", yaw_i);
+    this->declare_parameter("force_yaw_d", yaw_d);
 
-    pid_force_x_file = ament_index_cpp::get_package_share_directory("triton_pid_controller") 
-      + "/config/" + pid_force_x_file;
-    pid_force_y_file = ament_index_cpp::get_package_share_directory("triton_pid_controller") 
-      + "/config/" + pid_force_y_file;
-    pid_force_z_file = ament_index_cpp::get_package_share_directory("triton_pid_controller") 
-      + "/config/" + pid_force_z_file;
-    pid_yaw_file = ament_index_cpp::get_package_share_directory("triton_pid_controller") 
-      + "/config/" + pid_yaw_file;
+    this->get_parameter("force_x_p", x_p);
+    this->get_parameter("force_x_i", x_i);
+    this->get_parameter("force_x_d", x_d);
+    this->get_parameter("force_y_p", y_p);
+    this->get_parameter("force_y_i", y_i);
+    this->get_parameter("force_y_d", y_d);
+    this->get_parameter("force_z_p", z_p);
+    this->get_parameter("force_z_i", z_i);
+    this->get_parameter("force_z_d", z_d);
+    this->get_parameter("force_yaw_p", yaw_p);
+    this->get_parameter("force_yaw_i", yaw_i);
+    this->get_parameter("force_yaw_d", yaw_d);
 
-    pid_force_x.load(pid_force_x_file);
-    pid_force_y.load(pid_force_y_file);
-    pid_force_z.load(pid_force_z_file);
-    pid_yaw.load(pid_yaw_file);
+    pid_force_x.load(x_p, x_i, x_d);
+    pid_force_y.load(y_p, y_i, y_d);
+    pid_force_z.load(z_p, z_i, z_d);
+    pid_yaw.load(yaw_p, yaw_i, yaw_d);
 
     RCLCPP_INFO(this->get_logger(), "PID Controller successfully started!");
   }
