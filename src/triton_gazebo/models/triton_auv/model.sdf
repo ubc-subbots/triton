@@ -44,13 +44,13 @@
     <include>
       <uri>model://triton_thruster</uri>
       <pose>0.0474091 -0.357124 0.2136902 0 -1.5707 -2.35619</pose>
-      <name>thruster3</name>
+      <name>thruster4</name>
     </include>
 
     <include>
       <uri>model://triton_thruster</uri>
       <pose>0.0474091 0.026924 0.2136902 0 1.5707 -0.785398</pose>
-      <name>thruster4</name>
+      <name>thruster3</name>
     </include>
 
     <include>
@@ -77,7 +77,8 @@
     <base_link>frame::frame</base_link>
     <neutrally_buoyant>1</neutrally_buoyant>
     <volume>0.0209673336007</volume>
-    <center_of_buoyancy>-0.1460	-0.1651	0.2339</center_of_buoyancy>
+    <center_of_buoyancy>-0.14826	-0.1687	0.2339</center_of_buoyancy>
+        <!-- <pose>-0.14826 -0.1687 0.19368 0 -0 0</pose> -->
     <hydrodynamic_model>
         <!-- Useful params for controls simplifications-->
         <scalingBuoyancy>0.93</scalingBuoyancy>
@@ -233,6 +234,22 @@
     </plugin>
 
     <plugin name="hydrodynamics" filename="libhydrodynamics_plugin.so"></plugin>
+
+    <plugin name="ground_truth_sensor" filename="libground_truth_sensor.so">
+      <state_topic>/triton/state</state_topic>
+      <update_rate>50</update_rate>
+    </plugin>
+    <plugin name="p3d_base_controller" filename="libgazebo_ros_p3d.so">
+      <always_on>true</always_on>
+      <update_rate>50.0</update_rate>
+      <body_name>frame::frame</body_name>
+      <topic_name>/triton/state</topic_name>
+      <gaussian_noise>0.01</gaussian_noise>
+      <frame_name>map</frame_name>
+      <xyz_offset>0 0 0</xyz_offset>
+      <rpy_offset>0 0 0</rpy_offset>
+    </plugin>
+
 
     <static>0</static>
     <allow_auto_disable>1</allow_auto_disable>
