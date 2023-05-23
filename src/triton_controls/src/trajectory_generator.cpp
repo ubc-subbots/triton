@@ -42,7 +42,7 @@ namespace triton_controls
 
       // Set some small yaw offset
       tf2::Quaternion tf2_quat_dest;
-      tf2_quat_dest.setRPY(0.001, 0.001, 0.5); // todo: add back roll and pitch if we control them in the future
+      tf2_quat_dest.setRPY(0.001, 0.001, 1.0); // todo: add back roll and pitch if we control them in the future
       reply_msg.pose.orientation.x = tf2_quat_dest.x();
       reply_msg.pose.orientation.y = tf2_quat_dest.y();
       reply_msg.pose.orientation.z = tf2_quat_dest.z();
@@ -71,10 +71,42 @@ namespace triton_controls
       {
 
         auto reply_msg = triton_interfaces::msg::Waypoint();
-        reply_msg.pose.position.x = current_pose_.position.x + destination_pose_.position.x;
-        reply_msg.pose.position.y = current_pose_.position.y + destination_pose_.position.y;
+
+        // Forward and sidway components (assuming AUV is upright, no change in z)
+        tf2::Quaternion current_q;
+        tf2::Vector3 dest_v;
+        dest_v.setX(destination_pose_.position.x);
+        dest_v.setY(destination_pose_.position.y);
+        dest_v.setZ(0);
+        tf2::fromMsg(current_pose_.orientation, current_q); 
+        tf2::Vector3 targetForward = tf2::quatRotate(current_q, dest_v);
+        reply_msg.pose.position.x = current_pose_.position.x + targetForward.getX();
+        reply_msg.pose.position.y = current_pose_.position.y + targetForward.getY();
+
+        // Z
         reply_msg.pose.position.z = current_pose_.position.z + destination_pose_.position.z;
-        reply_msg.pose.orientation = current_pose_.orientation;
+
+
+        // If the gate is not in front (on the left or right in the image), 
+        // turn towards it. 
+        tf2::Quaternion current_pose_q(
+          current_pose_.orientation.x,
+          current_pose_.orientation.y,
+          current_pose_.orientation.z,
+          current_pose_.orientation.w);
+        tf2::Matrix3x3 current_pose_q_m(current_pose_q);
+        double current_pose_roll, current_pose_pitch, current_pose_yaw;
+        current_pose_q_m.getRPY(current_pose_roll, current_pose_pitch, current_pose_yaw);
+        // TODO: optimize, check math
+        // destination_pose_.position.y is in meters, should be in the single digits
+        double required_yaw = std::max(-1.57, std::min(1.57, destination_pose_.position.y/1.0 * 1.57));
+
+        tf2::Quaternion tf2_quat_destination;
+        tf2_quat_destination.setRPY(current_pose_roll, current_pose_pitch, current_pose_yaw + required_yaw + 0.2); // 0.2 is a magic number for triton_auv in gazebo
+        reply_msg.pose.orientation.x = tf2_quat_destination.x();
+        reply_msg.pose.orientation.y = tf2_quat_destination.y();
+        reply_msg.pose.orientation.z = tf2_quat_destination.z();
+        reply_msg.pose.orientation.w = tf2_quat_destination.w();
 
         // Set some small distance
         tf2::Quaternion tf2_quat_distance;
@@ -101,6 +133,8 @@ namespace triton_controls
     type_ = msg->type;
     destination_achieved_ = false;
 
+    RCLCPP_INFO(this->get_logger(), "Trajectory Type updated. ");
+
   }
 
   void TrajectoryGenerator::gate_callback(const triton_interfaces::msg::ObjectOffset::SharedPtr msg)
@@ -108,8 +142,14 @@ namespace triton_controls
 
     if (msg->class_id == type_ && type_ == TRAJ_GATE)
     {
-      destination_achieved_ = false;
-      destination_pose_ = msg->pose;
+      // Catch extreme cases when the gate detector did not detect properly
+      if (abs(msg->pose.position.x) < 50 
+          && abs(msg->pose.position.y) < 50
+          && abs(msg->pose.position.z) < 20)
+      {
+        destination_achieved_ = false;
+        destination_pose_ = msg->pose;
+      }
     }
 
   }

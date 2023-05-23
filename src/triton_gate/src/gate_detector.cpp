@@ -118,8 +118,8 @@ cv::Mat GateDetector::segment(cv::Mat& src)
 
 void GateDetector::boundGateUsingPoles(std::vector<std::vector<Point>> hulls, cv::Mat& src)
 {
-  // We can't do anything if we aren't given any hulls
-  if (hulls.size() == 0)
+  // We can't do anything if we aren't given enough hulls
+  if (hulls.size() < 2)
   {
     return;
   }
@@ -289,7 +289,7 @@ std::vector<Point> GateDetector::createGateContour(std::vector<Point> hull_point
   gate_pose_.class_id = 1;
   gate_pose_.pose.position.x = distance;
   gate_pose_.pose.position.y = -distance_x; // ENU
-  gate_pose_.pose.position.z = distance_y;
+  gate_pose_.pose.position.z =  -distance_y; // ENU, y=0 on image is top
   gate_pose_.pose.orientation.x = tf2_quat_gate.x();
   gate_pose_.pose.orientation.y = tf2_quat_gate.y();
   gate_pose_.pose.orientation.z = tf2_quat_gate.z();

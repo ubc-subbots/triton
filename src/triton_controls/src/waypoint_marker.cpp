@@ -232,7 +232,7 @@ namespace triton_controls
     reply_msg.distance = waypoint_.distance;
     reply_msg.duration = waypoint_.duration;
 
-    RCLCPP_INFO(this->get_logger(), "A new waypoint is set. ");
+    // RCLCPP_INFO(this->get_logger(), "A new waypoint is set. ");
     publisher_->publish(reply_msg);
   }
 } // namespace triton_controls
