@@ -55,7 +55,7 @@ namespace triton_controls
          /** Gate pose message callback
          * 
          * Updates private variable containing the current target pose if Object type is 
-         * TRAJ_GATE
+         * TRAJ_GATE and if current trajectory type is also TRAJ_GATE. 
          * 
          * @param msg triton_interfaces object offset message with pose and object type
          */

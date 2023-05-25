@@ -81,6 +81,10 @@ namespace triton_controls
 
         auto reply_msg = triton_interfaces::msg::Waypoint();
 
+        // reply_msg is sent to the Waypoint marker. It is in the map frame. 
+        // destination_pose_ is from the gate detector. It is in the base frame. 
+        // current_pose_ is also in the map frame. 
+
         // Forward and sidway components (assuming AUV is upright, no change in z)
         tf2::Quaternion current_q;
         tf2::Vector3 dest_v;
@@ -89,9 +93,6 @@ namespace triton_controls
         dest_v.setZ(0);
         tf2::fromMsg(current_pose_.orientation, current_q); 
         tf2::Vector3 targetForward = tf2::quatRotate(current_q, dest_v);
-        // std::cout << "cur q " << current_q.getX() << " " << current_q.getY() << " " << current_q.getZ() << std::endl;
-        // std::cout << " dest v " << dest_v.getX() << " " << dest_v.getY() << " " << dest_v.getZ() << std::endl;
-        // std::cout << " target v " << targetForward.getX() << " " << targetForward.getY() << " " << targetForward.getZ() << std::endl;
         reply_msg.pose.position.x = current_pose_.position.x + targetForward.getX();
         reply_msg.pose.position.y = current_pose_.position.y + targetForward.getY();
 

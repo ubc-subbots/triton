@@ -21,6 +21,11 @@ To run the waypoint marker node, run
 
         ros2 launch triton_controls waypoint_marker_launch.py
 
+### Trajectory Generator
+To run the Trajectory Generator node, run 
+
+        ros2 launch triton_controls trajectory_generator_launch.py
+
 ## Nodes
 
 - `thrust_allocator` : A standalone node which subscribes to the desired forces and torques to act upon the AUV and publishes an array which contains the allocated forces and associated PWM signals given to each thruster based on the config file passed in on launch
