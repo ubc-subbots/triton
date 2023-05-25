@@ -40,9 +40,18 @@ namespace triton_controls
       auto reply_msg = triton_interfaces::msg::Waypoint();
       reply_msg.pose = msg->pose.pose;
 
+      tf2::Quaternion current_pose_q(
+        current_pose_.orientation.x,
+        current_pose_.orientation.y,
+        current_pose_.orientation.z,
+        current_pose_.orientation.w);
+      tf2::Matrix3x3 current_pose_q_m(current_pose_q);
+      double current_pose_roll, current_pose_pitch, current_pose_yaw;
+      current_pose_q_m.getRPY(current_pose_roll, current_pose_pitch, current_pose_yaw);
+
       // Set some small yaw offset
       tf2::Quaternion tf2_quat_dest;
-      tf2_quat_dest.setRPY(0.001, 0.001, 1.0); // todo: add back roll and pitch if we control them in the future
+      tf2_quat_dest.setRPY(0.001, 0.001, current_pose_yaw -1.57); // todo: add back roll and pitch if we control them in the future
       reply_msg.pose.orientation.x = tf2_quat_dest.x();
       reply_msg.pose.orientation.y = tf2_quat_dest.y();
       reply_msg.pose.orientation.z = tf2_quat_dest.z();
@@ -80,6 +89,9 @@ namespace triton_controls
         dest_v.setZ(0);
         tf2::fromMsg(current_pose_.orientation, current_q); 
         tf2::Vector3 targetForward = tf2::quatRotate(current_q, dest_v);
+        // std::cout << "cur q " << current_q.getX() << " " << current_q.getY() << " " << current_q.getZ() << std::endl;
+        // std::cout << " dest v " << dest_v.getX() << " " << dest_v.getY() << " " << dest_v.getZ() << std::endl;
+        // std::cout << " target v " << targetForward.getX() << " " << targetForward.getY() << " " << targetForward.getZ() << std::endl;
         reply_msg.pose.position.x = current_pose_.position.x + targetForward.getX();
         reply_msg.pose.position.y = current_pose_.position.y + targetForward.getY();
 
