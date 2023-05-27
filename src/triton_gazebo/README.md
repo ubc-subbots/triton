@@ -29,7 +29,7 @@ It launches the `triton_auv.world` in Gazebo with `triton_auv/model.sdf`.
 ### Waypoint Marker and PID Controller
 To run the waypoint marker test
 
-        ros2 launch triton_gazebo waypoint_test_launch.py
+        ros2 launch triton_gazebo waypoint_pid_test_launch.py
 
 It launches ukf_teleop_sim_launch.py (except the teleop part), a PID controller, a waypoint marker, and a waypoint marker tester. The tester supports publishing one target pose. The target pose can be edited and more target poses can be added by editing the file src/triton_controls/triton_controls/waypoint_marker_tester.py. To notify the tester to publish a target waypoint: 
 
@@ -40,7 +40,7 @@ With 'data' being the index of the target pose, as defined in waypoint_marker_te
 ### Gate Navigation Test
 To run the Gate Navigation test
 
-        ros2 launch triton_gazebo gate_navitation_test.py
+        ros2 launch triton_gazebo gate_navigation_test.py
 
 It launches ukf_teleop_sim_launch.py (except the teleop part), a PID controller, a waypoint marker, and a trajectory generator. The trajectory starts by turning the AUV around slowly. We can start the Gate Detection and navigation process by publishing the following command:
 

@@ -22,6 +22,7 @@ find_package(rclcpp_components REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(triton_interfaces REQUIRED)
+find_package(tf2 REQUIRED)
 
 include_directories(include ${catkin_INCLUDE_DIRS})
 
@@ -39,7 +40,7 @@ target_include_directories(triton_pid_controller PUBLIC
 install(TARGETS triton_pid_controller
   DESTINATION lib/${PROJECT_NAME})
 
-ament_target_dependencies(triton_pid_controller rclcpp rclcpp_components sensor_msgs  std_msgs triton_interfaces)
+ament_target_dependencies(triton_pid_controller rclcpp rclcpp_components sensor_msgs  std_msgs triton_interfaces tf2)
 
 install(DIRECTORY
   launch

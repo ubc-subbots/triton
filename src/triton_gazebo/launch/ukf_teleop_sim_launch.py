@@ -11,6 +11,7 @@ def generate_launch_description():
     ld = LaunchDescription()
 
     pkg_share = get_package_share_directory('triton_gazebo')
+    # sdf_file =  os.path.join(pkg_share, 'gazebo', 'models', 'triton_auv_mini', 'model.sdf')
     sdf_file =  os.path.join(pkg_share, 'gazebo', 'models', 'triton_auv', 'model.sdf')
     with open(sdf_file, 'r') as infp:
         robot_desc = infp.read()
@@ -60,6 +61,21 @@ def generate_launch_description():
             os.path.join(get_package_share_directory('triton_controls'), 'launch', 'thrust_allocator_launch.py')
         )
     )
+
+    # ta_config = os.path.join(
+    #     get_package_share_directory('triton_controls'),
+    #     'config',
+    #     'thruster_config_triton_mini.yaml'
+    # )
+
+    # thrust_allocator = Node(
+    #     name='thrust_allocator',
+    #     namespace='/triton/controls',
+    #     package='triton_controls',
+    #     executable='thrust_allocator',
+    #     output='screen',
+    #     parameters=[ta_config]
+    # )
 
     keyboard_teleop = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(

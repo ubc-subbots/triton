@@ -61,6 +61,7 @@ namespace triton_controls
       error_v.setY(waypoint_.pose.position.y - current_pose_.position.y);
       error_v.setZ(waypoint_.pose.position.z - current_pose_.position.z);
       tf2::fromMsg(current_pose_.orientation, current_q); 
+      current_q[3] = -current_q[3]; // Invert quaternion
       tf2::Vector3 error_v_final = tf2::quatRotate(current_q, error_v);
       error_pose_.position.x = error_v_final.getX();
       error_pose_.position.y = error_v_final.getY();

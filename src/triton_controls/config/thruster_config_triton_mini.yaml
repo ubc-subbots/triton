@@ -1,0 +1,28 @@
+/triton/controls/thrust_allocator:
+  ros__parameters:
+  # Old values are commented, we should think about remodelling the Gazebo Sim to match  
+    num_thrusters: 6
+    t1:
+      contrib: 
+        x: 1.0
+        y: 0.0
+      lx: -0.5
+      ly: -0.5
+    t2:
+      contrib: 
+        x: 1.0
+        y: 0.0
+      lx: -0.5
+      ly: 0.5
+    t3:
+      contrib:
+        z: 1.0
+      lx: 0.0
+      ly: 0.5
+    t4:
+      contrib: 
+        z: 1.0
+      ly: -0.5
+    t5:
+      contrib:
+        y: -1.0

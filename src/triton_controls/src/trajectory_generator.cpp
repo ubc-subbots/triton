@@ -51,7 +51,7 @@ namespace triton_controls
 
       // Set some small yaw offset
       tf2::Quaternion tf2_quat_dest;
-      tf2_quat_dest.setRPY(0.001, 0.001, current_pose_yaw -1.57); // todo: add back roll and pitch if we control them in the future
+      tf2_quat_dest.setRPY(0.001, 0.001, current_pose_yaw -0.50);
       reply_msg.pose.orientation.x = tf2_quat_dest.x();
       reply_msg.pose.orientation.y = tf2_quat_dest.y();
       reply_msg.pose.orientation.z = tf2_quat_dest.z();
@@ -85,23 +85,14 @@ namespace triton_controls
         // destination_pose_ is from the gate detector. It is in the base frame. 
         // current_pose_ is also in the map frame. 
 
-        // Forward and sidway components (assuming AUV is upright, no change in z)
-        tf2::Quaternion current_q;
-        tf2::Vector3 dest_v;
-        dest_v.setX(destination_pose_.position.x);
-        dest_v.setY(destination_pose_.position.y);
-        dest_v.setZ(0);
-        tf2::fromMsg(current_pose_.orientation, current_q); 
-        tf2::Vector3 targetForward = tf2::quatRotate(current_q, dest_v);
-        reply_msg.pose.position.x = current_pose_.position.x + targetForward.getX();
-        reply_msg.pose.position.y = current_pose_.position.y + targetForward.getY();
-
-        // Z
-        reply_msg.pose.position.z = current_pose_.position.z + destination_pose_.position.z;
-
-
         // If the gate is not in front (on the left or right in the image), 
         // turn towards it. 
+        // TODO: optimize, check math
+        double required_yaw = std::atan(destination_pose_.position.y/destination_pose_.position.x);
+        // std::cout << "yaw " << required_yaw << std::endl;
+        // destination_pose_.position.y is in meters, should be in the single digits
+        // double required_yaw = std::max(-1.57, std::min(1.57, destination_pose_.position.y/1.0 * 1.57));
+
         tf2::Quaternion current_pose_q(
           current_pose_.orientation.x,
           current_pose_.orientation.y,
@@ -110,24 +101,41 @@ namespace triton_controls
         tf2::Matrix3x3 current_pose_q_m(current_pose_q);
         double current_pose_roll, current_pose_pitch, current_pose_yaw;
         current_pose_q_m.getRPY(current_pose_roll, current_pose_pitch, current_pose_yaw);
-        // TODO: optimize, check math
-        // destination_pose_.position.y is in meters, should be in the single digits
-        double required_yaw = std::max(-1.57, std::min(1.57, destination_pose_.position.y/1.0 * 1.57));
 
         tf2::Quaternion tf2_quat_destination;
-        tf2_quat_destination.setRPY(current_pose_roll, current_pose_pitch, current_pose_yaw + required_yaw + 0.2); // 0.2 is a magic number for triton_auv in gazebo
+        tf2_quat_destination.setRPY(current_pose_roll, current_pose_pitch, current_pose_yaw + required_yaw);
         reply_msg.pose.orientation.x = tf2_quat_destination.x();
         reply_msg.pose.orientation.y = tf2_quat_destination.y();
         reply_msg.pose.orientation.z = tf2_quat_destination.z();
         reply_msg.pose.orientation.w = tf2_quat_destination.w();
 
-        // Set some small distance
-        tf2::Quaternion tf2_quat_distance;
-        tf2_quat_distance.setRPY(0.05, 0.05, 0.05); 
+        // Forward component (assuming AUV is upright, no change in z)
+        // Calculate the distance to gate if the AUV faces it squarely
+        double distance_x = std::sqrt(std::pow(destination_pose_.position.y,2) + std::pow(destination_pose_.position.x,2));
+        // Calculate the point this far away in front of the AUV in the map frame
+        tf2::Quaternion current_q;
+        tf2::Vector3 dest_v;
+        dest_v.setX(distance_x + 1); // Since it is a passthrough waypoint anyway
+        dest_v.setY(0);
+        dest_v.setZ(0);
+        tf2::fromMsg(current_pose_.orientation, current_q); 
+        // current_q[3] = -current_q[3]; // Invert quaternion
+        tf2::Vector3 targetForward = tf2::quatRotate(current_q, dest_v);
+        reply_msg.pose.position.x = current_pose_.position.x + targetForward.getX();
+        reply_msg.pose.position.y = current_pose_.position.y + targetForward.getY();
 
-        reply_msg.distance.position.x = 0.2;
-        reply_msg.distance.position.y = 0.2;
-        reply_msg.distance.position.z = 0.2;
+        // Z
+        reply_msg.pose.position.z = current_pose_.position.z + destination_pose_.position.z;
+
+
+        tf2::Quaternion tf2_quat_distance;
+        tf2_quat_distance.setRPY(1.57, 1.57, 1.57); 
+
+        // Assume that the gate aligns with the y-axis, 
+        // i.e. a straight path on the x-axis goes through it
+        reply_msg.distance.position.x = 0.5; 
+        reply_msg.distance.position.y = 4.0; // Assume 2 meters wide gate
+        reply_msg.distance.position.z = 2.0; // Assume 1 meter tall gate
         reply_msg.distance.orientation.x = tf2_quat_distance.x();
         reply_msg.distance.orientation.y = tf2_quat_distance.y();
         reply_msg.distance.orientation.z = tf2_quat_distance.z();
