@@ -91,12 +91,20 @@ namespace triton_pid_controller
     float dt = 
       std::chrono::duration_cast<std::chrono::microseconds>(now - last_time_).count() / 1e6;
 
-    auto & x = cur_pose->orientation.x;
-    auto & y = cur_pose->orientation.y;
-    auto & z = cur_pose->orientation.z;
-    auto & w = cur_pose->orientation.w;
+    tf2::Quaternion current_pose_q(
+      cur_pose->orientation.x,
+      cur_pose->orientation.y,
+      cur_pose->orientation.z,
+      cur_pose->orientation.w);
+    tf2::Matrix3x3 current_pose_q_m(current_pose_q);
+    double current_pose_roll, current_pose_pitch, current_pose_yaw;
+    current_pose_q_m.getRPY(current_pose_roll, current_pose_pitch, current_pose_yaw);
 
-    float cur_yaw = -std::atan2(2*y*w + 2*x*z, 1 - 2*y*y - 2*z*z);
+    float cur_yaw = 0;
+    if (!std::isnan(current_pose_yaw)) 
+    {
+      cur_yaw = -current_pose_yaw; // TODO: why negative
+    }
 
     float yaw_error = cur_yaw;
     float pos_x_error = cur_pose->position.x;

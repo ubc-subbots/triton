@@ -13,6 +13,8 @@
   <depend>triton_vision_utils</depend>
   <depend>sensor_msgs</depend>
   <depend>image_transport</depend>
+  <depend>triton_interfaces</depend>
+  <depend>tf2</depend>
 
 
   <test_depend>ament_lint_auto</test_depend>

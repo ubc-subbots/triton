@@ -53,9 +53,19 @@ namespace triton_controls
       tf2_quat_difference.setRPY(0.001, 0.001, -error_yaw); // TODO: add back roll and pitch if we control them in the future
 
       // Assign differences to error_pose_
-      error_pose_.position.x = waypoint_.pose.position.x - current_pose_.position.x;
-      error_pose_.position.y = waypoint_.pose.position.y - current_pose_.position.y;
-      error_pose_.position.z = waypoint_.pose.position.z - current_pose_.position.z;
+      // error_pose_ is in the base frame, so we need some rotation
+      // TODO: traj generator just converted gate pose to map frame, and now we are converting it back
+      tf2::Quaternion current_q;
+      tf2::Vector3 error_v;
+      error_v.setX(waypoint_.pose.position.x - current_pose_.position.x);
+      error_v.setY(waypoint_.pose.position.y - current_pose_.position.y);
+      error_v.setZ(waypoint_.pose.position.z - current_pose_.position.z);
+      tf2::fromMsg(current_pose_.orientation, current_q); 
+      current_q[3] = -current_q[3]; // Invert quaternion
+      tf2::Vector3 error_v_final = tf2::quatRotate(current_q, error_v);
+      error_pose_.position.x = error_v_final.getX();
+      error_pose_.position.y = error_v_final.getY();
+      error_pose_.position.z = error_v_final.getZ();
       error_pose_.orientation.x = tf2_quat_difference.x();
       error_pose_.orientation.y = tf2_quat_difference.y();
       error_pose_.orientation.z = tf2_quat_difference.z();
@@ -232,7 +242,7 @@ namespace triton_controls
     reply_msg.distance = waypoint_.distance;
     reply_msg.duration = waypoint_.duration;
 
-    RCLCPP_INFO(this->get_logger(), "A new waypoint is set. ");
+    // RCLCPP_INFO(this->get_logger(), "A new waypoint is set. ");
     publisher_->publish(reply_msg);
   }
 } // namespace triton_controls

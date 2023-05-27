@@ -46,6 +46,14 @@ target_include_directories(waypoint_marker PUBLIC
   $<INSTALL_INTERFACE:include>
 )
 
+add_executable(trajectory_generator
+  src/trajectory_generator.cpp
+)
+target_include_directories(trajectory_generator PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+)
+
 ament_target_dependencies(
   thrust_allocator
   "rclcpp"
@@ -74,6 +82,20 @@ install(TARGETS waypoint_marker
   DESTINATION lib/${PROJECT_NAME}
 )
 
+ament_target_dependencies(
+  trajectory_generator
+  "rclcpp"
+  "rclcpp_components"
+  "tf2"
+  "triton_interfaces"
+  "geometry_msgs"
+  "sensor_msgs"
+  "nav_msgs"
+)
+install(TARGETS trajectory_generator
+  DESTINATION lib/${PROJECT_NAME}
+)
+
 add_library(triton_controls SHARED
   src/thrust_allocator.cpp
   # src/waypoint_marker.cpp
@@ -83,6 +105,7 @@ add_library(triton_controls SHARED
 rclcpp_components_register_nodes(triton_controls "triton_controls::ThrustAllocator")
 rclcpp_components_register_nodes(triton_controls "triton_controls::WaypointMarker")
 rclcpp_components_register_nodes(triton_controls "triton_controls::SerialSubscriber")
+rclcpp_components_register_nodes(triton_controls "triton_controls::TrajectoryGenerator")
 
 target_compile_definitions(triton_controls
   PRIVATE "triton_controls_CPP_BUILDING_DLL"
