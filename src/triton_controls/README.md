@@ -90,6 +90,7 @@ To run the Trajectory Generator node, run
     - Initially, trajectory type is 'START'. It publishes a waypoint that is always +0.5 rad in yaw of the current pose, causing the AUV to turn around slowly. 
     - Other nodes (e.g. the Mission Planner) decide when to start the next stage, and change trajectory type to 'GATE'
     - When trajectory type is 'GATE', the trajectory generator sets the gate pose to be the destination pose
+        - More specifically, it gets the AUV to turn towards the gate and move forward, as well as manage the depth
         - TODO: make an actual trajectory
 
 ## Contributors
