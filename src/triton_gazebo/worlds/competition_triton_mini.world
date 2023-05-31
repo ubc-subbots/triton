@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<sdf version="1.7">
+  <world name="default">
+    <gravity>0 0 -9.81</gravity>
+    <fluid_density>1000.00</fluid_density>
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <!-- A ground plane -->
+    <include>
+        <pose>0 0 0 0 0 0</pose>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <include>
+        <pose>-10 0 2 0 0 0</pose>
+        <uri>model://gate</uri>
+    </include>
+
+    <include>
+      <uri>model://triton_auv_mini</uri>
+      <pose>0 0 1 0 0 0</pose>
+    </include>
+    <grid>0</grid>
+  </world>
+</sdf>

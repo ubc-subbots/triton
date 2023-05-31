@@ -1,6 +1,6 @@
 <?xml version='1.0'?>
 <sdf version='1.7'>
-  <model name='triton_auv'>
+  <model name='triton_auv_mini'>
     <!-- 
 
       Triton AUV components
@@ -213,24 +213,6 @@
       </physics>
     </joint>
 
-    <joint name='frame_thruster6' type='fixed'>
-      <parent>frame::frame</parent>
-      <child>thruster6::thruster</child>
-      <pose>0 0 0 0 0 0</pose>
-      <physics>
-        <ode>
-          <limit>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </limit>
-          <suspension>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </suspension>
-        </ode>
-      </physics>
-    </joint>
-
     <!-- 
 
       Plugins
@@ -239,7 +221,7 @@
 
     <!-- Thrust Vectors -->
     <plugin name="thruster_array" filename="libthruster_driver_plugin.so">
-      <thruster_count>6</thruster_count>
+      <thruster_count>5</thruster_count>
       <ros>
         <namespace>/triton/controls</namespace>
         <remapping>output_forces</remapping>

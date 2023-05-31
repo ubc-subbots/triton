@@ -78,7 +78,7 @@ namespace triton_controls
       cv::Mat thrust_mat =  pinv_alloc_*tau_mat;
 
       std::vector<double> thrust;
-      for (int i = 0; i < 6 ; i++)
+      for (int i = 0; i < num_thrusters_ ; i++)
         thrust.push_back(thrust_mat.at<double>(i,0));
 
       auto forces_msg = std_msgs::msg::Float64MultiArray();
