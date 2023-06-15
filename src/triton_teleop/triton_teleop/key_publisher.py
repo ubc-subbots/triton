@@ -7,24 +7,47 @@ from std_msgs.msg import String, Int32, UInt32
 
 THRUSTER_DATA_BIT_SIZE = 5
 
-TLF_SHIFT_VAL = 0*THRUSTER_DATA_BIT_SIZE
-TLT_SHIFT_VAL = 1*THRUSTER_DATA_BIT_SIZE
-TLB_SHIFT_VAL = 2*THRUSTER_DATA_BIT_SIZE
-TRF_SHIFT_VAL = 3*THRUSTER_DATA_BIT_SIZE
-TRT_SHIFT_VAL = 4*THRUSTER_DATA_BIT_SIZE
-TRB_SHIFT_VAL = 5*THRUSTER_DATA_BIT_SIZE
+T1_SHIFT_VAL = 0*THRUSTER_DATA_BIT_SIZE
+T2_SHIFT_VAL = 1*THRUSTER_DATA_BIT_SIZE
+T3_SHIFT_VAL = 2*THRUSTER_DATA_BIT_SIZE
+T4_SHIFT_VAL = 3*THRUSTER_DATA_BIT_SIZE
+T5_SHIFT_VAL = 4*THRUSTER_DATA_BIT_SIZE
+T6_SHIFT_VAL = 5*THRUSTER_DATA_BIT_SIZE
 
 ENCODE_OFFSET = 2**(THRUSTER_DATA_BIT_SIZE-1)
 
-def encode_msg(thruster_power_level):
-    tlf_bits = (thruster_power_level["tlf"]+ENCODE_OFFSET) << TLF_SHIFT_VAL
-    tlt_bits = (thruster_power_level["tlt"]+ENCODE_OFFSET) << TLT_SHIFT_VAL
-    tlb_bits = (thruster_power_level["tlb"]+ENCODE_OFFSET) << TLB_SHIFT_VAL
-    trf_bits = (thruster_power_level["trf"]+ENCODE_OFFSET) << TRF_SHIFT_VAL
-    trt_bits = (thruster_power_level["trt"]+ENCODE_OFFSET) << TRT_SHIFT_VAL
-    trb_bits = (thruster_power_level["trb"]+ENCODE_OFFSET) << TRB_SHIFT_VAL
+CHAR_TO_THRUSTER = {
+    # key: [(thruster, level change)+]
+    "q": [('bl', -1), ('br', 1)],
+    "e": [('bl', 1), ('br', -1)],
+    "x": [('tl', -1), ('tr', -1)],
+    "c": [('tl', 1), ('tr', 1)],
+    "w": [('bl', 1), ('br', 1)],
+    "s": [('bl', -1), ('br', -1)],
+    "a": [('m', -1)],
+    "d": [('m', 1)],
 
-    return (tlf_bits | tlt_bits | tlb_bits | trf_bits | trt_bits | trb_bits)
+    "r": [('tl', 1)],
+    "f": [('tl', -1)],
+    "t": [('bl', 1)],
+    "g": [('bl', -1)],
+    "y": [('m', 1)],
+    "h": [('m', -1)],
+    "u": [('br', 1)],
+    "j": [('br', -1)],
+    "i": [('bl', 1)],
+    "k": [('bl', -1)],
+}
+
+def encode_msg(thruster_power_level):
+    t6_bits = (thruster_power_level["x"]+ENCODE_OFFSET) << T6_SHIFT_VAL
+    t5_bits = (thruster_power_level["bl"]+ENCODE_OFFSET) << T5_SHIFT_VAL
+    t4_bits = (thruster_power_level["m"]+ENCODE_OFFSET) << T4_SHIFT_VAL
+    t3_bits = (thruster_power_level["tl"]+ENCODE_OFFSET) << T3_SHIFT_VAL
+    t2_bits = (thruster_power_level["br"]+ENCODE_OFFSET) << T2_SHIFT_VAL
+    t1_bits = (thruster_power_level["tr"]+ENCODE_OFFSET) << T1_SHIFT_VAL
+
+    return (t6_bits | t5_bits | t4_bits | t3_bits | t2_bits | t1_bits)
 
 
 class KeyPublisher(Node):
@@ -41,12 +64,12 @@ class KeyPublisher(Node):
 
         # States
         self.thruster_power_level = {}
-        self.thruster_power_level["tlf"] = 0
-        self.thruster_power_level["tlt"] = 0
-        self.thruster_power_level["tlb"] = 0
-        self.thruster_power_level["trf"] = 0
-        self.thruster_power_level["trt"] = 0
-        self.thruster_power_level["trb"] = 0
+        self.thruster_power_level["tl"] = 0
+        self.thruster_power_level["tr"] = 0
+        self.thruster_power_level["bl"] = 0
+        self.thruster_power_level["br"] = 0
+        self.thruster_power_level["m"] = 0
+        self.thruster_power_level["x"] = 0
 
         self.get_logger().info('Key publisher succesfully started!')
 
@@ -67,80 +90,18 @@ class KeyPublisher(Node):
         @param key: They character of the key pressed
         """
         if key == keyboard.Key.space:
-            self.thruster_power_level["tlf"] = 0
-            self.thruster_power_level["tlt"] = 0
-            self.thruster_power_level["tlb"] = 0
-            self.thruster_power_level["trf"] = 0
-            self.thruster_power_level["trt"] = 0
-            self.thruster_power_level["trb"] = 0
+            self.thruster_power_level["tl"] = 0
+            self.thruster_power_level["tr"] = 0
+            self.thruster_power_level["bl"] = 0
+            self.thruster_power_level["br"] = 0
+            self.thruster_power_level["m"] = 0
+            self.thruster_power_level["x"] = 0
         elif 'char' in dir(key):
-            if key.char == 't':
-                if self.thruster_power_level["tlt"] != 15:
-                    self.thruster_power_level["tlt"] += 1
-            elif key.char == 'r':
-                if self.thruster_power_level["tlt"] != -16:
-                    self.thruster_power_level["tlt"] -= 1
-            elif key.char == 'g':
-                if self.thruster_power_level["tlf"] != 15:
-                    self.thruster_power_level["tlf"] += 1
-            elif key.char == 'f':
-                if self.thruster_power_level["tlf"] != -16:
-                    self.thruster_power_level["tlf"] -= 1
-            elif key.char == 'b':
-                if self.thruster_power_level["tlb"] != 15:
-                    self.thruster_power_level["tlb"] += 1
-            elif key.char == 'v':
-                if self.thruster_power_level["tlb"] != -16:
-                    self.thruster_power_level["tlb"] -= 1
-            elif key.char == 'u':
-                if self.thruster_power_level["trt"] != 15:
-                    self.thruster_power_level["trt"] += 1
-            elif key.char == 'y':
-                if self.thruster_power_level["trt"] != -16:
-                    self.thruster_power_level["trt"] -= 1
-            elif key.char == 'j':
-                if self.thruster_power_level["trf"] != 15:
-                    self.thruster_power_level["trf"] += 1
-            elif key.char == 'h':
-                if self.thruster_power_level["trf"] != -16:
-                    self.thruster_power_level["trf"] -= 1
-            elif key.char == 'm':
-                if self.thruster_power_level["trb"] != 15:
-                    self.thruster_power_level["trb"] += 1
-            elif key.char == 'n':
-                if self.thruster_power_level["trb"] != -16:
-                    self.thruster_power_level["trb"] -= 1
-            elif key.char == 'e':
-                if self.thruster_power_level["tlt"] != 15:
-                    self.thruster_power_level["tlt"] += 1
-                if self.thruster_power_level["trt"] != 15:
-                    self.thruster_power_level["trt"] += 1
-            elif key.char == 'w':
-                if self.thruster_power_level["tlt"] != -16:
-                    self.thruster_power_level["tlt"] -= 1
-                if self.thruster_power_level["trt"] != -16:
-                    self.thruster_power_level["trt"] -= 1
-            elif key.char == 'd':
-                if self.thruster_power_level["tlf"] != 15:
-                    self.thruster_power_level["tlf"] += 1
-                if self.thruster_power_level["tlb"] != 15:
-                    self.thruster_power_level["tlb"] += 1
-            elif key.char == 's':
-                if self.thruster_power_level["tlf"] != -16:
-                    self.thruster_power_level["tlf"] -= 1
-                if self.thruster_power_level["tlb"] != -16:
-                    self.thruster_power_level["tlb"] -= 1
-            elif key.char == 'c':
-                if self.thruster_power_level["trf"] != 15:
-                    self.thruster_power_level["trf"] += 1
-                if self.thruster_power_level["trb"] != 15:
-                    self.thruster_power_level["trb"] += 1
-            elif key.char == 'x':
-                if self.thruster_power_level["trf"] != -16:
-                    self.thruster_power_level["trf"] -= 1
-                if self.thruster_power_level["trb"] != -16:
-                    self.thruster_power_level["trb"] -= 1
-
+            if key.char in CHAR_TO_THRUSTER:
+                for thruster, level in CHAR_TO_THRUSTER[key.char]:
+                    if ((self.thruster_power_level[thruster] < 15 and level > 0) or
+                        (self.thruster_power_level[thruster] > -16 and level < 0)):
+                        self.thruster_power_level[thruster] += level
         msg = UInt32()
         msg.data = encode_msg(self.thruster_power_level)
         self.publisher_.publish(msg)
