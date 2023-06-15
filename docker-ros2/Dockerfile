@@ -81,7 +81,7 @@ RUN /bin/bash -c "source /opt/ros/foxy/install/setup.bash; source /root/ros2_ws/
 RUN echo "source /root/triton/install/setup.bash" >> /root/.bashrc
 RUN echo 'echo "Sourced Triton in /root/triton/"' >> /root/.bashrc
 RUN echo "source /root/microros_ws/install/local_setup.bash" >> /root/.bashrc
-RUN echo "alias cbs='colcon build --packages-skip triton_gazebo'" >> /root/.bashrc
+RUN echo "alias cbs='colcon build --packages-skip triton_gazebo && source ./install/setup.bash'" >> /root/.bashrc
 
 # Install VIM
 RUN apt-get install -y --no-install-recommends vim
