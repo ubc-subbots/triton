@@ -27,16 +27,16 @@
       Thrusters will follow the following naming convention: 
 
                     ___      Thruster 3
-         Thruster 2 ___________|__|________
+         Thruster 25___________|__|________
                       |                    |
                       |        +y          |
-                 Thruster 5 |||            |_
+                 Thruster 4 |||            |_
                       |     |||___+x       |_) AUV front 
                       |     +z             |
                       |   (pointing up)    |
                     __|____________________|   
-         Thruster 1 ___        |  |        
-                             Thruster 4
+         Thruster 2 ___        |  |        
+                             Thruster 1
 
     -->
 
@@ -51,13 +51,13 @@
     <include>
       <uri>model://triton_thruster</uri>
       <pose>-0.3776091 -0.357124 0.2136902 0 1.5707 0</pose>
-      <name>thruster1</name>
+      <name>thruster2</name>
     </include>
 
     <include>
       <uri>model://triton_thruster</uri>
       <pose>-0.3776091 0.026924 0.2136902 0 1.5707 0</pose>
-      <name>thruster2</name>
+      <name>thruster5</name>
     </include>
 
     <include>
@@ -69,13 +69,13 @@
     <include>
       <uri>model://triton_thruster</uri>
       <pose>-0.14965425999999998 -0.38172644 0.33146492 0 0 0</pose>
-      <name>thruster4</name>
+      <name>thruster1</name>
     </include>
 
     <include>
       <uri>model://triton_thruster</uri>
       <pose>-0.14965425999999998 -0.1651 0.1 1.5707 -1.5707 0</pose>
-      <name>thruster5</name>
+      <name>thruster4</name>
     </include>
 
     <!--
