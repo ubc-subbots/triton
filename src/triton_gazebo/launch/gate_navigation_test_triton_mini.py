@@ -10,9 +10,21 @@ from ament_index_python.packages import get_package_share_directory
 def generate_launch_description():
     ld = LaunchDescription()
 
+    pid_controller = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(get_package_share_directory('triton_pid_controller'), 'launch', 'triton_pid_controller_launch.py')
+        )
+    )
+
+    waypoint_marker = Node(
+        package='triton_controls', 
+        executable='waypoint_marker',
+        output='screen', 
+        parameters=[{'use_sim_time': True}]
+    )
+
     pkg_share = get_package_share_directory('triton_gazebo')
-    # sdf_file =  os.path.join(pkg_share, 'gazebo', 'models', 'triton_auv_mini', 'model.sdf')
-    sdf_file =  os.path.join(pkg_share, 'gazebo', 'models', 'triton_auv', 'model.sdf')
+    sdf_file =  os.path.join(pkg_share, 'gazebo', 'models', 'triton_auv_mini', 'model.sdf')
     with open(sdf_file, 'r') as infp:
         robot_desc = infp.read()
     rsp_params = {'robot_description': robot_desc}
@@ -21,29 +33,8 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(
             os.path.join(get_package_share_directory('triton_gazebo'), 'launch', 'gazebo_launch.py')
         ),
-        launch_arguments={'world': 'competition.world'}.items()
+        launch_arguments={'world': 'competition_triton_mini.world'}.items()
     )
-
-    thrust_allocator = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(get_package_share_directory('triton_controls'), 'launch', 'thrust_allocator_launch.py')
-        )
-    )
-
-    # ta_config = os.path.join(
-    #     get_package_share_directory('triton_controls'),
-    #     'config',
-    #     'thruster_config_triton_mini.yaml'
-    # )
-
-    # thrust_allocator = Node(
-    #     name='thrust_allocator',
-    #     namespace='/triton/controls',
-    #     package='triton_controls',
-    #     executable='thrust_allocator',
-    #     output='screen',
-    #     parameters=[ta_config]
-    # )
 
 
     rviz_config_file = os.path.join(
@@ -78,10 +69,19 @@ def generate_launch_description():
         parameters=[rsp_params, {'use_sim_time': True}]
     )
 
-    keyboard_teleop = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(get_package_share_directory('triton_teleop'), 'launch', 'keyboard_teleop_launch.py')
-        )
+    ta_config = os.path.join(
+        get_package_share_directory('triton_controls'),
+        'config',
+        'thruster_config_triton_mini.yaml'
+    )
+
+    thrust_allocator = Node(
+        name='thrust_allocator',
+        namespace='/triton/controls',
+        package='triton_controls',
+        executable='thrust_allocator',
+        output='screen',
+        parameters=[ta_config]
     )
 
     gate_detector = IncludeLaunchDescription(
@@ -96,14 +96,23 @@ def generate_launch_description():
         )
     )
 
+    trajectory_generator = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            get_package_share_directory('triton_controls') + '/launch/trajectory_generator_launch.py'
+        )
+    )
+
     ld.add_action(gazebo)
     # ld.add_action(rviz)
     ld.add_action(thrust_allocator)
-    ld.add_action(keyboard_teleop)
     ld.add_action(gate_detector)
     ld.add_action(state_publisher)
     ld.add_action(transform_publisher)
     ld.add_action(underwater_camera)
     ld.add_action(state_estimator)
+    ld.add_action(waypoint_marker)
+    # ld.add_action(waypoint_marker_tester)
+    ld.add_action(pid_controller)
+    ld.add_action(trajectory_generator)
 
     return ld

@@ -46,6 +46,10 @@ It launches ukf_teleop_sim_launch.py (except the teleop part), a PID controller,
 
         ros2 topic pub -1 /triton/controls/trajectory_generator/set_type triton_interfaces/msg/TrajectoryType "{type: 1}"
 
+Use this launch file instead for testing Triton-Mini
+
+        ros2 launch triton_gazebo gate_navigation_test_triton_mini.py
+
 ### Generating Data with Bounding Box
 To run the data generation node, use the following
 
