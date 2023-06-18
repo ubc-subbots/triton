@@ -11,6 +11,8 @@
   <depend>rclpy</depend>
   <depend>composition_interfaces</depend>
   <depend>python3-yaml</depend>
+  <depend>imu_filter_madgwick</depend>
+  <depend>phidgets_spatial</depend>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>

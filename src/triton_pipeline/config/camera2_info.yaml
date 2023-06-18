@@ -1,5 +1,7 @@
-image_width: 1024
-image_height: 768
+# image_width: 1024
+# image_height: 768
+image_width: 320
+image_height: 240
 camera_name: camera2
 camera_matrix:
   rows: 3
