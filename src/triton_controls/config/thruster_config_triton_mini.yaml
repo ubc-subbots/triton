@@ -19,6 +19,9 @@
       #                        Thruster 1
 
     num_thrusters: 5
+    bits_per_thruster: 5
+    max_fwd: 3.71 # kgf 
+    max_rev: 2.92 # kgf 
     t2:
       contrib: 
         x: 1.0

@@ -141,7 +141,10 @@ def generate_launch_description():
         package='triton_controls',
         executable='thrust_allocator',
         output='screen',
-        parameters=[ta_config]
+        parameters=[ta_config],
+        remappings=[
+            ('/triton/controls/signals', '/motor_control')
+        ]
     )
 
     trajectory_generator = IncludeLaunchDescription(

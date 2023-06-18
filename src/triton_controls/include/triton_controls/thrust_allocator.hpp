@@ -9,6 +9,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "geometry_msgs/msg/wrench.hpp"
 #include "std_msgs/msg/float64_multi_array.hpp"
+#include "std_msgs/msg/u_int32.hpp"
 
 #define MAX_THRUSTERS 6
 
@@ -58,14 +59,27 @@ namespace triton_controls
          */
         std::vector<std::vector<double>> createAllocMat();
 
+        /**
+         * @brief Helper for converting a force (in N) to a power level (0-31) for 
+         * a thruster. 
+         * 
+         * @param force 
+         * @return uint32_t 
+         */
+        uint32_t forceToLevel(double force) const;
+
         rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr forces_pub_;  
-        rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr signals_pub_;  
+        rclcpp::Publisher<std_msgs::msg::UInt32>::SharedPtr signals_pub_;  
 
         rclcpp::Subscription<geometry_msgs::msg::Wrench>::SharedPtr forces_sub_; 
 
         cv::Mat pinv_alloc_;
 
         int num_thrusters_ = 0;
+        int bits_per_thruster_ = 0;
+        int encode_levels_ = 0;
+        double max_fwd_ = 0;
+        double max_rev_ = 0;
         std::vector<double> x_lens_;
         std::vector<double> y_lens_;
         std::vector<double> z_lens_;
