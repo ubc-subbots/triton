@@ -55,12 +55,12 @@ RUN echo "source /root/ros2_ws/install/local_setup.bash" >> /root/.bashrc
 RUN echo 'echo "Sourced RealSense in /root/ros2_ws/"' >> /root/.bashrc
 
 # Build and Install OpenCV
-# WORKDIR /root/
-# RUN git clone https://github.com/ubc-subbots/triton.git && \
-#                 git clone -b 4.5.3 https://github.com/opencv/opencv
-# RUN mkdir /root/opencv/build
+WORKDIR /root/
+RUN git clone https://github.com/ubc-subbots/triton.git && \
+                git clone -b 4.5.3 https://github.com/opencv/opencv
+RUN mkdir /root/opencv/build
 WORKDIR /root/opencv/build
-# RUN cmake -D CMAKE_BUILD_TYPE=Release -D CMAKE_INSTALL_PREFIX=/usr/local ..
+RUN cmake -D CMAKE_BUILD_TYPE=Release -D CMAKE_INSTALL_PREFIX=/usr/local ..
 RUN make install
 RUN /bin/bash -c "source /opt/ros/foxy/install/setup.bash; rosdep update"
 
