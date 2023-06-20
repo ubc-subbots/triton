@@ -2,6 +2,9 @@
   ros__parameters:
   # Old values are commented, we should think about remodelling the Gazebo Sim to match  
     num_thrusters: 6
+    bits_per_thruster: 5
+    max_fwd: 3.71 # kgf 
+    max_rev: 2.92 # kgf 
     t1:
       contrib: 
         x: -0.7071

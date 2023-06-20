@@ -1,4 +1,5 @@
 #include "triton_controls/thrust_allocator.hpp"
+#include <unistd.h>
 using std::placeholders::_1;
 
 namespace triton_controls
@@ -19,6 +20,18 @@ namespace triton_controls
       if (num_thrusters_ > MAX_THRUSTERS){
         RCLCPP_ERROR(this->get_logger(), "Attempted to configure too many thrusters, results will not be desirable");
       }
+
+      this->declare_parameter<int>("bits_per_thruster", bits_per_thruster_);
+      this->get_parameter("bits_per_thruster", bits_per_thruster_);
+
+      this->declare_parameter<double>("max_fwd", max_fwd_);
+      this->get_parameter("max_fwd", max_fwd_);
+      max_fwd_ *= 9.807; // kgf to N
+      this->declare_parameter<double>("max_rev", max_rev_);
+      max_rev_ *= 9.807; // kgf to N
+      this->get_parameter("max_rev", max_rev_);
+
+      encode_levels_ = pow(2,bits_per_thruster_);
 
       std::string names[MAX_THRUSTERS] = {"t1", "t2", "t3", "t4", "t5", "t6"};
     
@@ -54,7 +67,7 @@ namespace triton_controls
       forces_pub_ = this->create_publisher<std_msgs::msg::Float64MultiArray>(
         "output_forces", 10);
 
-      signals_pub_ = this->create_publisher<std_msgs::msg::Float64MultiArray>(
+      signals_pub_ = this->create_publisher<std_msgs::msg::UInt32>(
         "signals", 10);
 
       forces_sub_ = this->create_subscription<geometry_msgs::msg::Wrench>(
@@ -78,12 +91,24 @@ namespace triton_controls
       cv::Mat thrust_mat =  pinv_alloc_*tau_mat;
 
       std::vector<double> thrust;
+      uint32_t signal = 0;
       for (int i = 0; i < num_thrusters_ ; i++)
-        thrust.push_back(thrust_mat.at<double>(i,0));
+      {
+        double thruster_thrust = thrust_mat.at<double>(i,0);
+        thrust.push_back(thruster_thrust);
+
+        uint32_t t_level = forceToLevel(thruster_thrust);
+        uint32_t t_bits = t_level << (bits_per_thruster_ * i);
+        // std::cout << "thruster " << i << " " << thruster_thrust << " " << t_bits  << " " << (t_bits >> bits_per_thruster_ * i) << std::endl;
+        signal |= t_bits;
+      }
 
       auto forces_msg = std_msgs::msg::Float64MultiArray();
       forces_msg.data = thrust;
       forces_pub_->publish(forces_msg);
+      auto signal_msg = std_msgs::msg::UInt32();
+      signal_msg.data = signal;
+      signals_pub_->publish(signal_msg);
   }
 
   std::vector<double> ThrustAllocator::cross(std::vector<double> r,std::vector<double> F){
@@ -110,6 +135,29 @@ namespace triton_controls
         }
       }
       return alloc_mat_trans;
+  }
+
+  uint32_t ThrustAllocator::forceToLevel(double force) const{
+    uint32_t t_level;
+    if (force < 0.1 && force > -0.1)
+    {
+      force = 0; 
+    }
+    if (force >= 0)
+    {
+      // levels 0 to 15 (0 is no force)
+      t_level = (uint32_t) (std::ceil(std::min(force, max_fwd_) / max_fwd_ * (encode_levels_/2 - 1)));
+      // turn to levels 16 to 31
+      t_level += encode_levels_ / 2;
+    }
+    else
+    {
+      // levels 0 to 16 (0 is max rev, 16 is no force)
+      t_level = (uint32_t) (16 - std::ceil(std::max(force, -max_rev_) / -max_rev_ * (encode_levels_/2)));
+    }
+
+    t_level &= ((uint32_t)pow(2, bits_per_thruster_) - 1);
+    return t_level;
   }
 
 
