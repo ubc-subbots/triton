@@ -88,11 +88,25 @@ def generate_launch_description():
         ]
     )
 
+    gate_detector = ComposableNode(
+        name='detector',
+        namespace='/triton/gate',
+        package='triton_gate',
+        plugin='triton_gate::GateDetector',
+        parameters=[
+            {'debug': False}
+        ]
+    )
 
-    gate_detector = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(get_package_share_directory('triton_gate'), 'launch', 'gate_detector_launch.py')
-        )
+    gate_container = ComposableNodeContainer(
+        name='gate_container',
+        namespace='/',
+        package='rclcpp_components',
+        executable='component_container',
+        composable_node_descriptions=[
+            gate_detector
+        ],
+        output='screen'
     )
 
     config = os.path.join(
@@ -170,7 +184,7 @@ def generate_launch_description():
     ld.add_action(pid_controller)
     ld.add_action(waypoint_marker)
     ld.add_action(thrust_allocator)
-    ld.add_action(gate_detector)
+    ld.add_action(gate_container)
     ld.add_action(trajectory_generator) # we use key publisher instead
     #ld.add_action(record)
     # ld.add_action(keyboard_teleop)

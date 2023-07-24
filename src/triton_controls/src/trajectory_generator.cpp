@@ -6,8 +6,10 @@ namespace triton_controls
 
   TrajectoryGenerator::TrajectoryGenerator(const rclcpp::NodeOptions &options)
       : Node("trajectory_generator", options),
-        type_(0),
-        destination_achieved_(false)
+        type_(TRAJ_GATE),
+        destination_achieved_(true) // note: this should be false, but in the interest of time, 
+        // this is set to true as a way to make the AUV turn around slowly as if it is in TRAJ_START
+        // mode even though it is in TRAJ_GATE mode.
   {
 
     waypoint_publisher_ = this->create_publisher<triton_interfaces::msg::Waypoint>("/triton/controls/waypoint_marker/set", 10);
@@ -144,6 +146,54 @@ namespace triton_controls
 
         waypoint_publisher_->publish(reply_msg);
       }
+      else  // This is based the TRAJ_START branch above
+      // because there is no time for making the gate-detected-confirmer
+      // so TrajectoryGenerator will start with type == TRAJ_GATE and 
+      // turn around when the detection makes no sense. 
+      {
+        // prevent division by zero
+        if (destination_pose_.position.x == 0)
+        {
+          destination_pose_.position.x = 0.1;
+        }
+
+        // Turn the AUV around slowly (to search for gate)
+        auto reply_msg = triton_interfaces::msg::Waypoint();
+        reply_msg.pose = current_pose_;
+
+        tf2::Quaternion current_pose_q(
+          current_pose_.orientation.x,
+          current_pose_.orientation.y,
+          current_pose_.orientation.z,
+          current_pose_.orientation.w);
+        tf2::Matrix3x3 current_pose_q_m(current_pose_q);
+        double current_pose_roll, current_pose_pitch, current_pose_yaw;
+        current_pose_q_m.getRPY(current_pose_roll, current_pose_pitch, current_pose_yaw);
+
+        // Set some small yaw offset
+        tf2::Quaternion tf2_quat_dest;
+        tf2_quat_dest.setRPY(0.001, 0.001, current_pose_yaw -0.50);
+        reply_msg.pose.orientation.x = tf2_quat_dest.x();
+        reply_msg.pose.orientation.y = tf2_quat_dest.y();
+        reply_msg.pose.orientation.z = tf2_quat_dest.z();
+        reply_msg.pose.orientation.w = tf2_quat_dest.w();
+
+        // Set some small distance
+        tf2::Quaternion tf2_quat_distance;
+        tf2_quat_distance.setRPY(0.05, 0.05, 0.1);
+
+        reply_msg.distance.position.x = 0.2;
+        reply_msg.distance.position.y = 0.2;
+        reply_msg.distance.position.z = 0.2;
+        reply_msg.distance.orientation.x = tf2_quat_distance.x();
+        reply_msg.distance.orientation.y = tf2_quat_distance.y();
+        reply_msg.distance.orientation.z = tf2_quat_distance.z();
+        reply_msg.distance.orientation.w = tf2_quat_distance.w();
+        reply_msg.duration = 2;
+        reply_msg.type = 0; // STABILIZE
+
+        waypoint_publisher_->publish(reply_msg);
+        }
     }
 
   }
