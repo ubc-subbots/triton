@@ -7,7 +7,7 @@
       # Thrusters will follow the following naming convention: 
 
       #               ___      Thruster 3
-      #    Thruster 5 ___________|__|________
+      #    Thruster 5 (1?)___________|__|________
       #                 |                    |
       #                 |        +y          |
       #            Thruster 4 |||            |_
@@ -16,7 +16,7 @@
       #                 |   (pointing up)    |
       #               __|____________________|   
       #    Thruster 2 ___        |  |        
-      #                        Thruster 1
+      #                        Thruster 1 (2?)
 
     num_thrusters: 5
     bits_per_thruster: 5

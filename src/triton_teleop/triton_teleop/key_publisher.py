@@ -35,8 +35,8 @@ CHAR_TO_THRUSTER = {
     "h": [('m', -1)],
     "u": [('br', 1)],
     "j": [('br', -1)],
-    "i": [('bl', 1)],
-    "k": [('bl', -1)],
+    "i": [('tr', 1)],
+    "k": [('tr', -1)],
 }
 
 def encode_msg(thruster_power_level):
@@ -47,7 +47,7 @@ def encode_msg(thruster_power_level):
     t2_bits = (thruster_power_level["br"]+ENCODE_OFFSET) << T2_SHIFT_VAL
     t1_bits = (thruster_power_level["tr"]+ENCODE_OFFSET) << T1_SHIFT_VAL
 
-    return (t6_bits | t5_bits | t4_bits | t3_bits | t2_bits | t1_bits)
+    return (0b10101010000000000000000000000000 | t5_bits | t4_bits | t3_bits | t2_bits | t1_bits)
 
 
 class KeyPublisher(Node):

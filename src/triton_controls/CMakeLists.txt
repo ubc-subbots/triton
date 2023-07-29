@@ -149,6 +149,8 @@ ament_python_install_package(${PROJECT_NAME})
 install(PROGRAMS
   triton_controls/auv_transform_publisher.py
   triton_controls/waypoint_marker_tester.py
+  triton_controls/predetermined_route.py
+  triton_controls/predetermined_thrust.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
