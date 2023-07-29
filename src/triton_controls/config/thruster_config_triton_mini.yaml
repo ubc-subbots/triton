@@ -6,43 +6,43 @@
 
       # Thrusters will follow the following naming convention: 
 
-      #               ___      Thruster 3
-      #    Thruster 5 (1?)___________|__|________
+      #               ___      Thruster 1
+      #    Thruster 3 ___________|__|________
       #                 |                    |
       #                 |        +y          |
-      #            Thruster 4 |||            |_
+      #            Thruster 5 |||            |_
       #                 |     |||___+x       |_) AUV front 
       #                 |     +z             |
       #                 |   (pointing up)    |
       #               __|____________________|   
-      #    Thruster 2 ___        |  |        
-      #                        Thruster 1 (2?)
+      #    Thruster 4 ___        |  |        
+      #                        Thruster 2
 
     num_thrusters: 5
     bits_per_thruster: 5
     max_fwd: 3.71 # kgf 
     max_rev: 2.92 # kgf 
-    t2:
+    t4: # changed
       contrib: 
         x: 1.0
         y: 0.0
       lx: -0.5
       ly: -0.5
-    t5:
+    t3: # changed
       contrib: 
         x: 1.0
         y: 0.0
       lx: -0.5
       ly: 0.5
-    t3:
+    t1: # changed
       contrib:
         z: 1.0
       lx: 0.0
       ly: 0.5
-    t1:
+    t2: # changed
       contrib: 
         z: 1.0
       ly: -0.5
-    t4:
+    t5: # changed
       contrib:
         y: -1.0
