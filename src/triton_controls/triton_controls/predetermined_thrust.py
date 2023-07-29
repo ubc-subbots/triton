@@ -41,58 +41,58 @@ STATIONARY = {
     "5": 0,
 }
 FORWARD = {
+    "3": DEFAULT_EFFORT,
+    "4": DEFAULT_EFFORT,
     "1": 0,
-    "2": DEFAULT_EFFORT,
-    "3": 0,
-    "4": 0,
-    "5": DEFAULT_EFFORT,
+    "2": 0,
+    "5": 0,
 }
 BACKWARD = {
+    "3": -DEFAULT_EFFORT,
+    "4": -DEFAULT_EFFORT,
     "1": 0,
-    "2": -DEFAULT_EFFORT,
-    "3": 0,
-    "4": 0,
-    "5": -DEFAULT_EFFORT,
+    "2": 0,
+    "5": 0,
 }
 RIGHT_TURN = {
+    "3": DEFAULT_EFFORT,
+    "4": -DEFAULT_EFFORT,
     "1": 0,
-    "2": -DEFAULT_EFFORT,
-    "3": 0,
-    "4": 0,
-    "5": DEFAULT_EFFORT,
+    "2": 0,
+    "5": 0,
 }
 LEFT_TURN = {
+    "3": -DEFAULT_EFFORT,
+    "4": DEFAULT_EFFORT,
     "1": 0,
-    "2": DEFAULT_EFFORT,
-    "3": 0,
-    "4": 0,
-    "5": -DEFAULT_EFFORT,
+    "2": 0,
+    "5": 0,
 }
 RIGHT_SWAY = {
     "1": 0,
     "2": 0,
     "3": 0,
-    "4": DEFAULT_EFFORT,
-    "5": 0,
+    "4": 0,
+    "5": DEFAULT_EFFORT,
 }
 LEFT_SWAY = {
     "1": 0,
     "2": 0,
     "3": 0,
-    "4": -DEFAULT_EFFORT,
-    "5": 0,
+    "4": 0,
+    "5": -DEFAULT_EFFORT,
 }
 UPWARD = {
     "1": DEFAULT_EFFORT,
-    "2": 0,
-    "3": DEFAULT_EFFORT,
+    "2": DEFAULT_EFFORT,
+    "3": 0,
     "4": 0,
     "5": 0,
 }
 DOWNWARD = {
     "1": -DEFAULT_EFFORT,
-    "2": 0,
-    "3": -DEFAULT_EFFORT,
+    "2": -DEFAULT_EFFORT,
+    "3": 0,
     "4": 0,
     "5": 0,
 }
