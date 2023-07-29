@@ -44,6 +44,7 @@ namespace triton_controls
   void SerialSubscriber::controlCallback(const std_msgs::msg::UInt32::SharedPtr msg) const
   {
     //RCLCPP_INFO(this->get_logger(), "WRITING SERIAL");
+    std::cout << "Serial subscriber writing message: " << msg->data << std::endl;
     write(fd_, &msg->data, 4);
   }
 

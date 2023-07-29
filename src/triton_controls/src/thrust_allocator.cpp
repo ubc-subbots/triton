@@ -102,6 +102,10 @@ namespace triton_controls
         // std::cout << "thruster " << i << " " << thruster_thrust << " " << t_bits  << " " << (t_bits >> bits_per_thruster_ * i) << std::endl;
         signal |= t_bits;
       }
+      // TEMP FIX: PLEASE CHANGE ME LATER
+      // so that the teensy can distinguish between rubbish and real data
+      signal |= 0b10101010000000000000000000000000;
+
 
       auto forces_msg = std_msgs::msg::Float64MultiArray();
       forces_msg.data = thrust;
