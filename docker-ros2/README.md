@@ -1,5 +1,5 @@
-# Docker container for ROS2 environment for Jetson TX2
-This container contains everything you need to run the ROS2 system of the robot, so that a brand new in box TX2 can be up and running in less than an hour.
+# Docker container for ROS2 environment for local development
+This container contains everything you need to run the ROS2 environment locally.
 
 ## How to run
 This assumes you have followed the TX2 imaging guide in Wiki.
