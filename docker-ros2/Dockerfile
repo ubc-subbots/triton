@@ -65,25 +65,26 @@ RUN make install
 RUN /bin/bash -c "source /opt/ros/foxy/install/setup.bash; rosdep update"
 
 # Micro-ROS Setup
-RUN mkdir /root/microros_ws
-WORKDIR /root/microros_ws
-RUN git clone -b foxy https://github.com/micro-ROS/micro_ros_setup.git src/micro_ros_setup
-RUN /bin/bash -c 'source /opt/ros/foxy/install/setup.bash; rosdep update && rosdep install -i --from-path src --ignore-src -y'
-RUN /bin/bash -c 'source /opt/ros/foxy/install/setup.bash; colcon build'
-RUN /bin/bash -c 'source /opt/ros/foxy/install/setup.bash; source /root/microros_ws/install/local_setup.bash; ros2 run micro_ros_setup create_agent_ws.sh'
-RUN /bin/bash -c 'source /opt/ros/foxy/install/setup.bash; source /root/microros_ws/install/local_setup.bash; colcon build --cmake-args -DUAGENT_USE_SYSTEM_LOGGER=ON'
+#RUN mkdir /root/microros_ws
+#WORKDIR /root/microros_ws
+#RUN git clone -b foxy https://github.com/micro-ROS/micro_ros_setup.git src/micro_ros_setup
+#RUN /bin/bash -c 'source /opt/ros/foxy/install/setup.bash; rosdep update && rosdep install -i --from-path src --ignore-src -y'
+#RUN /bin/bash -c 'source /opt/ros/foxy/install/setup.bash; colcon build'
+#RUN /bin/bash -c 'source /opt/ros/foxy/install/setup.bash; source /root/microros_ws/install/local_setup.bash; ros2 run micro_ros_setup create_agent_ws.sh'
+#RUN /bin/bash -c 'source /opt/ros/foxy/install/setup.bash; source /root/microros_ws/install/local_setup.bash; colcon build --cmake-args -DUAGENT_USE_SYSTEM_LOGGER=ON'
 
 # Setup and build Triton
-WORKDIR /root/triton
-RUN /bin/bash -c 'source /opt/ros/foxy/install/setup.bash; source /root/ros2_ws/install/local_setup.bash; rosdep update && rosdep install -i --from-path src --rosdistro foxy --skip-keys "gazebo_ros gazebo_dev gazebo_ros_pkgs" -y'
-RUN python3 -m pip install setuptools==58.2.0
-RUN /bin/bash -c "source /opt/ros/foxy/install/setup.bash; source /root/ros2_ws/install/local_setup.bash; colcon build --packages-skip triton_gazebo"
-RUN echo "source /root/triton/install/setup.bash" >> /root/.bashrc
-RUN echo 'echo "Sourced Triton in /root/triton/"' >> /root/.bashrc
-RUN echo "source /root/microros_ws/install/local_setup.bash" >> /root/.bashrc
-RUN echo "alias cbs='colcon build --packages-skip triton_gazebo && source ./install/setup.bash'" >> /root/.bashrc
+#WORKDIR /root/triton
+#RUN /bin/bash -c 'source /opt/ros/foxy/install/setup.bash; source /root/ros2_ws/install/local_setup.bash; rosdep update && rosdep install -i --from-path src --rosdistro foxy --skip-keys "gazebo_ros gazebo_dev gazebo_ros_pkgs" -y'
+#RUN python3 -m pip install setuptools==58.2.0
+#RUN /bin/bash -c "source /opt/ros/foxy/install/setup.bash; source /root/ros2_ws/install/local_setup.bash; colcon build --packages-skip triton_gazebo"
+#RUN echo "source /root/triton/install/setup.bash" >> /root/.bashrc
+#RUN echo 'echo "Sourced Triton in /root/triton/"' >> /root/.bashrc
+#RUN echo "source /root/microros_ws/install/local_setup.bash" >> /root/.bashrc
+#RUN echo "alias cbs='colcon build --packages-skip triton_gazebo && source ./install/setup.bash'" >> /root/.bashrc
 
 # Install VIM
 RUN apt-get install -y --no-install-recommends vim
+RUN apt-get install -y --no-install-recommends neovim
 
 CMD /bin/bash
