@@ -1,0 +1,93 @@
+<root BTCPP_format="4">
+    
+    <!-- <include ros_pkg="triton_mission_planner" path="config/gate_tree.xml"/>
+    <include ros_pkg="triton_mission_planner" path="config/path_tree.xml"/>
+    <include ros_pkg="triton_mission_planner" path="config/buoy_tree.xml"/>
+    <include ros_pkg="triton_mission_planner" path="config/bins_tree.xml"/>
+    <include ros_pkg="triton_mission_planner" path="config/torpedo_tree.xml"/> -->
+
+    <BehaviorTree ID="MainTree">
+        <Sequence>
+            <SubTree ID="GateTree"/>
+            <SubTree ID="PathTree"/>
+            <SubTree ID="BuoyTree"/>
+            <SubTree ID="PathTree"/>
+            <SubTree ID="BinsTree"/>
+            <SubTree ID="TorpedoTree"/>
+        </Sequence>
+    </BehaviorTree>
+
+    <BehaviorTree ID="GateTree">
+        <ReactiveSequence>
+          <ReactiveFallback>
+            <GateIsVisible/>
+            <Action ID="GateFind"/>
+          </ReactiveFallback>
+          <ReactiveFallback>
+            <GateIsAligned/>
+            <Action ID="GateAlign"/>
+          </ReactiveFallback>
+          <Action ID="GateGoThrough"/>
+        </ReactiveSequence>
+    </BehaviorTree>
+
+    <BehaviorTree ID="PathTree">
+      <ReactiveSequence>
+          <ReactiveFallback>
+            <PathIsVisible/>
+            <Action ID="PathFind"/>
+          </ReactiveFallback>
+          <ReactiveFallback>
+            <PathIsAligned/>
+            <Action ID="PathAlign"/>
+          </ReactiveFallback>
+          <Action ID="PathFollow"/>
+        </ReactiveSequence>
+    </BehaviorTree>
+
+    <BehaviorTree ID="BuoyTree">
+      <ReactiveSequence>
+          <ReactiveFallback>
+            <BuoyIsVisible/>
+            <Action ID="BuoyFind"/>
+          </ReactiveFallback>
+          <ReactiveFallback>
+            <BuoyIsAligned/>
+            <Action ID="BuoyAlign"/>
+          </ReactiveFallback>
+          <Action ID="BuoyHit"/>
+        </ReactiveSequence>
+    </BehaviorTree>
+
+    <BehaviorTree ID="BinsTree">
+      <Sequence>
+        <ReactiveSequence>
+          <ReactiveFallback>
+            <BinIsVisible/>
+            <Action ID="BinFind"/>
+          </ReactiveFallback>
+          <ReactiveFallback>
+            <BinIsAligned/>
+            <Action ID="BinAlign"/>
+          </ReactiveFallback>
+          <Action ID="BinAlignAbove"/>
+        </ReactiveSequence>
+        <Action ID="BinDrop"/>
+      </Sequence>
+    </BehaviorTree>
+
+    <BehaviorTree ID="TorpedoTree">
+      <ReactiveSequence>
+          <ReactiveFallback>
+            <TargetIsVisible/>
+            <Action ID="TargetFind"/>
+          </ReactiveFallback>
+          <ReactiveFallback>
+            <TargetIsAligned/>
+            <Action ID="TargetAlign"/>
+          </ReactiveFallback>
+          <Action ID="TargetShoot"/>
+        </ReactiveSequence>
+    </BehaviorTree>
+
+</root>
