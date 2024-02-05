@@ -6,7 +6,7 @@ from pynput import keyboard
 
 class KeyboardTeleop(Node):
     """
-    Keyboard teleop controller
+    Keyboard teleop controllers
     """
 
     def __init__(self):
