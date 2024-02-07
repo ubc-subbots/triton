@@ -1,5 +1,5 @@
-#ifndef TRITON_MISSION_PLANNER__GATE_TREE
-#define TRITON_MISSION_PLANNER__GATE_TREE
+#ifndef TRITON_MISSION_PLANNER__PATH_TREE
+#define TRITON_MISSION_PLANNER__PATH_TREE
 
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
@@ -19,12 +19,12 @@ namespace triton_mission_planner
   class MissionPlanner;
 
 
-  class GateIsVisible : public BT::ConditionNode
+  class PathIsVisible : public BT::ConditionNode
   {
     public:
 
 
-      /** Constructor for the gate visibility check condition.
+      /** Constructor for the path visibility check condition.
        * 
        * @param name the name of the instance.
        * @param config behavior tree options (unused because no blackboard ports),
@@ -35,7 +35,7 @@ namespace triton_mission_planner
        * the mission planner node.
        * 
        */
-      GateIsVisible(const std::string& name, const BT::NodeConfig& config, MissionPlanner* rosnode);
+      PathIsVisible(const std::string& name, const BT::NodeConfig& config, MissionPlanner* rosnode);
 
 
       static BT::PortsList providedPorts(); // needed for compilation
@@ -51,12 +51,12 @@ namespace triton_mission_planner
   };
 
 
-  class GateFind : public BT::StatefulActionNode
+  class PathFind : public BT::StatefulActionNode
   {
     public:
 
 
-      GateFind(const std::string& name, const BT::NodeConfig& config, MissionPlanner* rosnode);
+      PathFind(const std::string& name, const BT::NodeConfig& config, MissionPlanner* rosnode);
 
       
       static BT::PortsList providedPorts(); // needed for compilation
@@ -78,12 +78,12 @@ namespace triton_mission_planner
   };
 
 
-  class GateIsAligned : public BT::ConditionNode
+  class PathIsAligned : public BT::ConditionNode
   {
     public:
 
 
-      GateIsAligned(const std::string& name, const BT::NodeConfig& config, MissionPlanner* rosnode);
+      PathIsAligned(const std::string& name, const BT::NodeConfig& config, MissionPlanner* rosnode);
 
 
       static BT::PortsList providedPorts(); // needed for compilation
@@ -99,12 +99,12 @@ namespace triton_mission_planner
   };
 
 
-  class GateAlign : public BT::StatefulActionNode
+  class PathAlign : public BT::StatefulActionNode
   {
     public:
 
 
-      GateAlign(const std::string& name, const BT::NodeConfig& config, MissionPlanner* rosnode);
+      PathAlign(const std::string& name, const BT::NodeConfig& config, MissionPlanner* rosnode);
 
 
       static BT::PortsList providedPorts(); // needed for compilation
@@ -126,12 +126,12 @@ namespace triton_mission_planner
   };
 
 
-  class GateGoThrough : public BT::StatefulActionNode
+  class PathFollow : public BT::StatefulActionNode
   {
     public:
 
 
-      GateGoThrough(const std::string& name, const BT::NodeConfig& config, MissionPlanner* rosnode);
+      PathFollow(const std::string& name, const BT::NodeConfig& config, MissionPlanner* rosnode);
 
 
       static BT::PortsList providedPorts(); // needed for compilation
@@ -155,4 +155,4 @@ namespace triton_mission_planner
 
 } // namespace triton_mission_planner
 
-#endif // TRITON_MISSION_PLANNER__GATE_TREE
+#endif // TRITON_MISSION_PLANNER__PATH_TREE

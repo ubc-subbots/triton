@@ -1,6 +1,9 @@
 #include "triton_mission_planner/mission_planner_root.hpp"
 using std::placeholders::_1;
 
+#include "triton_mission_planner/gate_tree.hpp"
+#include "triton_mission_planner/path_tree.hpp"
+
 namespace triton_mission_planner
 {
 
@@ -13,7 +16,7 @@ namespace triton_mission_planner
     BT::BehaviorTreeFactory factory;
     registerNodes(factory);
 
-    factory.registerBehaviorTreeFromText("../config/tree.xml");
+    factory.registerBehaviorTreeFromFile("../../config/tree.xml");
     auto tree = factory.createTree("MainTree");
 
     tree.tickWhileRunning();
@@ -80,6 +83,16 @@ namespace triton_mission_planner
     //custom condition nodes
     factory.registerNodeType<GateIsVisible>("GateIsVisble", this);
     factory.registerNodeType<GateIsAligned>("GateIsAligned", this);
+
+    //* path nodes
+    //custom action nodes
+    factory.registerNodeType<PathFind>("PathFind", this);
+    factory.registerNodeType<PathAlign>("PathAlign", this);
+    factory.registerNodeType<PathFollow>("PathFollow", this);
+
+    //custom condition nodes
+    factory.registerNodeType<PathIsVisible>("PathIsVisble", this);
+    factory.registerNodeType<PathIsAligned>("PathIsAligned", this);
 
     //TODO: add other registers
   }

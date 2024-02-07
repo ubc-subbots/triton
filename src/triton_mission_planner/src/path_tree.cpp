@@ -1,4 +1,4 @@
-#include "triton_mission_planner/gate_tree.hpp"
+#include "triton_mission_planner/path_tree.hpp"
 using std::placeholders::_1;
 
 #include "triton_mission_planner/mission_planner_root.hpp"
@@ -7,17 +7,17 @@ namespace triton_mission_planner
 {
 
 
-  GateIsVisible::GateIsVisible(const std::string& name, const BT::NodeConfig& config, MissionPlanner* rosnode) : ConditionNode(name, config), mp_(rosnode)
+  PathIsVisible::PathIsVisible(const std::string& name, const BT::NodeConfig& config, MissionPlanner* rosnode) : ConditionNode(name, config), mp_(rosnode)
   {}
 
 
-  BT::PortsList GateIsVisible::providedPorts() // needed for compilation
+  BT::PortsList PathIsVisible::providedPorts() // needed for compilation
   {
     return {};
   }
 
 
-  BT::NodeStatus GateIsVisible::tick()
+  BT::NodeStatus PathIsVisible::tick()
   {
     //TODO: launch object recognition
     //! only once
@@ -41,38 +41,38 @@ namespace triton_mission_planner
   }
 
 
-  GateFind::GateFind(const std::string& name, const BT::NodeConfig& config, MissionPlanner* rosnode) : StatefulActionNode(name, config), mp_(rosnode)
+  PathFind::PathFind(const std::string& name, const BT::NodeConfig& config, MissionPlanner* rosnode) : StatefulActionNode(name, config), mp_(rosnode)
   {}
 
 
-  BT::PortsList GateFind::providedPorts() // needed for compilation
+  BT::PortsList PathFind::providedPorts() // needed for compilation
   {
     return {};
   }
 
 
-  BT::NodeStatus GateFind::onStart()
+  BT::NodeStatus PathFind::onStart()
   {
     //TODO: launch trajectory generation
     //TODO: launch thrust allocation
     //TODO: launch pid controller
     
-    return GateFind::onRunning(); // calls onRunning to do common actions
+    return PathFind::onRunning(); // calls onRunning to do common actions
   }
 
 
-  BT::NodeStatus GateFind::onRunning()
+  BT::NodeStatus PathFind::onRunning()
   {
     triton_interfaces::msg::TrajectoryType msg;
     msg.set__type(triton_interfaces::msg::TrajectoryType::START);
 
     mp_->trajectoryGenerationTypePub(msg);
 
-    return BT::NodeStatus::RUNNING; // will be halted as soon as GateIsVisible returns SUCCESS
+    return BT::NodeStatus::RUNNING; // will be halted as soon as PathIsVisible returns SUCCESS
   }
 
 
-  void GateFind::onHalted()
+  void PathFind::onHalted()
   {
     //TODO: halt trajectory generation
     //TODO: halt thrust allocation
@@ -82,17 +82,17 @@ namespace triton_mission_planner
   }
 
 
-  GateIsAligned::GateIsAligned(const std::string& name, const BT::NodeConfig& config, MissionPlanner* rosnode) : ConditionNode(name, config), mp_(rosnode)
+  PathIsAligned::PathIsAligned(const std::string& name, const BT::NodeConfig& config, MissionPlanner* rosnode) : ConditionNode(name, config), mp_(rosnode)
   {}
 
 
-  BT::PortsList GateIsAligned::providedPorts() // needed for compilation
+  BT::PortsList PathIsAligned::providedPorts() // needed for compilation
   {
     return {};
   }
 
 
-  BT::NodeStatus GateIsAligned::tick()
+  BT::NodeStatus PathIsAligned::tick()
   {
     //TODO:
 
@@ -100,38 +100,38 @@ namespace triton_mission_planner
   }
 
 
-  GateAlign::GateAlign(const std::string& name, const BT::NodeConfig& config, MissionPlanner* rosnode) : StatefulActionNode(name, config), mp_(rosnode)
+  PathAlign::PathAlign(const std::string& name, const BT::NodeConfig& config, MissionPlanner* rosnode) : StatefulActionNode(name, config), mp_(rosnode)
   {}
 
 
-  BT::PortsList GateAlign::providedPorts() // needed for compilation
+  BT::PortsList PathAlign::providedPorts() // needed for compilation
   {
     return {};
   }
 
 
-  BT::NodeStatus GateAlign::onStart()
+  BT::NodeStatus PathAlign::onStart()
   {
     //TODO: launch trajectory generation
     //TODO: launch thrust allocation
     //TODO: launch pid controller
     
-    return GateAlign::onRunning(); // calls onRunning to do common actions
+    return PathAlign::onRunning(); // calls onRunning to do common actions
   }
 
 
-  BT::NodeStatus GateAlign::onRunning()
+  BT::NodeStatus PathAlign::onRunning()
   {
     triton_interfaces::msg::TrajectoryType msg; //! might need to move to onStart
     msg.set__type(triton_interfaces::msg::TrajectoryType::GATE); //? correct message type?
 
     mp_->trajectoryGenerationTypePub(msg);
 
-    return BT::NodeStatus::RUNNING; // will be halted as soon as GateIsAligned returns SUCCESS
+    return BT::NodeStatus::RUNNING; // will be halted as soon as PathIsAligned returns SUCCESS
   }
 
 
-  void GateAlign::onHalted()
+  void PathAlign::onHalted()
   {
     //TODO: halt trajectory generation
     //TODO: halt thrust allocation
@@ -139,17 +139,17 @@ namespace triton_mission_planner
   }
 
 
-  GateGoThrough::GateGoThrough(const std::string& name, const BT::NodeConfig& config, MissionPlanner* rosnode) : StatefulActionNode(name, config), mp_(rosnode)
+  PathFollow::PathFollow(const std::string& name, const BT::NodeConfig& config, MissionPlanner* rosnode) : StatefulActionNode(name, config), mp_(rosnode)
   {}
 
 
-  BT::PortsList GateGoThrough::providedPorts() // needed for compilation
+  BT::PortsList PathFollow::providedPorts() // needed for compilation
   {
     return {};
   }
 
 
-  BT::NodeStatus GateGoThrough::onStart()
+  BT::NodeStatus PathFollow::onStart()
   {
     //TODO:
 
@@ -157,7 +157,7 @@ namespace triton_mission_planner
   }
 
 
-  BT::NodeStatus GateGoThrough::onRunning()
+  BT::NodeStatus PathFollow::onRunning()
   {
     //TODO:
 
@@ -165,7 +165,7 @@ namespace triton_mission_planner
   }
 
 
-  void GateGoThrough::onHalted()
+  void PathFollow::onHalted()
   {
     //TODO:
   }

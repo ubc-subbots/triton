@@ -12,8 +12,6 @@
 #include "triton_interfaces/msg/trajectory_type.hpp"
 #include "triton_interfaces/msg/object_offset.hpp"
 
-#include "triton_mission_planner/gate_tree.hpp" //! probably excessive
-
 namespace triton_mission_planner
 {
 

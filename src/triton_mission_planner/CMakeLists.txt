@@ -28,6 +28,7 @@ include_directories(include ${catkin_INCLUDE_DIRS})
 add_library(triton_mission_planner SHARED
   src/mission_planner_root.cpp
   src/gate_tree.cpp
+  src/path_tree.cpp
 )
 
 target_link_libraries(triton_mission_planner behaviortree_cpp)
