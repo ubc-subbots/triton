@@ -29,6 +29,9 @@ add_library(triton_mission_planner SHARED
   src/mission_planner_root.cpp
   src/gate_tree.cpp
   src/path_tree.cpp
+  src/buoy_tree.cpp
+  src/bin_tree.cpp
+  src/torpedo_tree.cpp
 )
 
 target_link_libraries(triton_mission_planner behaviortree_cpp)

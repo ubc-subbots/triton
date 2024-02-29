@@ -14,11 +14,11 @@
     <BehaviorTree ID="GateTree">
         <ReactiveSequence>
           <ReactiveFallback>
-            <Action ID="GateIsVisible"/>
+            <Condition ID="GateIsVisible"/>
             <Action ID="GateFind"/>
           </ReactiveFallback>
           <ReactiveFallback>
-            <Action ID="GateIsAligned"/>
+            <Condition ID="GateIsAligned"/>
             <Action ID="GateAlign"/>
           </ReactiveFallback>
           <Action ID="GateGoThrough"/>
@@ -28,11 +28,11 @@
     <BehaviorTree ID="PathTree">
       <ReactiveSequence>
           <ReactiveFallback>
-            <Action ID="PathIsVisible"/>
+            <Condition ID="PathIsVisible"/>
             <Action ID="PathFind"/>
           </ReactiveFallback>
           <ReactiveFallback>
-            <Action ID="PathIsAligned"/>
+            <Condition ID="PathIsAligned"/>
             <Action ID="PathAlign"/>
           </ReactiveFallback>
           <Action ID="PathFollow"/>
@@ -42,26 +42,26 @@
     <BehaviorTree ID="BuoyTree">
       <ReactiveSequence>
           <ReactiveFallback>
-            <Action ID="BuoyIsVisible"/>
+            <Condition ID="BuoyIsVisible"/>
             <Action ID="BuoyFind"/>
           </ReactiveFallback>
           <ReactiveFallback>
-            <Action ID="BuoyIsAligned"/>
+            <Condition ID="BuoyIsAligned"/>
             <Action ID="BuoyAlign"/>
           </ReactiveFallback>
           <Action ID="BuoyHit"/>
         </ReactiveSequence>
     </BehaviorTree>
 
-    <BehaviorTree ID="BinsTree">
+    <BehaviorTree ID="BinTree">
       <Sequence>
         <ReactiveSequence>
           <ReactiveFallback>
-            <Action ID="BinIsVisible"/>
+            <Condition ID="BinIsVisible"/>
             <Action ID="BinFind"/>
           </ReactiveFallback>
           <ReactiveFallback>
-            <Action ID="BinIsAligned"/>
+            <Condition ID="BinIsAligned"/>
             <Action ID="BinAlign"/>
           </ReactiveFallback>
           <Action ID="BinAlignAbove"/>
@@ -73,11 +73,11 @@
     <BehaviorTree ID="TorpedoTree">
       <ReactiveSequence>
           <ReactiveFallback>
-            <Action ID="TargetIsVisible"/>
+            <Condition ID="TargetIsVisible"/>
             <Action ID="TargetFind"/>
           </ReactiveFallback>
           <ReactiveFallback>
-            <Action ID="TargetIsAligned"/>
+            <Condition ID="TargetIsAligned"/>
             <Action ID="TargetAlign"/>
           </ReactiveFallback>
           <Action ID="TargetShoot"/>

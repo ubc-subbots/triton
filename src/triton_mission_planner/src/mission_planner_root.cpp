@@ -3,6 +3,9 @@ using std::placeholders::_1;
 
 #include "triton_mission_planner/gate_tree.hpp"
 #include "triton_mission_planner/path_tree.hpp"
+#include "triton_mission_planner/buoy_tree.hpp"
+#include "triton_mission_planner/bin_tree.hpp"
+#include "triton_mission_planner/torpedo_tree.hpp"
 
 namespace triton_mission_planner
 {
@@ -93,6 +96,37 @@ namespace triton_mission_planner
     //custom condition nodes
     factory.registerNodeType<PathIsVisible>("PathIsVisble", this);
     factory.registerNodeType<PathIsAligned>("PathIsAligned", this);
+
+    //* buoy nodes
+    //custom action nodes
+    factory.registerNodeType<BuoyFind>("BuoyFind", this);
+    factory.registerNodeType<BuoyAlign>("BuoyAlign", this);
+    factory.registerNodeType<BuoyHit>("BuoyHit", this);
+
+    //custom condition nodes
+    factory.registerNodeType<BuoyIsVisible>("BuoyIsVisble", this);
+    factory.registerNodeType<BuoyIsAligned>("BuoyIsAligned", this);
+
+    //* bin nodes
+    //custom action nodes
+    factory.registerNodeType<BinFind>("BinFind", this);
+    factory.registerNodeType<BinAlign>("BinAlign", this);
+    factory.registerNodeType<BinAlignAbove>("BinAlignAbove", this);
+    factory.registerNodeType<BinDrop>("BinDrop", this);
+
+    //custom condition nodes
+    factory.registerNodeType<BinIsVisible>("BinIsVisble", this);
+    factory.registerNodeType<BinIsAligned>("BinIsAligned", this);
+
+    //* torpedo nodes
+    //custom action nodes
+    factory.registerNodeType<TargetFind>("TargetFind", this);
+    factory.registerNodeType<TargetAlign>("TargetAlign", this);
+    factory.registerNodeType<TargetShoot>("TargetShoot", this);
+
+    //custom condition nodes
+    factory.registerNodeType<TargetIsVisible>("TargetIsVisble", this);
+    factory.registerNodeType<TargetIsAligned>("TargetIsAligned", this);
 
     //TODO: add other registers
   }
