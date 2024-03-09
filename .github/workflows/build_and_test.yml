@@ -25,8 +25,7 @@ jobs:
           rosdep update --include-eol
           rosdep install -i --from-path src --rosdistro foxy -y
           
-          pip uninstall em
-          pip install empy #Dependency issue
+          
           
       - name: Cache OpenCV
         id: opencv-cache
@@ -54,6 +53,8 @@ jobs:
         run: |
           source /opt/ros/foxy/setup.bash
           source /usr/share/gazebo/setup.sh
+          pip uninstall em
+          pip install empy #Dependency issue
           colcon build --cmake-args -DCMAKE_CXX_STANDARD=14
           source ./install/setup.bash
           colcon test
