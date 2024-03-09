@@ -24,6 +24,8 @@ jobs:
         run: |
           rosdep update --include-eol
           rosdep install -i --from-path src --rosdistro foxy -y
+          
+          pip uninstall em
           pip install empy #Dependency issue
           
       - name: Cache OpenCV
