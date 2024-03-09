@@ -70,7 +70,6 @@ Source the global ROS2 setup script in the terminal
 Next, install rosdep as such
  
     sudo apt install python3-rosdep2
-    rosdep update
     rosdep update --include-eol #(Foxy is now at end of life)
   
 Then, from the folder `triton`, resolve any dependency issues using the following command
