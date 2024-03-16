@@ -31,7 +31,7 @@ jobs:
 
       - name: Install empy package
         run: |
-          pip install empy
+         pip install em
           
           
           
@@ -61,6 +61,7 @@ jobs:
         run: |
           source /opt/ros/foxy/setup.bash
           source /usr/share/gazebo/setup.sh
+          pip uninstall em -y
           colcon build --cmake-args -DCMAKE_CXX_STANDARD=14
           source ./install/setup.bash
           colcon test
