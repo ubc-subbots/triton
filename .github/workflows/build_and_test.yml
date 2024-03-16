@@ -62,6 +62,9 @@ jobs:
           source /opt/ros/foxy/setup.bash
           source /usr/share/gazebo/setup.sh
           pip uninstall em -y
+          pip uninstall empy -y
+          pip install empy
+
           colcon build --cmake-args -DCMAKE_CXX_STANDARD=14
           source ./install/setup.bash
           colcon test
