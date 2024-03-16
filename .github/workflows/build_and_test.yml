@@ -53,9 +53,9 @@ jobs:
         run: |
           source /opt/ros/foxy/setup.bash
           source /usr/share/gazebo/setup.sh
-          sudo pip uninstall em -y
-          sudo pip uninstall empy -y
-          sudo pip install empy
+          pip uninstall em -y
+          
+          pip install empy --user
 
           colcon build --cmake-args -DCMAKE_CXX_STANDARD=14
           source ./install/setup.bash
