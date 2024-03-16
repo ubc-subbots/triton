@@ -31,7 +31,7 @@ jobs:
 
       - name: Install empy package
         run: |
-          pip install empy -y
+          pip install empy
           
           
           
