@@ -42,20 +42,5 @@ RUN useradd -m software && \
     echo 'software ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers.d/software && \
     echo 'software:password' | chpasswd
 
-USER software
-WORKDIR /home/software
-
-# ROS2 environment setup for the user
-RUN echo "source /opt/ros/foxy/setup.bash" >> ~/.bashrc
-
-# Custom messages for the user
-RUN echo "echo 'Hello, welcome to Ubuntu 20.04 with ROS2 installed'" >> ~/.bashrc && \
-    echo "echo 'Hashaam Zafar - 2023'" >> ~/.bashrc && \
-    echo "echo 'Contact Hzafar04@student.ubc.ca for any questions.'" >> ~/.bashrc
-
 # Source ROS2 setup.bash at the end
 ENTRYPOINT ["/bin/bash", "-c", "source /opt/ros/foxy/setup.bash && exec bash"]
-
-# Expose ports if needed for ROS2
-EXPOSE 11311
-
