@@ -1,8 +1,7 @@
 FROM ubuntu:20.04
-
 # Standard updating and installing required packages
-RUN apt-get update -y && \
-    apt-get install -y \
+RUN  apt-get update -y
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y \
     build-essential \
     git \
     curl \
