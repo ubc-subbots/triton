@@ -16,11 +16,6 @@ jobs:
       - name: Check out ubc-subbots/triton
         uses: actions/checkout@v2
 
-      - name: Setup ROS2 distro and system deps
-        uses: ros-tooling/setup-ros@v0.6
-        with:
-          required-ros-distributions: foxy
-
       - name: Install deps with rosdep
         run: |
           rosdep update --include-eol
