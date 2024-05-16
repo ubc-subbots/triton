@@ -2,18 +2,17 @@ name: ROS2 Build and Test CI
 
 on:
   push:
-    branches: [ master]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
   workflow_dispatch:
 
 jobs:
   build_and_test:
     runs-on: ubuntu-20.04
     container:
-      image: ./docker/testing/Dockerfile
+      image: hashaam1217/subbots_triton_testing:1.0.0
     steps:
-
       - name: Check out ubc-subbots/triton
         uses: actions/checkout@v2
 
@@ -26,7 +25,6 @@ jobs:
         run: |
           rosdep update --include-eol
           rosdep install -i --from-path src --rosdistro foxy -y
-
 
       - name: Cache OpenCV
         id: opencv-cache
@@ -55,10 +53,9 @@ jobs:
           source /opt/ros/foxy/setup.bash
           source /usr/share/gazebo/setup.sh
           pip uninstall em -y
-
           pip install empy --user
-
           colcon build --cmake-args -DCMAKE_CXX_STANDARD=14
           source ./install/setup.bash
           colcon test
           colcon test-result --verbose
+
