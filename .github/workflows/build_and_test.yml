@@ -13,6 +13,13 @@ jobs:
     container:
       image: hashaam1217/subbots_triton_testing:1.0.1
     steps:
+      - name: Ensure Permissions
+        run: |
+          sudo mkdir -p /__w/_temp
+          sudo mkdir -p /__w/_actions
+          sudo chmod -R 777 /__w/_temp
+          sudo chmod -R 777 /__w/_actions
+
       - name: Check out ubc-subbots/triton
         uses: actions/checkout@v2
 
@@ -43,6 +50,7 @@ jobs:
           touch ./opencv-install/COLCON_IGNORE
 
       - name: Source setup and build then test using colcon
+        shell: bash
         env:
           LD_LIBRARY_PATH: /usr/local/lib/
         run: |
