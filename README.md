@@ -1,6 +1,6 @@
 # Triton AUV
 
-This repository contains the ROS2 system for the UBC SubBots Triton AUV. It is meant be launched in Ubuntu 20.04 on the Jetson TX2 on board the Triton AUV. 
+This repository contains the ROS2 system for the UBC SubBots Triton AUV. It is meant be launched in Ubuntu 20.04 on the Jetson TX2 on board the Triton AUV.
 
 # Contents
 
