@@ -98,7 +98,7 @@ If this command executes successfully, you are ready to develop!
 
 ## Contributing
 To learn how to contribute to this repo, see the seperate [workflow](WORKFLOW.md) and [conventions](CONVENTIONS.md) documents.
-    
+
 ## Tips
 Here are some tips to be aware of when developing on this repository and when developing in ROS2 in general
 - Make sure when you run any `colcon` command such as `colcon build` or `colcon test` that you do so in the root folder of this directory (i.e `triton`)
