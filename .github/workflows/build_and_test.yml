@@ -20,6 +20,11 @@ jobs:
           sudo chmod -R 777 /__w/_temp
           sudo chmod -R 777 /__w/_actions
 
+      - name: Update and upgrade
+        run: |
+          sudo apt update -y
+          sudo apt upgrade -y
+
       - name: Check out ubc-subbots/triton
         uses: actions/checkout@v2
 
