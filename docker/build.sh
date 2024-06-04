@@ -3,6 +3,7 @@
 # prepare sources
 rosdep update --include-eol
 sudo apt update
+sudo apt install pip -y
 
 # fetch repo
 git clone https://github.com/ubc-subbots/triton.git
