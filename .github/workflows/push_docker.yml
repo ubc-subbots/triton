@@ -2,13 +2,12 @@ name: Build and push triton Docker image
 
 on:
   push:
-    branches: [ master ]
-  workflow_dispatch:
+    workflow_dispatch:
 
 jobs:
   docker:
     runs-on: ubuntu-20.04
-    steps: 
+    steps:
 
       - name: Check out ubc-subbots/triton
         uses: actions/checkout@v2
