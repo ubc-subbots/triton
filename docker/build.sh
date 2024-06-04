@@ -8,13 +8,8 @@ sudo apt update
 sudo apt install pip -y
 sudo apt update
 
-
-
-### Installing Opencv --START
-#!/bin/bash
-
+# Installing OpenCV from source
 # Install prerequisites
-sudo apt update
 sudo apt install -y cmake g++ wget unzip
 
 # Download and unpack OpenCV sources
@@ -34,14 +29,6 @@ sudo make install
 # Clean up
 cd ..
 rm -rf build opencv.zip opencv-4.5.3
-
-### Installing Opencv --END
-
-
-
-
-#sudo apt install libopencv-dev python3-opencv
-# sudo apt install ros-foxy-cv-bridge
 
 # fetch repo
 git clone https://github.com/ubc-subbots/triton.git
