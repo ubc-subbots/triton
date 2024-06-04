@@ -15,5 +15,6 @@ cd triton
 # install deps and build
 rosdep install -i --from-path src --rosdistro foxy -y
 source /opt/ros/foxy/setup.bash
+colcon clean --all
 pkg-config --modversion opencv #Debuging OpenCV Version
 colcon build
