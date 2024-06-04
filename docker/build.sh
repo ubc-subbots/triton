@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # prepare sources
-rosdep update
+rosdep update --include-eol
 sudo apt update
 
 # fetch repo
