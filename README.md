@@ -1,6 +1,6 @@
 # Triton AUV
 
-This repository contains the ROS2 system for the UBC SubBots Triton AUV. It is meant be launched in Ubuntu 20.04 on the Jetson TX2 on board the Triton AUV. 
+This repository contains the ROS2 system for the UBC SubBots Triton AUV. It is meant be launched in Ubuntu 20.04 on the Jetson TX2 on board the Triton AUV.
 
 # Contents
 
@@ -70,7 +70,7 @@ Source the global ROS2 setup script in the terminal
 Next, install rosdep as such
  
     sudo apt install python3-rosdep2
-    rosdep update
+    rosdep update --include-eol #(Foxy is now at end of life)
   
 Then, from the folder `triton`, resolve any dependency issues using the following command
  
