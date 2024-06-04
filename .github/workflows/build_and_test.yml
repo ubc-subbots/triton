@@ -2,29 +2,38 @@ name: ROS2 Build and Test CI
 
 on:
   push:
-    branches: [ master]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
   workflow_dispatch:
 
 jobs:
   build_and_test:
     runs-on: ubuntu-20.04
+    container:
+      image: hashaam1217/subbots_triton_testing:1.0.1
     steps:
+      - name: Ensure Permissions
+        run: |
+          sudo mkdir -p /__w/_temp
+          sudo mkdir -p /__w/_actions
+          sudo chmod -R 777 /__w/_temp
+          sudo chmod -R 777 /__w/_actions
+
+      - name: Update and upgrade
+        run: |
+          sudo apt update -y
+          sudo apt upgrade -y
 
       - name: Check out ubc-subbots/triton
         uses: actions/checkout@v2
 
-      - name: Setup ROS2 distro and system deps
-        uses: ros-tooling/setup-ros@v0.2
-        with: 
-          required-ros-distributions: foxy
-
       - name: Install deps with rosdep
         run: |
-          rosdep update
+          rosdep init
+          rosdep update --include-eol
           rosdep install -i --from-path src --rosdistro foxy -y
-          
+
       - name: Cache OpenCV
         id: opencv-cache
         uses: actions/cache@v2
@@ -34,18 +43,19 @@ jobs:
 
       - name: Install OpenCV
         uses: rayandrews/with-opencv-action@v1
-        with:  
+        with:
           dir: ./opencv-install
           cached: ${{ steps.opencv-cache.outputs.cache-hit }}
           opencv-version: '4.5.3'
-          CMAKE_BUILD_TYPE: RELEASE   
+          CMAKE_BUILD_TYPE: RELEASE
           ENABLE_PRECOMPILED_HEADERS: OFF
-          
+
       - name: Ignore with colcon build
         run: |
           touch ./opencv-install/COLCON_IGNORE
-          
+
       - name: Source setup and build then test using colcon
+        shell: bash
         env:
           LD_LIBRARY_PATH: /usr/local/lib/
         run: |
@@ -55,6 +65,4 @@ jobs:
           source ./install/setup.bash
           colcon test
           colcon test-result --verbose
-
-
 
