@@ -1,8 +1,9 @@
 name: Build and push triton Docker image
 
 on:
-  push: 
+  push:
     branches: [ master ]
+  workflow_dispatch:
 
 jobs:
   docker:
@@ -17,7 +18,7 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-      
+
       - name: Build and push Docker image
         uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
         with:
