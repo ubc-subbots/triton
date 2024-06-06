@@ -60,10 +60,14 @@ namespace triton_object_recognition
         std::shared_ptr<cv::dnn::Net> net_;
 
         //Default Neural Net Parameters (overriden by parameters)
-        std::string weights_url_ = "https://pjreddie.com/media/files/tiny.weights";
-        std::string weights_filename_ = "tiny.weights";
-        std::string cfg_url_ = "https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/yolov3-tiny.cfg";
-        std::string cfg_filename_ = "yolov3-tiny.cfg";
+        // THESE ARE RELATED TO DARKNET SO I HAVE COMMENTED THEM OUT 
+        // std::string weights_url_ = "https://pjreddie.com/media/files/tiny.weights";
+        // std::string weights_filename_ = "tiny.weights";
+        // std::string cfg_url_ = "https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/yolov3-tiny.cfg";
+        // std::string cfg_filename_ = "yolov3-tiny.cfg";
+
+        std::string weights_filename_ = "config/weights/best.pt";  // Path to the PyTorch model
+
         cv::dnn::Backend backend_ = cv::dnn::DNN_BACKEND_OPENCV;
         cv::dnn::Target target_ = cv::dnn::DNN_TARGET_CPU;
         std::vector<std::string> classes_;
