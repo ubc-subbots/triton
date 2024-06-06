@@ -18,12 +18,12 @@ jobs:
           sudo chmod -R 777 /__w/_actions
 
       - name: Update and upgrade
-        run: |
+        run: |    
           sudo apt update -y
-          sudo apt upgrade -y
+          sudo apt upgrade -y 
 
       - name: Check out ubc-subbots/triton
-        uses: actions/checkout@v3  # Update to the latest version
+        uses: actions/checkout@v3  # Update to the latest version.
 
       - name: Install deps with rosdep
         run: |
