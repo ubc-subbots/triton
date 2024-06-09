@@ -3,6 +3,9 @@
 #include <boost/filesystem.hpp>
 #include <rcl_yaml_param_parser/parser.h>
 #include "ament_index_cpp/get_package_share_directory.hpp"
+#include <torch/script.h> // One-stop header for TorchScript
+#include <torch/torch.h>  // General purpose header for PyTorch
+
 using std::placeholders::_1;
 using std::placeholders::_2;
 using std::placeholders::_3;
@@ -118,7 +121,7 @@ namespace triton_object_recognition
     
     // Load PyTorch model
     try {
-        module_ = std::make_shared<torch::jit::script::Module>(torch::jit::load(model_weights.string()));
+        module_ = torch::jit::load(model_weights.string());
         module_->eval();  // Set the model to evaluation mode
     } catch (const c10::Error &e) {
         RCLCPP_ERROR(this->get_logger(), "Error loading the model: %s", e.what());
@@ -126,7 +129,7 @@ namespace triton_object_recognition
     }
 
     RCLCPP_INFO(get_logger(), "Object Recognizer successfully started!");
-
+    }
     void ObjectRecognizer::subscriberCallback(const sensor_msgs::msg::Image::ConstSharedPtr & msg) const
     {
         #if DEBUG_VISUALIZE
