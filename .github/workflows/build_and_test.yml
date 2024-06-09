@@ -51,14 +51,20 @@ jobs:
         run: |
           touch ./opencv-install/COLCON_IGNORE
 
+      - name: Download and extract LibTorch
+        run: |
+          wget https://download.pytorch.org/libtorch/cu111/libtorch-shared-with-deps-1.8.1%2Bcu111.zip
+          unzip -o libtorch-shared-with-deps-1.8.1+cu111.zip -d libtorch
+
       - name: Source setup and build then test using colcon
         shell: bash
         env:
           LD_LIBRARY_PATH: /usr/local/lib/
+          Torch_DIR: ${{ github.workspace }}/libtorch/libtorch/share/cmake/Torch
         run: |
           source /opt/ros/foxy/setup.bash
           source /usr/share/gazebo/setup.sh
-          colcon build --cmake-args -DCMAKE_CXX_STANDARD=14
+          colcon build --cmake-args -DCMAKE_CXX_STANDARD=14 -DTorch_DIR=$Torch_DIR
           source ./install/setup.bash
           colcon test
           colcon test-result --verbose

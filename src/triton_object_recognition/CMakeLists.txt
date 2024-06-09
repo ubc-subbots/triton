@@ -25,9 +25,15 @@ find_package(cv_bridge REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(image_transport REQUIRED)
 find_package(OpenCV 4.5.3 REQUIRED)
-find_package(Boost REQUIRED COMPONENTS filesystem) 
-find_package(Torch REQUIRED)
+find_package(Boost REQUIRED COMPONENTS filesystem)
 
+# Use Torch_DIR environment variable if set
+if(DEFINED ENV{Torch_DIR})
+  set(Torch_DIR $ENV{Torch_DIR})
+else()
+  set(Torch_DIR "/default/path/to/libtorch/share/cmake/Torch")
+endif()
+find_package(Torch REQUIRED)
 
 include_directories(include ${catkin_INCLUDE_DIRS})
 include_directories(${OpenCV_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
@@ -38,7 +44,6 @@ add_library(triton_object_recognition SHARED
 
 target_link_libraries(triton_object_recognition ${OpenCV_LIBRARIES} ${Boost_LIBRARIES})
 target_link_libraries(your_executable_name "${TORCH_LIBRARIES}")
-
 
 rclcpp_components_register_nodes(triton_object_recognition 
   "triton_object_recognition::ObjectRecognizer"
