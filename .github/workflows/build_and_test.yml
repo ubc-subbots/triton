@@ -17,20 +17,27 @@ jobs:
           sudo chmod -R 777 /__w/_temp
           sudo chmod -R 777 /__w/_actions
 
+      # Cleaning up disk space
+      - name: Clean up disk space
+        run: |
+          sudo apt-get clean                      # Clean up APT cache
+          sudo rm -rf /var/lib/apt/lists/*        # Remove APT lists
+          sudo rm -rf /var/cache/apt/*            # Remove APT cache
+          sudo rm -rf /usr/share/man/??           # Remove man pages (optional)
+          sudo rm -rf /usr/share/man/??_*         # Remove man pages (optional)
+
       - name: Update and upgrade
         run: |    
-          sudo apt update -y
-          sudo apt upgrade -y
+          sudo apt update -y                      # Update package lists
+          sudo apt upgrade -y                     # Upgrade packages
 
       - name: Install CUDA
         run: |
-          sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/7fa2af80.pub
-          sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/3bf863cc.pub
+          sudo apt-key adv --fetch-keys http://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/7fa2af80.pub
           sudo sh -c 'echo "deb http://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64 /" > /etc/apt/sources.list.d/cuda.list'
           sudo apt-get update
           sudo apt-get -y install cuda
           sudo apt-get -y install libcudnn8 libcudnn8-dev
-
 
       - name: Set CUDA paths
         run: |
