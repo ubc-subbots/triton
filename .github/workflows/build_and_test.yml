@@ -25,6 +25,8 @@ jobs:
           sudo rm -rf /var/cache/apt/*
           sudo rm -rf /usr/share/man/?? 
           sudo rm -rf /usr/share/man/??_*
+          sudo rm -rf /var/tmp/*
+          sudo rm -rf /tmp/*
 
       - name: Update and upgrade
         run: |    
@@ -37,8 +39,7 @@ jobs:
           sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/3bf863cc.pub
           sudo sh -c 'echo "deb http://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64 /" > /etc/apt/sources.list.d/cuda.list'
           sudo apt-get update
-          sudo apt-get -y install cuda
-          sudo apt-get -y install libcudnn8 libcudnn8-dev
+          sudo apt-get -y install cuda libcudnn8 libcudnn8-dev
 
       - name: Set CUDA paths
         run: |
