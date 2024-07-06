@@ -27,17 +27,19 @@ namespace triton_mission_planner
     // coordinates: box.xyxy -> tensor([[1.0000,2.0000,3.0000,4.0000]])
     // probability: box.conf -> tensor([0.9528])
 
-    bool isVisible = false;
-    // const int32_t GATE_ID = 0;
+    const int32_t GATE_ID = 0;
 
-    // triton_interfaces::msg::DetectionBoxArray detBoxArr = mp_.getObjectRecognitionSubInfo();
+    triton_interfaces::msg::DetectionBoxArray::SharedPtr detBoxArr = mp_->getObjectRecognitionSubInfo();
 
-    // for (int i = 0; i < sizeof(detBoxArr.boxes) / sizeof(int); i ++)
-    // {
-    //   isVisible = detBoxArr.boxes[i].class_id == GATE_ID ? true : false; //! needs to differentiate between objects
-    // }
+    for (int i = 0; i < detBoxArr->boxes.size(); i ++)
+    {
+      if (detBoxArr->boxes[i].class_id == GATE_ID)
+      {
+        return BT::NodeStatus::SUCCESS;
+      }
+    }
 
-    return isVisible ? BT::NodeStatus::SUCCESS : BT::NodeStatus::FAILURE;
+    return BT::NodeStatus::FAILURE;
   }
 
 

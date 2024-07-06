@@ -17,7 +17,17 @@ namespace triton_mission_planner
     initSubs();
 
     BT::BehaviorTreeFactory factory;
-    registerNodes(factory);
+
+    const int PRE_COMP = 0;
+
+    if (PRE_COMP == 1)
+    {
+      // registerPreCompNodes(factory);
+    }
+    else
+    {
+      registerNodes(factory);
+    }
 
     factory.registerBehaviorTreeFromFile("../../config/tree.xml");
     auto tree = factory.createTree("MainTree");
@@ -127,8 +137,6 @@ namespace triton_mission_planner
     //custom condition nodes
     factory.registerNodeType<TargetIsVisible>("TargetIsVisble", this);
     factory.registerNodeType<TargetIsAligned>("TargetIsAligned", this);
-
-    //TODO: add other registers
   }
 
 
