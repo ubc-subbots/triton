@@ -14,6 +14,9 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
+# Adding LibTorch Path
+list(APPEND CMAKE_PREFIX_PATH "/home/hashaam1217/Downloads/rough/libtorch")
+
 # Find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
@@ -24,6 +27,7 @@ find_package(cv_bridge REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(image_transport REQUIRED)
 find_package(Boost REQUIRED COMPONENTS filesystem)
+find_package(Torch REQUIRED)
 
 # Include directories
 include_directories(
@@ -41,6 +45,7 @@ add_library(triton_object_recognition SHARED
 target_link_libraries(triton_object_recognition
   ${OpenCV_LIBRARIES}
   ${Boost_LIBRARIES}
+  ${TORCH_LIBRARIES}
 )
 
 # Register component nodes
@@ -59,6 +64,7 @@ ament_target_dependencies(triton_object_recognition
   image_transport
   OpenCV
   Boost
+  Torch
 )
 
 # Install the library and other directories
