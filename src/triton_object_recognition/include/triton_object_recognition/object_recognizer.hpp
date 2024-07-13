@@ -9,6 +9,8 @@
 #include "triton_interfaces/msg/detection_box_array.hpp"
 #include "triton_interfaces/srv/object_detection.hpp"
 #include <opencv2/opencv.hpp>
+#include <torch/torch.h>
+#include <torch/script.h>
 
 #ifndef DEBUG_VISUALIZE
     #define DEBUG_VISUALIZE 1
