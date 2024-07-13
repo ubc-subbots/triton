@@ -15,6 +15,9 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 
+list(APPEND CMAKE_PREFIX_PATH "~/libtorch/libtorch")
+set(Torch_DIR "~/libtorch/libtorch/share/cmake/Torch")
+
 
 # Find dependencies
 find_package(ament_cmake REQUIRED)
@@ -28,14 +31,17 @@ find_package(image_transport REQUIRED)
 find_package(Boost REQUIRED COMPONENTS filesystem)
 find_package(Torch REQUIRED)
 
+# message(SEND_ERROR "My boost value: ${Boost_INCLUDE_DIRS}")
 
 # Include directories
 include_directories(
   include
   ${OpenCV_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
-  ${Torch_INCLUDE_DIRS}
+  ${TORCH_INCLUDE_DIRS}
   ~/libtorch/libtorch/include
+  ~/libtorch/libtorch/include/torch/csrc/api/include
+
 )
 
 # Create a shared library
@@ -43,17 +49,16 @@ add_library(triton_object_recognition SHARED
   src/object_recognizer.cpp
 )
 
-target_include_directories(triton_object_recognition
-    ${Torch_DIR}/include
-)
+# message(SEND_ERROR "My torch value: ${TORCH_LIBRARIES}")
 
 # Link libraries
 target_link_libraries(triton_object_recognition
   ${OpenCV_LIBRARIES}
   ${Boost_LIBRARIES}
-  ${Torch_LIBRARIES}
-  ~/libtorch/libtorch/lib/libtorch.so
+  ${TORCH_LIBRARIES}
+  # ~/libtorch/libtorch/lib/libtorch.so
 )
+
 
 
 # Register component nodes
