@@ -3,8 +3,8 @@
 #include <boost/filesystem.hpp>
 #include <rcl_yaml_param_parser/parser.h>
 #include "ament_index_cpp/get_package_share_directory.hpp"
+#include <torch/torch.h> // General purpose header for PyTorch
 #include <torch/script.h> // One-stop header for TorchScript
-#include <torch/torch.h>  // General purpose header for PyTorch
 
 using std::placeholders::_1;
 using std::placeholders::_2;
@@ -54,6 +54,7 @@ namespace triton_object_recognition
         this->declare_parameter("mean", mean_);
         this->declare_parameter("backend", (int) backend_);
         this->declare_parameter("target", (int) target_);
+        f 
 
         this->get_parameter("weights_filename", weights_filename_);
         // this->get_parameter("cfg_filename", cfg_filename_);

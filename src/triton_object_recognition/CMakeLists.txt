@@ -1,18 +1,20 @@
 cmake_minimum_required(VERSION 3.5)
 project(triton_object_recognition)
 
-# Default to C99 for C and C++14 for C++
+# Default to C99 for C and C++17 for C++
 if(NOT CMAKE_C_STANDARD)
   set(CMAKE_C_STANDARD 99)
 endif()
 if(NOT CMAKE_CXX_STANDARD)
-  set(CMAKE_CXX_STANDARD 14)
+  set(CMAKE_CXX_STANDARD 17)
 endif()
 
 # Compiler options
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
+
+
 
 # Find dependencies
 find_package(ament_cmake REQUIRED)
@@ -24,12 +26,16 @@ find_package(cv_bridge REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(image_transport REQUIRED)
 find_package(Boost REQUIRED COMPONENTS filesystem)
+find_package(Torch REQUIRED)
+
 
 # Include directories
 include_directories(
   include
   ${OpenCV_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
+  ${Torch_INCLUDE_DIRS}
+  ~/libtorch/libtorch/include
 )
 
 # Create a shared library
@@ -37,11 +43,18 @@ add_library(triton_object_recognition SHARED
   src/object_recognizer.cpp
 )
 
+target_include_directories(triton_object_recognition
+    ${Torch_DIR}/include
+)
+
 # Link libraries
 target_link_libraries(triton_object_recognition
   ${OpenCV_LIBRARIES}
   ${Boost_LIBRARIES}
+  ${Torch_LIBRARIES}
+  ~/libtorch/libtorch/lib/libtorch.so
 )
+
 
 # Register component nodes
 rclcpp_components_register_nodes(triton_object_recognition 
@@ -59,6 +72,7 @@ ament_target_dependencies(triton_object_recognition
   image_transport
   OpenCV
   Boost
+  Torch
 )
 
 # Install the library and other directories
