@@ -59,23 +59,18 @@ namespace triton_object_recognition
 
         std::shared_ptr<cv::dnn::Net> net_;
 
-        //Default Neural Net Parameters (overriden by parameters)
-        std::string weights_url_ = "https://pjreddie.com/media/files/tiny.weights";
-        std::string weights_filename_ = "tiny.weights";
-        std::string cfg_url_ = "https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/yolov3-tiny.cfg";
-        std::string cfg_filename_ = "yolov3-tiny.cfg";
+        std::string weights_filename_ = "config/weights/best.pt";  // Path to the PyTorch model
         cv::dnn::Backend backend_ = cv::dnn::DNN_BACKEND_OPENCV;
         cv::dnn::Target target_ = cv::dnn::DNN_TARGET_CPU;
         std::vector<std::string> classes_;
         float conf_threshold_ = 0.2;
         float nms_threshold_ = 0.2;
         float scale_ = 0.00392;
-        int inp_width_ = 416;
-        int inp_height_ = 416;
+        int inp_width_ = 608;
+        int inp_height_ = 608;
         bool swap_rb_ = true;
-        float mean_ = 0.5;
+        cv::Scalar mean_ = cv::Scalar(0.5, 0.5, 0.5);
 
-        //Processing code adapted from https://github.com/opencv/opencv/blob/master/samples/dnn/object_detection.cpp
         /** Loads image data into network and runs model
          */
         void preprocess(const cv::Mat& frame) const;

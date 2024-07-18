@@ -1,10 +1,14 @@
-#There is an issue with ComposableNode where it doesn't understand the typical nested YAML structure
-#https://github.com/ros2/rclcpp/issues/715
+# There is an issue with ComposableNode where it doesn't understand the typical nested YAML structure
+# https://github.com/ros2/rclcpp/issues/715
 
-weights_filename: "yolov4-custom-3l.weights"
-cfg_filename: "yolov4-custom-3l.cfg"
-weights_url: "https://github.com/AlexeyAB/darknet/releases/download/darknet_yolo_v4_pre/yolov4-tiny.weights"
-cfg_url: "https://raw.githubusercontent.com/AlexeyAB/darknet/master/cfg/yolov4-tiny.cfg"
+weights_filename: "src/triton_object_recognition/config/weights/best.pt"
+# cfg_filename: "yolov4-custom-3l.cfg"
+# cfg_url: "https://raw.githubusercontent.com/AlexeyAB/darknet/master/cfg/yolov4-tiny.cfg"
+# We are using a PyTorch model that was trained and saved with the .pt file, so we typically do not need a separate configuration file like we would with Darknet models.
+
+# weights_url: "https://github.com/AlexeyAB/darknet/releases/download/darknet_yolo_v4_pre/yolov4-tiny.weights"
+# We do not need to download this weights file since we already have it in the folder.
+
 backend: 3 # cv::dnn::DNN_BACKEND_OPENCV
 target: 0 # cv::dnn::DNN_TARGET_CPU
 conf_threshold: 0.2
@@ -15,11 +19,10 @@ inp_height: 608
 swap_rb: true
 mean: 0.5
 classes:
-  - "Bootlegger"
-  - "Gman"
-  - "BinsBootlegger"
-  - "BinsGman"
-  - "BuoyBootlegger"
-  - "BuoyGman"
-  - "OctagonBootlegger"
-  - "OctagonGman"
+  - "Gate"
+  - "Buoy"
+  - "Map"
+  - "Marker"
+  - "Blue"
+  - "Red"
+  - "Red_Blue"
