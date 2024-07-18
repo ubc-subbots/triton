@@ -21,7 +21,7 @@ def generate_test_description():
     config = os.path.join(
         get_package_share_directory('triton_object_recognition'),
         'config',
-        'tiny_yolov3.yaml'
+        'custom_yolov4.yaml'
     )
 
     object_recognizer_container = ComposableNodeContainer(

@@ -17,13 +17,37 @@ jobs:
           sudo chmod -R 777 /__w/_temp
           sudo chmod -R 777 /__w/_actions
 
-      - name: Update and upgrade
+      # Cleaning up disk space
+      - name: Clean up disk space
         run: |
+          sudo apt-get clean
+          sudo rm -rf /var/lib/apt/lists/*
+          sudo rm -rf /var/cache/apt/*
+          sudo rm -rf /usr/share/man/?? 
+          sudo rm -rf /usr/share/man/??_*
+          sudo rm -rf /var/tmp/*
+          sudo rm -rf /tmp/*
+
+      - name: Update and upgrade
+        run: |    
           sudo apt update -y
           sudo apt upgrade -y
 
+      - name: Install CUDA
+        run: |
+          sudo apt-key adv --fetch-keys http://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/7fa2af80.pub
+          sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/3bf863cc.pub
+          sudo sh -c 'echo "deb http://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64 /" > /etc/apt/sources.list.d/cuda.list'
+          sudo apt-get update
+          sudo apt-get -y install cuda libcudnn8 libcudnn8-dev
+
+      - name: Set CUDA paths
+        run: |
+          echo "/usr/local/cuda/lib64" >> $GITHUB_PATH
+          echo "/usr/local/cuda/bin" >> $GITHUB_PATH
+
       - name: Check out ubc-subbots/triton
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3  # Update to the latest version.
 
       - name: Install deps with rosdep
         run: |
@@ -33,7 +57,7 @@ jobs:
 
       - name: Cache OpenCV
         id: opencv-cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3  # Update to the latest version
         with:
           path: ./opencv-install
           key: ${{ runner.os }}-opencv-cache
@@ -55,11 +79,11 @@ jobs:
         shell: bash
         env:
           LD_LIBRARY_PATH: /usr/local/lib/
+          Torch_DIR: ${{ github.workspace }}/libtorch/libtorch/share/cmake/Torch
         run: |
           source /opt/ros/foxy/setup.bash
           source /usr/share/gazebo/setup.sh
-          colcon build --cmake-args -DCMAKE_CXX_STANDARD=14
+          colcon build --cmake-args -DCMAKE_CXX_STANDARD=14 -DTorch_DIR=$Torch_DIR
           source ./install/setup.bash
           colcon test
           colcon test-result --verbose
-

@@ -5,17 +5,13 @@
 #include "ament_index_cpp/get_package_share_directory.hpp"
 using std::placeholders::_1;
 using std::placeholders::_2;
-using std::placeholders::_3;
-using namespace std;
-using namespace cv;
-using namespace dnn;
 
 namespace triton_object_recognition
 {
     ObjectRecognizer::ObjectRecognizer(const rclcpp::NodeOptions & options)
     : Node("object_recognizer", options) 
     {
-        //Create publisher, subscriber, and service
+        // Create publisher, subscriber, and service
         publisher_ = this->create_publisher<triton_interfaces::msg::DetectionBoxArray>(
             "object_recognizer/out", 
             10
@@ -23,23 +19,21 @@ namespace triton_object_recognition
 
         subscription_ = image_transport::create_subscription(this,
             "object_recognizer/in",
-            bind(&ObjectRecognizer::subscriberCallback, this, _1),
+            std::bind(&ObjectRecognizer::subscriberCallback, this, _1),
             "raw"
         );
 
         service_ = create_service<triton_interfaces::srv::ObjectDetection>(
             "object_recognizer/recognize",
-            bind(&ObjectRecognizer::serviceCallback, this, _1,_2)
+            std::bind(&ObjectRecognizer::serviceCallback, this, _1, _2)
         );
 
         #if DEBUG_VISUALIZE
             debug_publisher_ = image_transport::create_publisher(this, "object_recognizer/debug");
         #endif
-        //Populate parameters (values are not modified if parameters have not been declared)
+
+        // Populate parameters
         this->declare_parameter("weights_filename", weights_filename_);
-        this->declare_parameter("cfg_filename", cfg_filename_);
-        this->declare_parameter("weights_url", weights_url_);
-        this->declare_parameter("cfg_url", cfg_url_);
         this->declare_parameter("classes", classes_);
         this->declare_parameter("conf_threshold", conf_threshold_);
         this->declare_parameter("nms_threshold", nms_threshold_);
@@ -47,14 +41,11 @@ namespace triton_object_recognition
         this->declare_parameter("inp_width", inp_width_);
         this->declare_parameter("inp_height", inp_height_);
         this->declare_parameter("swap_rb", swap_rb_);
-        this->declare_parameter("mean", mean_);
+        this->declare_parameter("mean", std::vector<double>{mean_[0], mean_[1], mean_[2]});
         this->declare_parameter("backend", (int) backend_);
         this->declare_parameter("target", (int) target_);
 
         this->get_parameter("weights_filename", weights_filename_);
-        this->get_parameter("cfg_filename", cfg_filename_);
-        this->get_parameter("weights_url", weights_url_);
-        this->get_parameter("cfg_url", cfg_url_);
         this->get_parameter("classes", classes_);
         this->get_parameter("conf_threshold", conf_threshold_);
         this->get_parameter("nms_threshold", nms_threshold_);
@@ -62,45 +53,36 @@ namespace triton_object_recognition
         this->get_parameter("inp_width", inp_width_);
         this->get_parameter("inp_height", inp_height_);
         this->get_parameter("swap_rb", swap_rb_);
-        this->get_parameter("mean", mean_);
+        
+        std::vector<double> mean_vector;
+        this->get_parameter("mean", mean_vector);
+        if (mean_vector.size() == 3) {
+            mean_ = cv::Scalar(mean_vector[0], mean_vector[1], mean_vector[2]);
+        }
+        
         int backend, target;
         if (this->get_parameter("backend", backend))
-            backend_ = (Backend) backend;
+            backend_ = (cv::dnn::Backend) backend;
         if (this->get_parameter("target", target))
-            target_ = (Target) target;
+            target_ = (cv::dnn::Target) target;
 
-        //Get model folder as the install directory of this package
+        // Get model folder as the install directory of this package
         boost::filesystem::path model_folder = boost::filesystem::path(
             ament_index_cpp::get_package_share_directory("triton_object_recognition"));
 
-        //Check cfg file exists and downloads if it doesn't
-        boost::filesystem::path model_config = model_folder / cfg_filename_;
-        if (!boost::filesystem::exists(model_config)){
-            RCLCPP_WARN(get_logger(),"Model config not found. Downloading from " + cfg_url_);
-            //Warning: This command is not portable
-            string command = "wget -O " + model_config.string() + " " + cfg_url_;
-            if (system(command.c_str())){
-                RCLCPP_ERROR(get_logger(),"Model config failed to download");
-            };
-        }
-        
-        //Check weights file exists and download if it doesn't
+        // Check weights file exists
         boost::filesystem::path model_weights = model_folder / weights_filename_;
         if (!boost::filesystem::exists(model_weights)){
-            RCLCPP_WARN(get_logger(),"Model weights not found. Downloading from " + weights_url_);
-            //Warning: This command is not portable
-            string command = "wget -O " + model_weights.string() + " " + weights_url_;
-            if (system(command.c_str())){
-                RCLCPP_ERROR(get_logger(),"Model weights failed to download");
-            };
+            RCLCPP_ERROR(get_logger(),"Model weights not found at " + model_weights.string());
+            return;
         }
         
-        //Load network
-        net_ = std::make_shared<Net>();
+        // Load network
+        net_ = std::make_shared<cv::dnn::Net>();
         try {
-        *net_ = readNet(model_weights.string(),model_config.string());
-        } catch(Exception &e){
-            RCLCPP_ERROR(get_logger(),e.what());
+            *net_ = cv::dnn::readNet(model_weights.string());
+        } catch(cv::Exception &e){
+            RCLCPP_ERROR(get_logger(), e.what());
         }
         net_->setPreferableBackend(backend_);
         net_->setPreferableTarget(target_);
@@ -123,7 +105,7 @@ namespace triton_object_recognition
 
     triton_interfaces::msg::DetectionBoxArray ObjectRecognizer::process(const sensor_msgs::msg::Image & msg) const
     {
-        //Get image from message
+        // Get image from message
         RCLCPP_INFO(this->get_logger(), "In object_recognizer");
         cv_bridge::CvImagePtr cv_ptr;
         try {
@@ -133,25 +115,25 @@ namespace triton_object_recognition
             return triton_interfaces::msg::DetectionBoxArray();
         }
 
-        //Detect objects in image
+        // Detect objects in image
         preprocess(cv_ptr->image);
-        std::vector<cv::String> outNames = net_->getLayerNames();;
+        std::vector<cv::String> outNames = net_->getLayerNames();
         std::vector<cv::Mat> outs;
-        net_->forward(outs,outNames);
+        net_->forward(outs, outNames);
 
         std::vector<int> classIds;
         std::vector<float> confidences;
-        std::vector<Rect> boxes;
-        postprocess(classIds,confidences,boxes,cv_ptr->image, outs);
+        std::vector<cv::Rect> boxes;
+        postprocess(classIds, confidences, boxes, cv_ptr->image, outs);
 
         // Visualize when debugging
         #if DEBUG_VISUALIZE
-            //Draw prediction boxes on input image
-            auto drawPred = [&](int classId, float conf, int left, int top, int right, int bottom, Mat& frame)
+            // Draw prediction boxes on input image
+            auto drawPred = [&](int classId, float conf, int left, int top, int right, int bottom, cv::Mat& frame)
             {
-                rectangle(frame, Point(left, top), Point(right, bottom), Scalar(0, 255, 0));
+                cv::rectangle(frame, cv::Point(left, top), cv::Point(right, bottom), cv::Scalar(0, 255, 0));
 
-                std::string label = format("%.2f", conf);
+                std::string label = cv::format("%.2f", conf);
                 if (!classes_.empty())
                 {
                     CV_Assert(classId < (int)classes_.size());
@@ -159,17 +141,17 @@ namespace triton_object_recognition
                 }
 
                 int baseLine;
-                Size labelSize = getTextSize(label, FONT_HERSHEY_SIMPLEX, 0.5, 1, &baseLine);
+                cv::Size labelSize = cv::getTextSize(label, cv::FONT_HERSHEY_SIMPLEX, 0.5, 1, &baseLine);
 
-                top = max(top, labelSize.height);
-                rectangle(frame, Point(left, top - labelSize.height),
-                        Point(left + labelSize.width, top + baseLine), Scalar::all(255), FILLED);
-                putText(frame, label, Point(left, top), FONT_HERSHEY_SIMPLEX, 0.5, Scalar());
+                top = std::max(top, labelSize.height);
+                cv::rectangle(frame, cv::Point(left, top - labelSize.height),
+                        cv::Point(left + labelSize.width, top + baseLine), cv::Scalar::all(255), cv::FILLED);
+                cv::putText(frame, label, cv::Point(left, top), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar());
             };
             cv::Mat frame = cv_ptr->image;
             for (size_t idx = 0; idx < boxes.size(); ++idx)
             {
-                Rect box = boxes[idx];
+                cv::Rect box = boxes[idx];
                 drawPred(classIds[idx], confidences[idx], box.x, box.y,
                          box.x + box.width, box.y + box.height, frame);
             }
@@ -182,9 +164,9 @@ namespace triton_object_recognition
             cv::waitKey(1);
         #endif
 
-        //Publish message with detected boxes
+        // Publish message with detected boxes
         auto message = triton_interfaces::msg::DetectionBoxArray();
-        for (size_t i = 0; i<boxes.size(); i++){
+        for (size_t i = 0; i < boxes.size(); i++){
             triton_interfaces::msg::DetectionBox out;
             out.class_id = classIds[i];
             out.confidence = confidences[i];
@@ -198,29 +180,26 @@ namespace triton_object_recognition
         return message;
     }
 
-    void ObjectRecognizer::preprocess(const Mat& frame) const{
+    void ObjectRecognizer::preprocess(const cv::Mat& frame) const
+    {
+        static cv::Mat blob;
+        // Create a 4D blob from a frame
+        cv::Size inp_size(inp_width_, inp_height_);
+        blob = cv::dnn::blobFromImage(frame, scale_, inp_size, mean_, swap_rb_, false);
 
-        static Mat blob;
-        // Create a 4D blob from a frame.
-        //if (inpSize.width <= 0) inpSize.width = frame.cols;
-        //if (inpSize.height <= 0) inpSize.height = frame.rows;
-        cv::Size inp_size;
-        inp_size.width = inp_width_;
-        inp_size.height = inp_height_;
-        blob = blobFromImage(frame,(1.0/255.0),inp_size,mean_,swap_rb_,false);
-
-        // Run model.
-        net_->setInput(blob,"");
+        // Run model
+        net_->setInput(blob, "");
         if (net_->getLayer(0)->outputNameToIndex("im_info") != -1)
         {
-            resize(frame, frame, inp_size);
-            Mat imInfo = (Mat_<float>(1, 3) << inp_size.height, inp_size.width, 1.6f);
+            cv::resize(frame, frame, inp_size);
+            cv::Mat imInfo = (cv::Mat_<float>(1, 3) << inp_size.height, inp_size.width, 1.6f);
             net_->setInput(imInfo, "im_info");
         }
     }
 
-    void ObjectRecognizer::postprocess(std::vector<int> & classIds, std::vector<float> & confidences, std::vector<Rect> & boxes, 
-            cv::Mat & frame, const std::vector<Mat>& outs) const{
+    void ObjectRecognizer::postprocess(std::vector<int> & classIds, std::vector<float> & confidences, std::vector<cv::Rect> & boxes, 
+            cv::Mat & frame, const std::vector<cv::Mat>& outs) const
+    {
         static std::vector<int> outLayers = net_->getUnconnectedOutLayers();
         static std::string outLayerType = net_->getLayer(outLayers[0])->type;
 
@@ -254,7 +233,7 @@ namespace triton_object_recognition
                             height = bottom - top + 1;
                         }
                         classIds.push_back((int)(data[i + 1]) - 1);  // Skip 0th background class id.
-                        boxes.push_back(Rect(left, top, width, height));
+                        boxes.push_back(cv::Rect(left, top, width, height));
                         confidences.push_back(confidence);
                     }
                 }
@@ -270,10 +249,10 @@ namespace triton_object_recognition
                 float* data = (float*)outs[i].data;
                 for (int j = 0; j < outs[i].rows; ++j, data += outs[i].cols)
                 {
-                    Mat scores = outs[i].row(j).colRange(5, outs[i].cols);
-                    Point classIdPoint;
+                    cv::Mat scores = outs[i].row(j).colRange(5, outs[i].cols);
+                    cv::Point classIdPoint;
                     double confidence;
-                    minMaxLoc(scores, 0, &confidence, 0, &classIdPoint);
+                    cv::minMaxLoc(scores, 0, &confidence, 0, &classIdPoint);
                     if (confidence > conf_threshold_)
                     {
                         int centerX = (int)(data[0] * frame.cols);
@@ -285,17 +264,17 @@ namespace triton_object_recognition
 
                         classIds.push_back(classIdPoint.x);
                         confidences.push_back((float)confidence);
-                        boxes.push_back(Rect(left, top, width, height));
+                        boxes.push_back(cv::Rect(left, top, width, height));
                     }
                 }
             }
         }
         else
-            CV_Error(Error::StsNotImplemented, "Unknown output layer type: " + outLayerType);
+            CV_Error(cv::Error::StsNotImplemented, "Unknown output layer type: " + outLayerType);
 
-        // NMS is used inside Region layer only on DNN_BACKEND_OPENCV for another backends we need NMS in sample
+        // NMS is used inside Region layer only on DNN_BACKEND_OPENCV for other backends we need NMS in sample
         // or NMS is required if number of outputs > 1
-        if (outLayers.size() > 1 || (outLayerType == "Region" ))
+        if (outLayers.size() > 1 || (outLayerType == "Region"))
         {
             std::map<int, std::vector<size_t> > class2indices;
             for (size_t i = 0; i < classIds.size(); i++)
@@ -305,12 +284,12 @@ namespace triton_object_recognition
                     class2indices[classIds[i]].push_back(i);
                 }
             }
-            std::vector<Rect> nmsBoxes;
+            std::vector<cv::Rect> nmsBoxes;
             std::vector<float> nmsConfidences;
             std::vector<int> nmsClassIds;
             for (std::map<int, std::vector<size_t> >::iterator it = class2indices.begin(); it != class2indices.end(); ++it)
             {
-                std::vector<Rect> localBoxes;
+                std::vector<cv::Rect> localBoxes;
                 std::vector<float> localConfidences;
                 std::vector<size_t> classIndices = it->second;
                 for (size_t i = 0; i < classIndices.size(); i++)
@@ -319,7 +298,7 @@ namespace triton_object_recognition
                     localConfidences.push_back(confidences[classIndices[i]]);
                 }
                 std::vector<int> nmsIndices;
-                NMSBoxes(localBoxes, localConfidences, conf_threshold_, nms_threshold_, nmsIndices);
+                cv::dnn::NMSBoxes(localBoxes, localConfidences, conf_threshold_, nms_threshold_, nmsIndices);
                 for (size_t i = 0; i < nmsIndices.size(); i++)
                 {
                     size_t idx = nmsIndices[i];
@@ -334,3 +313,4 @@ namespace triton_object_recognition
         }
     }
 } // namespace triton_object_recognition
+
