@@ -82,61 +82,61 @@ namespace triton_mission_planner
   }
 
 
-  PathIsAligned::PathIsAligned(const std::string& name, const BT::NodeConfig& config, MissionPlanner* rosnode) : ConditionNode(name, config), mp_(rosnode)
-  {}
+  // PathIsAligned::PathIsAligned(const std::string& name, const BT::NodeConfig& config, MissionPlanner* rosnode) : ConditionNode(name, config), mp_(rosnode)
+  // {}
 
 
-  BT::PortsList PathIsAligned::providedPorts() // needed for compilation
-  {
-    return {};
-  }
+  // BT::PortsList PathIsAligned::providedPorts() // needed for compilation
+  // {
+  //   return {};
+  // }
 
 
-  BT::NodeStatus PathIsAligned::tick()
-  {
-    //TODO:
+  // BT::NodeStatus PathIsAligned::tick()
+  // {
+  //   //TODO:
 
-    return BT::NodeStatus::FAILURE;
-  }
-
-
-  PathAlign::PathAlign(const std::string& name, const BT::NodeConfig& config, MissionPlanner* rosnode) : StatefulActionNode(name, config), mp_(rosnode)
-  {}
+  //   return BT::NodeStatus::FAILURE;
+  // }
 
 
-  BT::PortsList PathAlign::providedPorts() // needed for compilation
-  {
-    return {};
-  }
+  // PathAlign::PathAlign(const std::string& name, const BT::NodeConfig& config, MissionPlanner* rosnode) : StatefulActionNode(name, config), mp_(rosnode)
+  // {}
 
 
-  BT::NodeStatus PathAlign::onStart()
-  {
-    //TODO: launch trajectory generation
-    //TODO: launch thrust allocation
-    //TODO: launch pid controller
+  // BT::PortsList PathAlign::providedPorts() // needed for compilation
+  // {
+  //   return {};
+  // }
+
+
+  // BT::NodeStatus PathAlign::onStart()
+  // {
+  //   //TODO: launch trajectory generation
+  //   //TODO: launch thrust allocation
+  //   //TODO: launch pid controller
     
-    return PathAlign::onRunning(); // calls onRunning to do common actions
-  }
+  //   return PathAlign::onRunning(); // calls onRunning to do common actions
+  // }
 
 
-  BT::NodeStatus PathAlign::onRunning()
-  {
-    triton_interfaces::msg::TrajectoryType msg; //! might need to move to onStart
-    msg.set__type(triton_interfaces::msg::TrajectoryType::GATE); //? correct message type?
+  // BT::NodeStatus PathAlign::onRunning()
+  // {
+  //   triton_interfaces::msg::TrajectoryType msg; //! might need to move to onStart
+  //   msg.set__type(triton_interfaces::msg::TrajectoryType::GATE); //? correct message type?
 
-    mp_->trajectoryGenerationTypePub(msg);
+  //   mp_->trajectoryGenerationTypePub(msg);
 
-    return BT::NodeStatus::RUNNING; // will be halted as soon as PathIsAligned returns SUCCESS
-  }
+  //   return BT::NodeStatus::RUNNING; // will be halted as soon as PathIsAligned returns SUCCESS
+  // }
 
 
-  void PathAlign::onHalted()
-  {
-    //TODO: halt trajectory generation
-    //TODO: halt thrust allocation
-    //TODO: halt pid controller
-  }
+  // void PathAlign::onHalted()
+  // {
+  //   //TODO: halt trajectory generation
+  //   //TODO: halt thrust allocation
+  //   //TODO: halt pid controller
+  // }
 
 
   PathFollow::PathFollow(const std::string& name, const BT::NodeConfig& config, MissionPlanner* rosnode) : StatefulActionNode(name, config), mp_(rosnode)

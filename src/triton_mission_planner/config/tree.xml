@@ -11,16 +11,23 @@
         </Sequence>
     </BehaviorTree>
 
+    <!-- <BehaviorTree ID="PreComp">
+        <Sequence>
+            <SubTree ID="GateTree"/>
+            <SubTree ID="BuoyTree"/>
+        </Sequence>
+    </BehaviorTree> -->
+
     <BehaviorTree ID="GateTree">
         <ReactiveSequence>
           <ReactiveFallback>
             <Condition ID="GateIsVisible"/>
             <Action ID="GateFind"/>
           </ReactiveFallback>
-          <ReactiveFallback>
+          <!-- <ReactiveFallback>
             <Condition ID="GateIsAligned"/>
             <Action ID="GateAlign"/>
-          </ReactiveFallback>
+          </ReactiveFallback> -->
           <Action ID="GateGoThrough"/>
         </ReactiveSequence>
     </BehaviorTree>
@@ -31,10 +38,10 @@
             <Condition ID="PathIsVisible"/>
             <Action ID="PathFind"/>
           </ReactiveFallback>
-          <ReactiveFallback>
+          <!-- <ReactiveFallback>
             <Condition ID="PathIsAligned"/>
             <Action ID="PathAlign"/>
-          </ReactiveFallback>
+          </ReactiveFallback> -->
           <Action ID="PathFollow"/>
         </ReactiveSequence>
     </BehaviorTree>
@@ -45,10 +52,10 @@
             <Condition ID="BuoyIsVisible"/>
             <Action ID="BuoyFind"/>
           </ReactiveFallback>
-          <ReactiveFallback>
+          <!-- <ReactiveFallback>
             <Condition ID="BuoyIsAligned"/>
             <Action ID="BuoyAlign"/>
-          </ReactiveFallback>
+          </ReactiveFallback> -->
           <Action ID="BuoyHit"/>
         </ReactiveSequence>
     </BehaviorTree>
@@ -76,10 +83,10 @@
             <Condition ID="TargetIsVisible"/>
             <Action ID="TargetFind"/>
           </ReactiveFallback>
-          <ReactiveFallback>
+          <!-- <ReactiveFallback>
             <Condition ID="TargetIsAligned"/>
             <Action ID="TargetAlign"/>
-          </ReactiveFallback>
+          </ReactiveFallback> -->
           <Action ID="TargetShoot"/>
         </ReactiveSequence>
     </BehaviorTree>

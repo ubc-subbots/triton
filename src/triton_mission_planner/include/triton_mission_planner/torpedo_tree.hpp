@@ -78,52 +78,52 @@ namespace triton_mission_planner
   };
 
 
-  class TargetIsAligned : public BT::ConditionNode
-  {
-    public:
+  // class TargetIsAligned : public BT::ConditionNode
+  // {
+  //   public:
 
 
-      TargetIsAligned(const std::string& name, const BT::NodeConfig& config, MissionPlanner* rosnode);
+  //     TargetIsAligned(const std::string& name, const BT::NodeConfig& config, MissionPlanner* rosnode);
 
 
-      static BT::PortsList providedPorts(); // needed for compilation
+  //     static BT::PortsList providedPorts(); // needed for compilation
 
 
-      BT::NodeStatus tick() override;
+  //     BT::NodeStatus tick() override;
 
 
-    private:
+  //   private:
 
-      MissionPlanner* mp_;
+  //     MissionPlanner* mp_;
 
-  };
-
-
-  class TargetAlign : public BT::StatefulActionNode
-  {
-    public:
+  // };
 
 
-      TargetAlign(const std::string& name, const BT::NodeConfig& config, MissionPlanner* rosnode);
+  // class TargetAlign : public BT::StatefulActionNode
+  // {
+  //   public:
 
 
-      static BT::PortsList providedPorts(); // needed for compilation
+  //     TargetAlign(const std::string& name, const BT::NodeConfig& config, MissionPlanner* rosnode);
 
 
-      BT::NodeStatus onStart() override;
+  //     static BT::PortsList providedPorts(); // needed for compilation
 
 
-      BT::NodeStatus onRunning() override;
+  //     BT::NodeStatus onStart() override;
 
 
-      void onHalted() override;
+  //     BT::NodeStatus onRunning() override;
 
 
-    private:
+  //     void onHalted() override;
 
-      MissionPlanner* mp_;
+
+  //   private:
+
+  //     MissionPlanner* mp_;
       
-  };
+  // };
 
 
   class TargetShoot : public BT::StatefulActionNode

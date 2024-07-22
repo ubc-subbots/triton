@@ -82,61 +82,61 @@ namespace triton_mission_planner
   }
 
 
-  BuoyIsAligned::BuoyIsAligned(const std::string& name, const BT::NodeConfig& config, MissionPlanner* rosnode) : ConditionNode(name, config), mp_(rosnode)
-  {}
+  // BuoyIsAligned::BuoyIsAligned(const std::string& name, const BT::NodeConfig& config, MissionPlanner* rosnode) : ConditionNode(name, config), mp_(rosnode)
+  // {}
 
 
-  BT::PortsList BuoyIsAligned::providedPorts() // needed for compilation
-  {
-    return {};
-  }
+  // BT::PortsList BuoyIsAligned::providedPorts() // needed for compilation
+  // {
+  //   return {};
+  // }
 
 
-  BT::NodeStatus BuoyIsAligned::tick()
-  {
-    //TODO:
+  // BT::NodeStatus BuoyIsAligned::tick()
+  // {
+  //   //TODO:
 
-    return BT::NodeStatus::FAILURE;
-  }
-
-
-  BuoyAlign::BuoyAlign(const std::string& name, const BT::NodeConfig& config, MissionPlanner* rosnode) : StatefulActionNode(name, config), mp_(rosnode)
-  {}
+  //   return BT::NodeStatus::FAILURE;
+  // }
 
 
-  BT::PortsList BuoyAlign::providedPorts() // needed for compilation
-  {
-    return {};
-  }
+  // BuoyAlign::BuoyAlign(const std::string& name, const BT::NodeConfig& config, MissionPlanner* rosnode) : StatefulActionNode(name, config), mp_(rosnode)
+  // {}
 
 
-  BT::NodeStatus BuoyAlign::onStart()
-  {
-    //TODO: launch trajectory generation
-    //TODO: launch thrust allocation
-    //TODO: launch pid controller
+  // BT::PortsList BuoyAlign::providedPorts() // needed for compilation
+  // {
+  //   return {};
+  // }
+
+
+  // BT::NodeStatus BuoyAlign::onStart()
+  // {
+  //   //TODO: launch trajectory generation
+  //   //TODO: launch thrust allocation
+  //   //TODO: launch pid controller
     
-    return BuoyAlign::onRunning(); // calls onRunning to do common actions
-  }
+  //   return BuoyAlign::onRunning(); // calls onRunning to do common actions
+  // }
 
 
-  BT::NodeStatus BuoyAlign::onRunning()
-  {
-    triton_interfaces::msg::TrajectoryType msg; //! might need to move to onStart
-    msg.set__type(triton_interfaces::msg::TrajectoryType::GATE); //? correct message type?
+  // BT::NodeStatus BuoyAlign::onRunning()
+  // {
+  //   triton_interfaces::msg::TrajectoryType msg; //! might need to move to onStart
+  //   msg.set__type(triton_interfaces::msg::TrajectoryType::GATE); //? correct message type?
 
-    mp_->trajectoryGenerationTypePub(msg);
+  //   mp_->trajectoryGenerationTypePub(msg);
 
-    return BT::NodeStatus::RUNNING; // will be halted as soon as BuoyIsAligned returns SUCCESS
-  }
+  //   return BT::NodeStatus::RUNNING; // will be halted as soon as BuoyIsAligned returns SUCCESS
+  // }
 
 
-  void BuoyAlign::onHalted()
-  {
-    //TODO: halt trajectory generation
-    //TODO: halt thrust allocation
-    //TODO: halt pid controller
-  }
+  // void BuoyAlign::onHalted()
+  // {
+  //   //TODO: halt trajectory generation
+  //   //TODO: halt thrust allocation
+  //   //TODO: halt pid controller
+  // }
 
 
   BuoyHit::BuoyHit(const std::string& name, const BT::NodeConfig& config, MissionPlanner* rosnode) : StatefulActionNode(name, config), mp_(rosnode)

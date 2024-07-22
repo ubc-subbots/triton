@@ -90,32 +90,32 @@ namespace triton_mission_planner
     //* gate nodes
     // custom action nodes
     factory.registerNodeType<GateFind>("GateFind", this);
-    factory.registerNodeType<GateAlign>("GateAlign", this);
+    // factory.registerNodeType<GateAlign>("GateAlign", this);
     factory.registerNodeType<GateGoThrough>("GateGoThrough", this);
 
     //custom condition nodes
     factory.registerNodeType<GateIsVisible>("GateIsVisble", this);
-    factory.registerNodeType<GateIsAligned>("GateIsAligned", this);
+    // factory.registerNodeType<GateIsAligned>("GateIsAligned", this);
 
     //* path nodes
     //custom action nodes
     factory.registerNodeType<PathFind>("PathFind", this);
-    factory.registerNodeType<PathAlign>("PathAlign", this);
+    // factory.registerNodeType<PathAlign>("PathAlign", this);
     factory.registerNodeType<PathFollow>("PathFollow", this);
 
     //custom condition nodes
     factory.registerNodeType<PathIsVisible>("PathIsVisble", this);
-    factory.registerNodeType<PathIsAligned>("PathIsAligned", this);
+    // factory.registerNodeType<PathIsAligned>("PathIsAligned", this);
 
     //* buoy nodes
     //custom action nodes
     factory.registerNodeType<BuoyFind>("BuoyFind", this);
-    factory.registerNodeType<BuoyAlign>("BuoyAlign", this);
+    // factory.registerNodeType<BuoyAlign>("BuoyAlign", this);
     factory.registerNodeType<BuoyHit>("BuoyHit", this);
 
     //custom condition nodes
     factory.registerNodeType<BuoyIsVisible>("BuoyIsVisble", this);
-    factory.registerNodeType<BuoyIsAligned>("BuoyIsAligned", this);
+    // factory.registerNodeType<BuoyIsAligned>("BuoyIsAligned", this);
 
     //* bin nodes
     //custom action nodes
@@ -131,12 +131,12 @@ namespace triton_mission_planner
     //* torpedo nodes
     //custom action nodes
     factory.registerNodeType<TargetFind>("TargetFind", this);
-    factory.registerNodeType<TargetAlign>("TargetAlign", this);
+    // factory.registerNodeType<TargetAlign>("TargetAlign", this);
     factory.registerNodeType<TargetShoot>("TargetShoot", this);
 
     //custom condition nodes
     factory.registerNodeType<TargetIsVisible>("TargetIsVisble", this);
-    factory.registerNodeType<TargetIsAligned>("TargetIsAligned", this);
+    // factory.registerNodeType<TargetIsAligned>("TargetIsAligned", this);
   }
 
 
