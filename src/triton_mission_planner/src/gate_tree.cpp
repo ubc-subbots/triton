@@ -31,11 +31,22 @@ namespace triton_mission_planner
 
     triton_interfaces::msg::DetectionBoxArray::SharedPtr detBoxArr = mp_->getObjectRecognitionSubInfo();
 
-    for (int i = 0; i < detBoxArr->boxes.size(); i ++)
+    // int arrLen = sizeof(detBoxArr->boxes) / sizeof(detBoxArr->boxes[0]);
+
+    const float_t CAMERA_WIDTH = 1920;
+    const float_t CAMERA_HEIGHT = 1080;
+
+    for (auto box : detBoxArr->boxes)
     {
-      if (detBoxArr->boxes[i].class_id == GATE_ID)
+      if (box.class_id == GATE_ID)
       {
-        return BT::NodeStatus::SUCCESS;
+        float_t hcenter = box.x + box.width / 2;
+        float_t ycenter = box.y + box.height / 2;
+
+        if (hcenter > CAMERA_WIDTH * 1 / 3 && hcenter < CAMERA_WIDTH * 2 / 3 && ycenter > CAMERA_HEIGHT * 1 / 3 && ycenter < CAMERA_HEIGHT * 2 / 3)
+        {
+          return BT::NodeStatus::SUCCESS;
+        }
       }
     }
 

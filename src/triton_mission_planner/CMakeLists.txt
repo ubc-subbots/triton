@@ -24,6 +24,7 @@ find_package(triton_interfaces REQUIRED)
 find_package(behaviortree_cpp REQUIRED)
 
 include_directories(include ${catkin_INCLUDE_DIRS})
+include_directories(${behaviortree_cpp_INCLUDE_DIRS})
 
 add_library(triton_mission_planner SHARED
   src/mission_planner_root.cpp
@@ -34,7 +35,7 @@ add_library(triton_mission_planner SHARED
   src/torpedo_tree.cpp
 )
 
-target_link_libraries(triton_mission_planner behaviortree_cpp)
+target_link_libraries(triton_mission_planner ${behaviortree_cpp_LIBRARIES})
 
 target_compile_definitions(triton_mission_planner
   PRIVATE "triton_mission_planner_CPP_BUILDING_DLL"
@@ -45,6 +46,7 @@ ament_target_dependencies(triton_mission_planner
   "rclcpp_components"
   "std_msgs"
   "triton_interfaces"
+  "behaviortree_cpp"
 )
 
 install(TARGETS
