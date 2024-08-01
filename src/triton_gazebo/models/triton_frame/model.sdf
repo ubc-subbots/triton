@@ -96,7 +96,7 @@
       </collision>
       
       <sensor type="camera" name="front_camera">
-        <pose>0.05 -0.17 0 0 0 0</pose>
+        <pose>0.05 -0.57 0 0 0 -1.7 </pose>
         <update_rate>60</update_rate>
         <visualize>true</visualize>
         <camera name="front">
