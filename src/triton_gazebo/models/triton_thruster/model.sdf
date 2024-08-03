@@ -4,7 +4,7 @@
     <link name='thruster'>
       <pose>-0 0 0 0 -0 0</pose>
       <inertial>
-        <mass>0.1542214</mass>
+        <mass>0.000001</mass>
         <inertia>
           <ixx>0.00030988</ixx>
           <ixy>5.5564e-08</ixy>
