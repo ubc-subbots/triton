@@ -101,6 +101,13 @@ def generate_launch_description():
         )
     )
 
+    mission_planner = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            get_package_share_directory('triton_mission_planner') +
+            '/launch/mission_planner_launch.py'
+        )
+    )
+
     ld.add_action(gazebo)
     # ld.add_action(rviz)
     ld.add_action(thrust_allocator)
@@ -113,5 +120,6 @@ def generate_launch_description():
     # ld.add_action(waypoint_marker_tester)
     ld.add_action(pid_controller)
     ld.add_action(trajectory_generator)
+    ld.add_action(mission_planner)
 
     return ld
