@@ -8,7 +8,7 @@ def generate_launch_description():
     ld = LaunchDescription()
 
     mission_planner_root = ComposableNode(
-        name='mission_planner_root',
+        name='mission_planner',
         namespace='/triton/mission_planner',
         package='triton_mission_planner',
         plugin='triton_mission_planner::MissionPlanner'
@@ -27,4 +27,4 @@ def generate_launch_description():
 
     ld.add_action(mission_container)
 
-    return ld 
+    return ld

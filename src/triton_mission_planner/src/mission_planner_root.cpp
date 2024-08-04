@@ -29,7 +29,7 @@ namespace triton_mission_planner
       registerNodes(factory);
     }
 
-    factory.registerBehaviorTreeFromFile("../../config/tree.xml");
+    factory.registerBehaviorTreeFromFile("/triton/src/triton_mission_planner/config/tree.xml");
     auto tree = factory.createTree("MainTree");
 
     tree.tickWhileRunning();

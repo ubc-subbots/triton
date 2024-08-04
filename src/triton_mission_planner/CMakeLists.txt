@@ -17,14 +17,18 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
+find_package(ament_index_cpp REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_components REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(triton_interfaces REQUIRED)
 find_package(behaviortree_cpp REQUIRED)
+find_package(image_transport REQUIRED)
+
 
 include_directories(include ${catkin_INCLUDE_DIRS})
 include_directories(${behaviortree_cpp_INCLUDE_DIRS})
+include_directories(${image_transport_INCLUDE_DIRS})
 
 add_library(triton_mission_planner SHARED
   src/mission_planner_root.cpp
@@ -35,7 +39,10 @@ add_library(triton_mission_planner SHARED
   src/torpedo_tree.cpp
 )
 
-target_link_libraries(triton_mission_planner ${behaviortree_cpp_LIBRARIES})
+target_link_libraries(triton_mission_planner
+  ${behaviortree_cpp_LIBRARIES}
+  ${image_transport_LIBRARIES}
+)
 
 target_compile_definitions(triton_mission_planner
   PRIVATE "triton_mission_planner_CPP_BUILDING_DLL"
@@ -47,7 +54,11 @@ ament_target_dependencies(triton_mission_planner
   "std_msgs"
   "triton_interfaces"
   "behaviortree_cpp"
+  "image_transport"
 )
+
+rclcpp_components_register_nodes(triton_mission_planner "triton_mission_planner::MissionPlanner")
+
 
 install(TARGETS
   triton_mission_planner
