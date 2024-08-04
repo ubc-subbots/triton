@@ -29,7 +29,20 @@ namespace triton_mission_planner
       registerNodes(factory);
     }
 
-    factory.registerBehaviorTreeFromFile("/triton/src/triton_mission_planner/config/tree.xml");
+    // Retrieve the parameter for the file path
+    std::string tree_file_path;
+    this->declare_parameter<std::string>("tree_file_path", "");
+    this->get_parameter("tree_file_path", tree_file_path);
+
+    if (tree_file_path.empty()) {
+        RCLCPP_ERROR(this->get_logger(), "tree_file_path parameter is empty. Cannot load behavior tree.");
+        return;
+    }
+
+    RCLCPP_INFO(this->get_logger(), "Loading behavior tree from: %s", tree_file_path.c_str());
+
+
+     factory.registerBehaviorTreeFromFile(tree_file_path);
     auto tree = factory.createTree("MainTree");
 
     tree.tickWhileRunning();
