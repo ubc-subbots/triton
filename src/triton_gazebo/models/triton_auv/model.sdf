@@ -47,7 +47,7 @@
     </include>
 
     <include>
-      <uri>model://triton_thruster</uri>-0.78775
+      <uri>model://triton_thruster</uri>
       <!--
       <pose>-0.14965425999999998 0.05152644 0.33146492 3.1415 3.1415 3.1415</pose>
       -->
