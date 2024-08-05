@@ -22,7 +22,7 @@
     max_rev: 2.92 # kgf
     t1:
       contrib: 
-        x: 1
+        x: 0 #1
       lx: 0.01
       ly: 0.36
     t2:
