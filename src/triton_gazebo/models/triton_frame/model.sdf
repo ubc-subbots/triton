@@ -14,12 +14,12 @@
           <iyz>-0.00224649356</iyz>
           <izz> 0.42575057622</izz>
         </inertia>
-        <pose>-0.14826 -0.1687 0.19368 0 -0 0</pose>
+        <pose>-0.14826 -0.1687 0.19368 3.1415 0</pose>
       </inertial>
 
       <!-- Visual Data -->
       <visual name='visual'>
-        <pose>0 0 0 0 0 0</pose>
+        <pose>0 0 0 0 3.1415 0</pose>
         <geometry>
           <mesh>
             <uri>model://triton_frame/meshes/triton_frame.dae</uri>

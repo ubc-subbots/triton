@@ -20,29 +20,32 @@
 
     num_thrusters: 5
     bits_per_thruster: 5
-    max_fwd: 3.71 # kgf 
-    max_rev: 2.92 # kgf 
-    t4: # changed
-      contrib: 
-        x: 1.0
-        y: 0.0
-      lx: -0.5
-      ly: -0.5
-    t3: # changed
-      contrib: 
-        x: 1.0
-        y: 0.0
-      lx: -0.5
-      ly: 0.5
+    max_fwd: 3.71 # kgf
+    max_rev: 2.92 # kgf
     t1: # changed
       contrib:
-        z: 1.0
+        y: -0.7071
+        z: 0.7071
       lx: 0.0
       ly: 0.5
     t2: # changed
       contrib: 
-        z: 1.0
+        y: 0.7071
+        z: 0.7071
+      ly: -0.5
+    t3: # changed
+      contrib: 
+        x: 1.0
+      lx: -0.5
+      ly: 0.5
+    t4: # changed
+      contrib: 
+        x: 1.0
+      lx: -0.5
       ly: -0.5
     t5: # changed
       contrib:
+        z: 1.0
+    t6: # changed
+      contrib: 
         y: -1.0
