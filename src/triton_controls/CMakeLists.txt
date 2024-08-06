@@ -27,8 +27,9 @@ find_package(sensor_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
 find_package(OpenCV 4.2 REQUIRED)
 find_package(tf2 REQUIRED)
+find_package(tf2_geometry_msgs REQUIRED)
 
-include_directories(include ${catkin_INCLUDE_DIRS})
+include_directories(include)
 
 add_executable(thrust_allocator 
   src/thrust_allocator.cpp
@@ -63,6 +64,8 @@ ament_target_dependencies(
   "geometry_msgs"
   "sensor_msgs"
   "OpenCV"
+  "tf2"
+  "tf2_geometry_msgs"
 )
 install(TARGETS thrust_allocator
   DESTINATION lib/${PROJECT_NAME}
@@ -73,6 +76,8 @@ ament_target_dependencies(
   "rclcpp"
   "rclcpp_components"
   "tf2"
+  "tf2_ros"
+  "tf2_geometry_msgs"
   "triton_interfaces"
   "geometry_msgs"
   "sensor_msgs"
@@ -87,6 +92,8 @@ ament_target_dependencies(
   "rclcpp"
   "rclcpp_components"
   "tf2"
+  "tf2_ros"
+  "tf2_geometry_msgs"
   "triton_interfaces"
   "geometry_msgs"
   "sensor_msgs"
@@ -120,6 +127,8 @@ ament_target_dependencies(triton_controls
   "sensor_msgs"
   "OpenCV"
   "tf2"
+  "tf2_ros"
+  "tf2_geometry_msgs"
   "nav_msgs"
 )
 
@@ -136,7 +145,6 @@ install(DIRECTORY
   DESTINATION share/${PROJECT_NAME}/
 )
 
- 
 install(DIRECTORY
   test/config
   DESTINATION share/${PROJECT_NAME}/test
@@ -162,3 +170,5 @@ if(BUILD_TESTING)
 endif()
 
 ament_package()
+
+
