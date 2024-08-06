@@ -24,7 +24,7 @@
     <!-- Frame -->
     <include>
       <uri>model://triton_frame</uri>
-      <pose>0 0 0 0 3.1415 0</pose>
+      <pose>0 0 0 0 0 0</pose>
       <name>frame</name>
     </include>
 

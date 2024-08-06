@@ -22,35 +22,22 @@
     max_rev: 2.92 # kgf
     t1:
       contrib: 
-        x: 0 #1
+        x: -1.0
       lx: 0.01
       ly: 0.36
     t2:
       contrib: 
-        z: 1
+        z: 1.0
       ly: 0.22
       lz: -0.07
-    t3:
-      contrib:
-        x: 0.7071
-        z: 0.7071
-      lx: 0.21
-      ly: -0.33
-      lz: 0.0075
-    t4:
-      contrib: 
-        x: 0.7071
-        z: 0.7071
-      lx: 0.21
-      ly: -0.33
-      lz: 0.0075
+
     t5:
       contrib:
-        y: -1.0
+        y: 1.0
       lx: 0.325
       ly: 0.075
     t6:
       contrib:
-        y: -1.0
+        y: 1.0
       lx: -0.325
       ly: 0.075
