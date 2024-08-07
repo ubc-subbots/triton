@@ -40,7 +40,6 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 include_directories(${GAZEBO_INCLUDE_DIRS})
 
 link_directories(${GAZEBO_LIBRARY_DIRS})
-
 link_directories(${gazebo_dev_LIBRARY_DIRS})
 
 add_library(ground_truth_sensor SHARED
@@ -52,11 +51,11 @@ target_include_directories(ground_truth_sensor PUBLIC
 ament_target_dependencies(ground_truth_sensor
   "gazebo_dev"
   "gazebo_ros"
+  "geometry_msgs"
 )
 ament_export_libraries(ground_truth_sensor)
 target_link_libraries(
   ground_truth_sensor
-  ${geometry_msgs_LIBRARIES} 
   ${GAZEBO_LIBRARIES}
 )
 
@@ -76,6 +75,7 @@ target_include_directories(thruster_driver_plugin PUBLIC
 ament_target_dependencies(thruster_driver_plugin
   "gazebo_dev"
   "gazebo_ros"
+  "std_msgs"
 )
 ament_export_libraries(thruster_driver_plugin)
 target_link_libraries(
@@ -83,14 +83,7 @@ target_link_libraries(
   ${GAZEBO_LIBRARIES}
 )
 
-install(TARGETS
-  thruster_driver_plugin
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib
-  RUNTIME DESTINATION bin
-)
-
-add_executable(underwater_camera 
+add_library(underwater_camera SHARED
   src/underwater_camera.cpp
 )
 target_include_directories(underwater_camera PUBLIC
@@ -102,38 +95,37 @@ ament_target_dependencies(underwater_camera
   "sensor_msgs"
   "message_filters"
   "rclcpp"
+  "rclcpp_components"
   "OpenCV"
   "cv_bridge"
   "triton_interfaces"
 )
+rclcpp_components_register_nodes(underwater_camera "triton_gazebo::UnderwaterCamera")
 
 install(TARGETS 
   underwater_camera
   DESTINATION lib/${PROJECT_NAME}
 )
 
-add_library(triton_gazebo SHARED
-  src/underwater_camera.cpp
-)
-
 add_library(bounding_box_plugin SHARED src/bounding_box_plugin.cpp)
 target_include_directories(bounding_box_plugin PUBLIC
   include
 )
-target_link_libraries(bounding_box_plugin ${GAZEBO_LIBRARIES})
 ament_target_dependencies(bounding_box_plugin
+  "gazebo_dev"
+  "gazebo_ros"
   "triton_interfaces"
 )
 ament_export_libraries(bounding_box_plugin)
 target_link_libraries(bounding_box_plugin ${GAZEBO_LIBRARIES})
 
-
 add_library(camera_orbit_plugin SHARED src/camera_orbit_plugin.cpp)
 target_include_directories(camera_orbit_plugin PUBLIC
   include
 )
-target_link_libraries(camera_orbit_plugin ${GAZEBO_LIBRARIES})
 ament_target_dependencies(camera_orbit_plugin
+  "gazebo_dev"
+  "gazebo_ros"
   "triton_interfaces"
 )
 ament_export_libraries(camera_orbit_plugin)
@@ -143,8 +135,9 @@ add_library(random_camera_plugin SHARED src/random_camera_plugin.cpp)
 target_include_directories(random_camera_plugin PUBLIC
   include
 )
-target_link_libraries(random_camera_plugin ${GAZEBO_LIBRARIES})
 ament_target_dependencies(random_camera_plugin
+  "gazebo_dev"
+  "gazebo_ros"
   "triton_interfaces"
 )
 ament_export_libraries(random_camera_plugin)
@@ -154,30 +147,13 @@ add_library(smooth_camera_plugin SHARED src/smooth_camera_plugin.cpp)
 target_include_directories(smooth_camera_plugin PUBLIC
   include
 )
-target_link_libraries(smooth_camera_plugin ${GAZEBO_LIBRARIES})
 ament_target_dependencies(smooth_camera_plugin
+  "gazebo_dev"
+  "gazebo_ros"
   "triton_interfaces"
 )
 ament_export_libraries(smooth_camera_plugin)
 target_link_libraries(smooth_camera_plugin ${GAZEBO_LIBRARIES})
-
-rclcpp_components_register_nodes(triton_gazebo "triton_gazebo::UnderwaterCamera")
-
-target_compile_definitions(triton_gazebo
-  PRIVATE "triton_gazebo_CPP_BUILDING_DLL"
-)
-
-ament_target_dependencies(triton_gazebo
-  "rclcpp"
-  "rclcpp_components"
-  "image_transport"
-  "sensor_msgs"
-  "message_filters"
-  "triton_interfaces"
-  "geometry_msgs"
-)
-
-link_directories(${gazebo_dev_LIBRARY_DIRS})
 
 add_library(hydrodynamics_plugin SHARED
   src/hydrodynamics_plugin.cpp
@@ -204,13 +180,6 @@ install(TARGETS
 )
 
 install(TARGETS
-  triton_gazebo
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib
-  RUNTIME DESTINATION bin
-)
-
-install(TARGETS
   bounding_box_plugin
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
@@ -231,14 +200,12 @@ install(TARGETS
   RUNTIME DESTINATION bin
 )
 
-
 install(TARGETS
   smooth_camera_plugin
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
 )
-
 
 install(DIRECTORY
   config
@@ -258,6 +225,7 @@ install(DIRECTORY
 
 # Install Python modules
 ament_python_install_package(${PROJECT_NAME})
+
 # Install Python executables
 install(PROGRAMS
   triton_gazebo/bounding_box_image_saver.py
@@ -289,3 +257,4 @@ if(BUILD_TESTING)
 endif()
 
 ament_package()
+

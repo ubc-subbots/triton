@@ -1,5 +1,4 @@
 <?xml version="1.0"?>
-<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>triton_gazebo</name>
   <version>0.0.0</version>
@@ -16,12 +15,14 @@
   <depend>gazebo_ros</depend>
   <depend>image_transport</depend>
   <depend>sensor_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>message_filters</depend>
   <depend>rclcpp</depend>
   <depend>rclcpp_components</depend>
   <depend>rclpy</depend>
   <depend>cv_bridge</depend>
   <depend>triton_interfaces</depend>
-  <depend>python-gdown-pip</depend>
+  <depend>OpenCV</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
@@ -33,3 +34,5 @@
     <build_type>ament_cmake</build_type>
   </export>
 </package>
+
+

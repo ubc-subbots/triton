@@ -73,7 +73,12 @@ namespace triton_object_recognition
         // Check weights file exists
         boost::filesystem::path model_weights = model_folder / weights_filename_;
         if (!boost::filesystem::exists(model_weights)){
-            RCLCPP_ERROR(get_logger(),"Model weights not found at " + model_weights.string());
+
+            // RCLCPP_ERROR(get_logger(),"Model weights not found at " + model_weights.string());
+            RCLCPP_ERROR(get_logger(), "Model weights not found at %s", model_weights.string().c_str());
+
+
+
             return;
         }
         

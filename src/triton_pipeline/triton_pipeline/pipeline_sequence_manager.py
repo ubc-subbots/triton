@@ -17,7 +17,7 @@ class PipelineSequenceManager(Node):
         self.declare_parameters(
             namespace='',
             parameters=[
-                ('pipeline_sequence', []),
+                ('pipeline_sequence', rclpy.Parameter.Type.STRING_ARRAY),
         ])
 
         self.pipelines = self.get_parameter('pipeline_sequence').get_parameter_value().string_array_value

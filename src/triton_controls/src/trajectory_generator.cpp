@@ -7,7 +7,7 @@ namespace triton_controls
   TrajectoryGenerator::TrajectoryGenerator(const rclcpp::NodeOptions &options)
       : Node("trajectory_generator", options),
         type_(TRAJ_GATE),
-        destination_achieved_(true) // note: this should be false, but in the interest of time, 
+        destination_achieved_(true) // note: this should be false, but in the interest of time,
         // this is set to true as a way to make the AUV turn around slowly as if it is in TRAJ_START
         // mode even though it is in TRAJ_GATE mode.
   {
