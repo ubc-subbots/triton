@@ -11,7 +11,7 @@ namespace triton_object_recognition
     ObjectRecognizer::ObjectRecognizer(const rclcpp::NodeOptions & options)
     : Node("object_recognizer", options) 
     {
-        // Create publisher, subscriber, and service
+        // Create publisher, subscriber and service
         publisher_ = this->create_publisher<triton_interfaces::msg::DetectionBoxArray>(
             "object_recognizer/out", 
             10
