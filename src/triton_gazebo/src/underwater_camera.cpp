@@ -9,48 +9,54 @@ namespace triton_gazebo
 {
 
     UnderwaterCamera::UnderwaterCamera(const rclcpp::NodeOptions & options)
-    : Node("underwater_camera", options) 
+    : Node("underwater_camera", options)
     {
 
         rmw_qos_profile_t subscriber_qos_profile = rmw_qos_profile_sensor_data;
         rmw_qos_profile_t publisher_qos_profile = rmw_qos_profile_default;
 
-        underwater_image_pub_ = image_transport::create_publisher(this, 
-            "front_camera/underwater/image_raw", 
+        underwater_image_pub_ = image_transport::create_publisher(this,
+            "front_camera/underwater/image_raw",
             publisher_qos_profile);
 
-        image_pub_ = image_transport::create_publisher(this, 
-            "repub/image_raw", 
+        image_pub_ = image_transport::create_publisher(this,
+            "repub/image_raw",
             publisher_qos_profile);
 
-        depth_pub_ = image_transport::create_publisher(this, 
-            "repub/depth/image_raw", 
+        depth_pub_ = image_transport::create_publisher(this,
+            "repub/depth/image_raw",
             publisher_qos_profile);
 
         image_sub_.subscribe(this,
-            "front_camera/image_raw", 
+            "front_camera/image_raw",
             "raw",
             subscriber_qos_profile);
 
         depth_sub_.subscribe(this,
-             "front_camera/depth/image_raw", 
+             "front_camera/depth/image_raw",
              "raw",
              subscriber_qos_profile);
 
         approx_sync_ = std::make_shared<ApproxSync>(
             ApproxPolicy(5),
-            image_sub_, 
+            image_sub_,
             depth_sub_);
 
         approx_sync_->registerCallback(
             std::bind(&UnderwaterCamera::syncCallback, this, _1, _2));
 
-        this->declare_parameter("rho");
-        this->declare_parameter("irradiance_transmission");
-        this->declare_parameter("spectral_sensitivity_blue");
-        this->declare_parameter("spectral_sensitivity_red");
-        this->declare_parameter("spectral_sensitivity_green");
-        this->declare_parameter("illumination_irradiance");
+//        this->declare_parameter("rho");
+//        this->declare_parameter("irradiance_transmission");
+//        this->declare_parameter("spectral_sensitivity_blue");
+//        this->declare_parameter("spectral_sensitivity_red");
+//        this->declare_parameter("spectral_sensitivity_green");
+//        this->declare_parameter("illumination_irradiance");
+          this->declare_parameter<std::vector<double>>("rho", std::vector<double>{0.0});
+          this->declare_parameter<std::vector<double>>("irradiance_transmission", std::vector<double>{0.0});
+          this->declare_parameter<std::vector<double>>("spectral_sensitivity_blue", std::vector<double>{0.0});
+          this->declare_parameter<std::vector<double>>("spectral_sensitivity_red", std::vector<double>{0.0});
+          this->declare_parameter<std::vector<double>>("spectral_sensitivity_green", std::vector<double>{0.0});
+          this->declare_parameter<std::vector<double>>("illumination_irradiance", std::vector<double>{0.0});
 
         std::vector<double> rho_vals;
         std::vector<double> Beta_vals;
