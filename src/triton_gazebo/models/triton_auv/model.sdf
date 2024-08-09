@@ -29,27 +29,32 @@
     </include>
 
     <!-- Thrusters -->
+
+    <!-- Back Horizontal-->
     <include>
       <uri>model://triton_thruster</uri>
-      <pose>-0.325 0 0 1.57 0</pose>
+      <pose>-0.325 0 0 0 0</pose>
       <name>thruster1</name>
     </include>
 
+    <!-- Angled Front Left-->
     <include>
       <uri>model://triton_thruster</uri>
-      <pose>0 -0.22 0.0045 0 0 0</pose>
+      <pose>-0.062 -0.22 0.0045 0.785 0 0</pose>
       <name>thruster2</name>
     </include>
 
+    <!-- Angled Front Right-->
     <include>
       <uri>model://triton_thruster</uri>
-      <pose>-0.21 -0.33 0.0075 0 -0.785 0</pose>
+      <pose>0.21 -0.33 0.0075 0 -0.785 0</pose>
       <name>thruster4</name>
     </include>
-
+    
+    <!-- Vertical-->
     <include>
       <uri>model://triton_thruster</uri>
-      <pose>0.21 -0.33 0.0075 0 0.785 0</pose>
+      <pose>-0.219431 -0.055 0.09 0 3.14 0</pose>
       <name>thruster3</name>
     </include>
 
@@ -83,8 +88,8 @@
 
     <base_link>frame::frame</base_link>
     <neutrally_buoyant>1</neutrally_buoyant>
-    <volume>0.0209673336007</volume>
-    <center_of_buoyancy>-0.14826	-0.1687	0.2339</center_of_buoyancy>
+    <volume>0.00340702866633</volume>
+    <center_of_buoyancy>0.1 -0.062 -0.00878</center_of_buoyancy>
         <!-- <pose>-0.14826 -0.1687 0.19368 0 -0 0</pose> -->
     <hydrodynamic_model>
         <!-- Useful params for controls simplifications-->

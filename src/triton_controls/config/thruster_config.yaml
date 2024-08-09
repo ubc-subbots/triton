@@ -20,6 +20,13 @@
     bits_per_thruster: 5
     max_fwd: 3.71 # kgf
     max_rev: 2.92 # kgf
+    t3:
+      contrib:
+        z: 1.0
+      lx: -0.219431
+      ly: -0.055
+      lz: 0.09
+
     t5:
       contrib:
         x: -1.0

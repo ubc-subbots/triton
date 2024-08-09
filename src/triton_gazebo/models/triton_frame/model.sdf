@@ -4,17 +4,18 @@
     <link name='frame'>
 
       <!-- pose relaive to STL file origin, was moved to AUV center using Blender -->
+      <!-- Edited for Steelhead Mini Aug 9 2024-->
       <inertial>
-        <mass>17.43388</mass>
+        <mass>29.4835</mass>
         <inertia>
-          <ixx> 0.42659179587</ixx>
-          <ixy> 0.00091257391</ixy>
-          <ixz>-0.00613671114</ixz>
-          <iyy> 0.47862692534</iyy>
-          <iyz>-0.00224649356</iyz>
-          <izz> 0.42575057622</izz>
+          <ixx> 0.548853532</ixx>
+          <ixy> 0.000990367</ixy>
+          <ixz> 0.007434770</ixz>
+          <iyy> 0.725638212</iyy>
+          <iyz> 0.045963196</iyz>
+          <izz> 1.077000000</izz>
         </inertia>
-        <pose>-0.14826 -0.1687 0.19368 0 -0 0</pose>
+        <pose>0.1 -0.062 -0.00878 0 -0 0</pose>
       </inertial>
 
       <!-- Visual Data -->
