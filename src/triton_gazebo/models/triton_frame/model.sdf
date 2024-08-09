@@ -22,7 +22,7 @@
         <pose>0 0 0 0 0 0</pose>
         <geometry>
           <mesh>
-            <uri>model://triton_frame/meshes/triton_frame.dae</uri>
+            <uri>model://triton_frame/meshes/triton_frame.stl</uri>
             <scale>1 1 1</scale>
           </mesh>
         </geometry>
@@ -43,7 +43,7 @@
         <pose>0 0 0 0 0 0</pose>
         <geometry>
           <mesh>
-            <uri>model://triton_frame/meshes/triton_frame.dae</uri>
+            <uri>model://triton_frame/meshes/triton_frame.stl</uri>
             <scale>1 1 1</scale>
           </mesh>
         </geometry>
@@ -96,7 +96,7 @@
       </collision>
       
       <sensor type="camera" name="front_camera">
-        <pose>0.05 -0.57 0 0 0 -1.7 </pose>
+        <pose>0.57 -0.05 0 0 0 0 </pose>
         <update_rate>60</update_rate>
         <visualize>true</visualize>
         <camera name="front">
